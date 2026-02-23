@@ -164,8 +164,7 @@ cardmarket-tracker/
 │   │   ├── schema.ts         # SQLite schema, migrations
 │   │   └── queries.ts        # CRUD operations
 │   ├── engine/
-│   │   ├── deals.ts          # Deal detection logic
-│   │   └── filters.ts        # Price threshold, watchlist filters
+│   │   └── deals.ts          # Deal detection logic + filters
 │   ├── notifications/
 │   │   └── slack.ts           # Slack webhook client
 │   └── config.ts             # All configurable thresholds

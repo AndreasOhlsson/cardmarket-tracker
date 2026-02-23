@@ -173,7 +173,6 @@
     { "name": "Pact of Negation", "category": "spell", "notes": "Zero-mana counter" },
     { "name": "Flawless Maneuver", "category": "spell", "notes": "Free protection" },
     { "name": "Obscuring Haze", "category": "spell", "notes": "Free fog" },
-    { "name": "Fierce Guardianship", "category": "spell", "notes": "Free noncreature counter" },
 
     { "name": "Solphim, Mayhem Dominus", "category": "creature", "notes": "Damage doubler" },
     { "name": "Aurelia, the Warleader", "category": "creature", "notes": "Extra combat" },
