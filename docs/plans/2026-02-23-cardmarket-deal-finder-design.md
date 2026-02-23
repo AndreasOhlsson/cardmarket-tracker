@@ -25,31 +25,51 @@ MTGJSON is free, no auth, and already includes Cardmarket paper prices. Cardmark
 ## Architecture
 
 ```
-Scheduler (daily)
-    │
-    ├── MTGJSON Fetcher ──────┐
-    │                         ▼
-    ├── Cardmarket CSV ──► SQLite DB ──► Deal Engine ──► Slack Webhook
-    │   Fetcher (v2)          ▲
-    │                         │
-    └── Watchlist (JSON) ─────┘
+Seed (one-time)                     Scheduler (daily)
+    │                                   │
+    ├── AllPrices (90-day) ─────┐       ├── MTGJSON Fetcher ──────┐
+    │                           ▼       │                         ▼
+    └── AllIdentifiers ──► SQLite DB ◄──┤── Cardmarket CSV ──► Deal Engine ──► Slack Webhook
+        (card metadata)        ▲        │   Fetcher (Phase 2)     ▲
+                               │        │                         │
+                               │        └── Watchlist (JSON) ─────┘
+                               │
+                          AllIdentifiers
+                          (cached monthly)
 ```
 
-### Phase 1: MTGJSON pipeline
+### Bootstrap: `npm run seed`
 
-- Download MTGJSON `AllPricesToday` (JSON, ~50MB compressed)
-- Parse Cardmarket paper prices
-- Filter to cards with trend price > €10
+- Download MTGJSON `AllPrices` (~136MB gzipped, 90-day history)
+- Download MTGJSON `AllIdentifiers` (~500MB+, card metadata)
+- Populate `cards` table with names, set codes, mcmId, scryfall_id, format legality
+- Populate `prices` table with 90-day Cardmarket price history
+- Filter to Commander-legal cards only
+- This gives the deal engine a meaningful baseline from day one
+
+### Phase 1: MTGJSON daily pipeline
+
+- Download MTGJSON `AllPricesToday` (JSON, ~5MB gzipped, ~50MB uncompressed)
+- Load full file into memory and parse Cardmarket paper prices
+- Path: `data.<uuid>.paper.cardmarket.retail.normal: { "YYYY-MM-DD": price }`
+- Filter to Commander-legal cards with trend price > €10 (or on watchlist)
 - Store daily snapshots in SQLite
 - Run deal detection against accumulated history
 - Send Slack webhook for triggered alerts
 
-### Phase 2: Cardmarket CSV enrichment
+### Phase 2: Cardmarket CSV enrichment (runs alongside Phase 1)
 
 - Download Cardmarket's official Price Guide CSV (free for all users)
 - Merge with MTGJSON data — adds low_price, 1/7/30-day averages
 - Improves deal detection with low_price vs trend_price comparison
 - Requires Cardmarket account + session cookie management
+
+### Card identity: AllIdentifiers
+
+- MTGJSON price files are keyed by UUID but do NOT contain card names or metadata
+- AllIdentifiers provides: name, setCode, setName, mcmId, mcmMetaId, scryfallId, legalities
+- Cached locally, refreshed monthly (new sets release ~quarterly)
+- mcmId used to construct Cardmarket URLs: `https://www.cardmarket.com/en/Magic/Products/Singles/<set>/<name>`
 
 ## Data Model (SQLite)
 
@@ -59,7 +79,10 @@ CREATE TABLE cards (
     name TEXT NOT NULL,
     set_code TEXT,
     set_name TEXT,
-    scryfall_id TEXT
+    scryfall_id TEXT,
+    mcm_id INTEGER,              -- Cardmarket product ID (for URL construction)
+    mcm_meta_id INTEGER,         -- Cardmarket meta product ID
+    commander_legal INTEGER DEFAULT 0  -- 1 if legal in Commander
 );
 
 CREATE TABLE prices (
@@ -120,8 +143,10 @@ Batch deals into a single message per run to avoid spam. Slack webhooks have no 
 
 ## Filters
 
+- **Format:** Commander-legal cards only (checked against AllIdentifiers legalities)
 - **Price floor:** Only track cards with Cardmarket trend > €10 (configurable)
 - **Watchlist:** Always track watchlisted cards regardless of price
+- **Multiple printings:** All printings tracked separately (same card name, different sets/UUIDs)
 - **Language:** Phase 2 — MTGJSON aggregates across languages. Per-language filtering requires Cardmarket's product-level data or individual listing scraping
 - **Region:** Cardmarket is inherently EU. No additional filtering needed.
 
@@ -131,6 +156,7 @@ Batch deals into a single message per run to avoid spam. Slack webhooks have no 
 cardmarket-tracker/
 ├── src/
 │   ├── index.ts              # Entry point, scheduler
+│   ├── seed.ts               # Bootstrap: download AllPrices + AllIdentifiers
 │   ├── fetchers/
 │   │   ├── mtgjson.ts        # MTGJSON download + parse
 │   │   └── cardmarket.ts     # Phase 2: CSV download + parse
@@ -144,7 +170,8 @@ cardmarket-tracker/
 │   │   └── slack.ts           # Slack webhook client
 │   └── config.ts             # All configurable thresholds
 ├── data/
-│   └── watchlist.json        # User's card watchlist
+│   ├── watchlist.json        # User's card watchlist (~190 Commander staples)
+│   └── cache/                # Cached AllIdentifiers (refreshed monthly)
 ├── docs/
 │   └── plans/
 │       └── 2026-02-23-cardmarket-deal-finder-design.md
@@ -162,8 +189,19 @@ cardmarket-tracker/
 - **Slack:** Incoming Webhook POST (no library needed)
 - **Compression:** zlib (for MTGJSON gzip handling)
 
+## Resolved Design Decisions
+
+| # | Question | Decision |
+|---|---|---|
+| 1 | AllPricesToday file size | ~5MB gzipped, ~50MB uncompressed. Load fully into memory. |
+| 2 | Card identity (names, metadata) | Download AllIdentifiers separately (~500MB+), cache locally, refresh monthly. |
+| 3 | Cardmarket URL construction | Build from mcmId (product ID) in AllIdentifiers. |
+| 4 | Large file memory handling | Load into memory — simplest approach, Node.js handles it fine. |
+| 5 | Multiple printings of same card | Track all printings separately (unique UUID per printing). |
+| 6 | Cold start (no history) | Separate `npm run seed` command bootstraps 90-day history from AllPrices. |
+| 7 | MTGJSON buylist data | Empty for Cardmarket — ignore. |
+| 8 | Format filtering | Commander-legal cards only. |
+
 ## Open Questions for Implementation
 
-1. MTGJSON's AllPricesToday file size — need to verify and handle memory efficiently (stream if large)
-2. Cardmarket product ID mapping to MTGJSON UUID — need to verify join key
-3. Slack webhook message size limits — batch appropriately (max ~50 attachments per message)
+1. Slack webhook message size limits — batch appropriately (max ~50 attachments per message)
