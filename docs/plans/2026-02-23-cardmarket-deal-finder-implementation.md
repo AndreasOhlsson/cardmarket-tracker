@@ -6,7 +6,9 @@
 
 **Architecture:** MTGJSON AllPricesToday downloaded daily, parsed for Cardmarket EUR prices, stored in SQLite alongside card metadata from AllIdentifiers. Deal engine compares today's price against 30-day average, watchlist thresholds, and historical lows. Slack webhook fires batched alerts.
 
-**Tech Stack:** TypeScript (ESM), Node.js 18+, better-sqlite3, node-cron, Vitest, native fetch, zlib
+**Tech Stack:** TypeScript (ESM, strict), Node.js 18+, better-sqlite3, node-cron, Zod, Vitest, ESLint, Prettier, native fetch, zlib
+
+**Code Quality:** Every task must pass `npm run lint` and `npm run format:check` before committing. Run `npm run format && npm run lint:fix` after writing code.
 
 ---
 
@@ -17,6 +19,8 @@
 - Create: `tsconfig.json`
 - Create: `.gitignore`
 - Create: `vitest.config.ts`
+- Create: `eslint.config.js`
+- Create: `.prettierrc`
 
 **Step 1: Create package.json**
 
@@ -34,18 +38,28 @@
     "seed": "tsx src/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts' 'tests/**/*.ts'"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.0",
-    "node-cron": "^4.2.0"
+    "node-cron": "^4.2.0",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.0.0",
     "@types/node-cron": "^3.0.11",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.5.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0",
+    "typescript-eslint": "^8.0.0",
     "vitest": "^3.2.0"
   }
 }
@@ -62,6 +76,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
@@ -75,7 +91,47 @@
 }
 ```
 
-**Step 3: Create vitest.config.ts**
+**Step 3: Create eslint.config.js**
+
+```javascript
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import eslintConfigPrettier from "eslint-config-prettier";
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.strict,
+  eslintConfigPrettier,
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-explicit-any": "error",
+      "prefer-const": "error",
+      "no-var": "error",
+    },
+  },
+  {
+    ignores: ["dist/", "node_modules/"],
+  }
+);
+```
+
+**Step 4: Create .prettierrc**
+
+```json
+{
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2
+}
+```
+
+**Step 5: Create vitest.config.ts**
 
 ```typescript
 import { defineConfig } from "vitest/config";
@@ -89,7 +145,7 @@ export default defineConfig({
 });
 ```
 
-**Step 4: Update .gitignore**
+**Step 6: Update .gitignore**
 
 ```
 node_modules/
@@ -99,21 +155,21 @@ data/cache/
 .env
 ```
 
-**Step 5: Install dependencies**
+**Step 7: Install dependencies**
 
 Run: `npm install`
 Expected: `node_modules/` created, `package-lock.json` generated
 
-**Step 6: Verify TypeScript compiles**
+**Step 8: Verify toolchain**
 
-Run: `npx tsc --noEmit`
-Expected: No errors (no source files yet, clean exit)
+Run: `npx tsc --noEmit && npx eslint --version && npx prettier --version`
+Expected: No errors, prints ESLint and Prettier versions
 
-**Step 7: Commit**
+**Step 9: Commit**
 
 ```bash
-git add package.json package-lock.json tsconfig.json vitest.config.ts .gitignore
-git commit -m "feat: project scaffolding with TypeScript, better-sqlite3, vitest"
+git add package.json package-lock.json tsconfig.json vitest.config.ts eslint.config.js .prettierrc .gitignore
+git commit -m "feat: project scaffolding with TypeScript strict, Zod, ESLint, Prettier"
 ```
 
 ---
@@ -128,10 +184,16 @@ git commit -m "feat: project scaffolding with TypeScript, better-sqlite3, vitest
 
 ```typescript
 // tests/config.test.ts
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { getConfig } from "../src/config.js";
 
 describe("getConfig", () => {
+  afterEach(() => {
+    delete process.env.SLACK_WEBHOOK_URL;
+    delete process.env.PRICE_FLOOR_EUR;
+    delete process.env.TREND_DROP_PCT;
+  });
+
   it("returns default config values", () => {
     const config = getConfig();
     expect(config.priceFloorEur).toBe(10);
@@ -150,7 +212,19 @@ describe("getConfig", () => {
     process.env.SLACK_WEBHOOK_URL = "https://hooks.slack.com/test";
     const config = getConfig();
     expect(config.slackWebhookUrl).toBe("https://hooks.slack.com/test");
-    delete process.env.SLACK_WEBHOOK_URL;
+  });
+
+  it("validates numeric env vars and rejects invalid values", () => {
+    process.env.PRICE_FLOOR_EUR = "not-a-number";
+    expect(() => getConfig()).toThrow();
+  });
+
+  it("accepts valid numeric overrides", () => {
+    process.env.PRICE_FLOOR_EUR = "25";
+    process.env.TREND_DROP_PCT = "0.20";
+    const config = getConfig();
+    expect(config.priceFloorEur).toBe(25);
+    expect(config.trendDropPct).toBe(0.2);
   });
 });
 ```
@@ -164,55 +238,73 @@ Expected: FAIL — cannot find module `../src/config.js`
 
 ```typescript
 // src/config.ts
-export interface Config {
-  priceFloorEur: number;
-  trendDropPct: number;
-  watchlistAlertPct: number;
-  cronSchedule: string;
-  slackWebhookUrl: string;
-  dbPath: string;
-  watchlistPath: string;
-  identifiersCachePath: string;
-  mtgjson: {
-    allPricesTodayUrl: string;
-    allPricesUrl: string;
-    allIdentifiersUrl: string;
-  };
+import { z } from "zod";
+
+const configSchema = z.object({
+  priceFloorEur: z.number().min(0).default(10),
+  trendDropPct: z.number().min(0).max(1).default(0.15),
+  watchlistAlertPct: z.number().min(0).max(1).default(0.05),
+  cronSchedule: z.string().default("0 8 * * *"),
+  slackWebhookUrl: z.string().url().or(z.literal("")).default(""),
+  dbPath: z.string().default("data/tracker.db"),
+  watchlistPath: z.string().default("data/watchlist.json"),
+  identifiersCachePath: z.string().default("data/cache/AllIdentifiers.json"),
+  mtgjson: z.object({
+    allPricesTodayUrl: z.string().url(),
+    allPricesUrl: z.string().url(),
+    allIdentifiersUrl: z.string().url(),
+  }),
+});
+
+export type Config = z.infer<typeof configSchema>;
+
+function parseNumericEnv(value: string | undefined): number | undefined {
+  if (value === undefined || value === "") return undefined;
+  const parsed = Number(value);
+  if (Number.isNaN(parsed)) {
+    throw new Error(`Invalid numeric env var value: "${value}"`);
+  }
+  return parsed;
 }
 
 export function getConfig(): Config {
-  return {
-    priceFloorEur: Number(process.env.PRICE_FLOOR_EUR) || 10,
-    trendDropPct: Number(process.env.TREND_DROP_PCT) || 0.15,
-    watchlistAlertPct: Number(process.env.WATCHLIST_ALERT_PCT) || 0.05,
-    cronSchedule: process.env.CRON_SCHEDULE || "0 8 * * *",
-    slackWebhookUrl: process.env.SLACK_WEBHOOK_URL || "",
-    dbPath: process.env.DB_PATH || "data/tracker.db",
-    watchlistPath: process.env.WATCHLIST_PATH || "data/watchlist.json",
-    identifiersCachePath:
-      process.env.IDENTIFIERS_CACHE_PATH || "data/cache/AllIdentifiers.json",
+  const raw = {
+    priceFloorEur: parseNumericEnv(process.env.PRICE_FLOOR_EUR),
+    trendDropPct: parseNumericEnv(process.env.TREND_DROP_PCT),
+    watchlistAlertPct: parseNumericEnv(process.env.WATCHLIST_ALERT_PCT),
+    cronSchedule: process.env.CRON_SCHEDULE,
+    slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
+    dbPath: process.env.DB_PATH,
+    watchlistPath: process.env.WATCHLIST_PATH,
+    identifiersCachePath: process.env.IDENTIFIERS_CACHE_PATH,
     mtgjson: {
-      allPricesTodayUrl:
-        "https://mtgjson.com/api/v5/AllPricesToday.json.gz",
-      allPricesUrl:
-        "https://mtgjson.com/api/v5/AllPrices.json.gz",
-      allIdentifiersUrl:
-        "https://mtgjson.com/api/v5/AllIdentifiers.json.gz",
+      allPricesTodayUrl: "https://mtgjson.com/api/v5/AllPricesToday.json.gz",
+      allPricesUrl: "https://mtgjson.com/api/v5/AllPrices.json.gz",
+      allIdentifiersUrl: "https://mtgjson.com/api/v5/AllIdentifiers.json.gz",
     },
   };
+
+  // Strip undefined values so Zod defaults apply
+  const cleaned = JSON.parse(JSON.stringify(raw));
+  return configSchema.parse(cleaned);
 }
 ```
 
 **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/config.test.ts`
-Expected: PASS (2 tests)
+Expected: PASS (4 tests)
 
-**Step 5: Commit**
+**Step 5: Format and lint**
+
+Run: `npx prettier --write src/config.ts tests/config.test.ts && npx eslint src/config.ts`
+Expected: Files formatted, no lint errors
+
+**Step 6: Commit**
 
 ```bash
 git add src/config.ts tests/config.test.ts
-git commit -m "feat: add configuration module with env overrides"
+git commit -m "feat: add Zod-validated configuration module"
 ```
 
 ---
@@ -933,27 +1025,31 @@ Expected: FAIL
 ```typescript
 // src/fetchers/mtgjson.ts
 import { createGunzip } from "node:zlib";
-import { pipeline } from "node:stream/promises";
-import { Readable } from "node:stream";
+import { z } from "zod";
 
-// --- Types matching MTGJSON AllPricesToday structure ---
+// --- Zod schemas for MTGJSON data validation ---
 
-export interface MtgjsonPriceEntry {
-  paper?: {
-    cardmarket?: {
-      retail?: {
-        normal?: Record<string, number>;
-        foil?: Record<string, number>;
-      };
-      buylist?: {
-        normal?: Record<string, number>;
-        foil?: Record<string, number>;
-      };
-    };
-    [vendor: string]: unknown;
-  };
-  [platform: string]: unknown;
-}
+const priceMapSchema = z.record(z.string(), z.number());
+
+const retailSchema = z.object({
+  normal: priceMapSchema.optional(),
+  foil: priceMapSchema.optional(),
+});
+
+const cardmarketPriceSchema = z.object({
+  retail: retailSchema.optional(),
+  buylist: retailSchema.optional(),
+});
+
+const paperPriceSchema = z.object({
+  cardmarket: cardmarketPriceSchema.optional(),
+}).passthrough();
+
+const mtgjsonPriceEntrySchema = z.object({
+  paper: paperPriceSchema.optional(),
+}).passthrough();
+
+export type MtgjsonPriceEntry = z.infer<typeof mtgjsonPriceEntrySchema>;
 
 export interface ParsedPrice {
   uuid: string;
@@ -1060,15 +1156,19 @@ export async function downloadMtgjsonGzToDisk(
   await pipeline(nodeStream, gunzip, fileStream);
 }
 
+const allPricesTodaySchema = z.object({
+  data: z.record(z.string(), mtgjsonPriceEntrySchema),
+});
+
 export async function fetchAllPricesToday(
-  url: string
+  url: string,
 ): Promise<Record<string, MtgjsonPriceEntry>> {
   console.log("Downloading AllPricesToday...");
   const json = await downloadMtgjsonGz(url);
   console.log(`Downloaded ${(json.length / 1024 / 1024).toFixed(1)}MB`);
 
-  const parsed = JSON.parse(json);
-  return parsed.data as Record<string, MtgjsonPriceEntry>;
+  const parsed = allPricesTodaySchema.parse(JSON.parse(json));
+  return parsed.data;
 }
 ```
 
@@ -1701,12 +1801,21 @@ Expected: FAIL
 ```typescript
 // src/watchlist.ts
 import { readFileSync, existsSync } from "node:fs";
+import { z } from "zod";
 
-export interface WatchlistCard {
-  name: string;
-  category: string;
-  notes?: string;
-}
+const watchlistCardSchema = z.object({
+  name: z.string().min(1),
+  category: z.string(),
+  notes: z.string().optional(),
+});
+
+const watchlistSchema = z.object({
+  description: z.string().optional(),
+  created: z.string().optional(),
+  cards: z.array(watchlistCardSchema),
+});
+
+export type WatchlistCard = z.infer<typeof watchlistCardSchema>;
 
 export function loadWatchlist(filePath: string): WatchlistCard[] {
   if (!existsSync(filePath)) {
@@ -1715,8 +1824,8 @@ export function loadWatchlist(filePath: string): WatchlistCard[] {
   }
 
   const raw = readFileSync(filePath, "utf-8");
-  const data = JSON.parse(raw);
-  return (data.cards || []) as WatchlistCard[];
+  const data = watchlistSchema.parse(JSON.parse(raw));
+  return data.cards;
 }
 ```
 
@@ -1748,24 +1857,27 @@ This is a CLI script, not a library module. Testing via integration (run it and 
 import Database from "better-sqlite3";
 import { mkdirSync, existsSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { z } from "zod";
 import { getConfig } from "./config.js";
 import { initializeDatabase } from "./db/schema.js";
 import { upsertCard, upsertPrice, upsertWatchlistEntry, getCardsByName } from "./db/queries.js";
-import { downloadMtgjsonGzToDisk, downloadMtgjsonGz, type MtgjsonPriceEntry } from "./fetchers/mtgjson.js";
+import { downloadMtgjsonGzToDisk, type MtgjsonPriceEntry } from "./fetchers/mtgjson.js";
 import { loadWatchlist } from "./watchlist.js";
 
-interface AllIdentifiersCard {
-  uuid: string;
-  name: string;
-  setCode: string;
-  setName: string;
-  identifiers: {
-    scryfallId?: string;
-    mcmId?: string;
-    mcmMetaId?: string;
-  };
-  legalities: Record<string, string>;
-}
+const identifiersCardSchema = z.object({
+  uuid: z.string(),
+  name: z.string(),
+  setCode: z.string(),
+  setName: z.string(),
+  identifiers: z.object({
+    scryfallId: z.string().optional(),
+    mcmId: z.string().optional(),
+    mcmMetaId: z.string().optional(),
+  }).passthrough(),
+  legalities: z.record(z.string(), z.string()).default({}),
+}).passthrough();
+
+type AllIdentifiersCard = z.infer<typeof identifiersCardSchema>;
 
 async function main() {
   const config = getConfig();
@@ -2210,22 +2322,32 @@ git commit -m "feat: add daily pipeline with MTGJSON fetch, deal detection, Slac
 
 ### Task 11: Run All Tests & Final Verification
 
-**Step 1: Run full test suite**
+**Step 1: Format all code**
+
+Run: `npm run format`
+Expected: All files formatted
+
+**Step 2: Lint all code**
+
+Run: `npm run lint`
+Expected: No lint errors (zero `@typescript-eslint/no-explicit-any` violations)
+
+**Step 3: Run full test suite**
 
 Run: `npx vitest run`
 Expected: All tests pass
 
-**Step 2: Type check**
+**Step 4: Type check**
 
 Run: `npx tsc --noEmit`
 Expected: No type errors
 
-**Step 3: Build**
+**Step 5: Build**
 
 Run: `npm run build`
 Expected: `dist/` directory created with compiled JS
 
-**Step 4: Create .env.example**
+**Step 6: Create .env.example**
 
 ```
 # Required: Slack webhook for deal notifications
@@ -2239,7 +2361,7 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 # DB_PATH=data/tracker.db
 ```
 
-**Step 5: Commit**
+**Step 7: Commit**
 
 ```bash
 git add .env.example

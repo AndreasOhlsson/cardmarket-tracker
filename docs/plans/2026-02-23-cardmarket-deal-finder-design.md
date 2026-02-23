@@ -181,12 +181,14 @@ cardmarket-tracker/
 
 ## Tech Stack
 
-- **Runtime:** Node.js + TypeScript
+- **Runtime:** Node.js + TypeScript (ESM, strict mode)
+- **Validation:** Zod (config, API responses, watchlist)
 - **Database:** better-sqlite3 (sync, fast, zero-config)
 - **HTTP:** native fetch (Node 18+)
 - **Scheduling:** node-cron
 - **Slack:** Incoming Webhook POST (no library needed)
 - **Compression:** zlib (for MTGJSON gzip handling)
+- **Code Quality:** ESLint (typescript-eslint strict), Prettier, `noUncheckedIndexedAccess`
 
 ## Resolved Design Decisions
 
