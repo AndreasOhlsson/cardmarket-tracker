@@ -44,9 +44,9 @@ describe("database queries", () => {
 
       const card = getCardByUuid(db, "abc-123");
       expect(card).toBeTruthy();
-      expect(card!.name).toBe("Lightning Bolt");
-      expect(card!.mcm_id).toBe(1234);
-      expect(card!.commander_legal).toBe(1);
+      expect(card?.name).toBe("Lightning Bolt");
+      expect(card?.mcm_id).toBe(1234);
+      expect(card?.commander_legal).toBe(1);
     });
 
     it("updates existing card on conflict", () => {
@@ -66,13 +66,13 @@ describe("database queries", () => {
       });
 
       const card = getCardByUuid(db, "abc-123");
-      expect(card!.set_code).toBe("STA");
+      expect(card?.set_code).toBe("STA");
     });
   });
 
   describe("upsertPrice", () => {
     it("inserts a price record", () => {
-      const today = new Date().toISOString().split("T")[0]!;
+      const today = new Date().toISOString().slice(0, 10);
       upsertCard(db, { uuid: "abc-123", name: "Test", commanderLegal: true });
       upsertPrice(db, {
         uuid: "abc-123",
@@ -83,11 +83,11 @@ describe("database queries", () => {
 
       const latest = getLatestPrice(db, "abc-123");
       expect(latest).toBeTruthy();
-      expect(latest!.cm_trend).toBe(15.5);
+      expect(latest?.cm_trend).toBe(15.5);
     });
 
     it("replaces on duplicate uuid+date+source", () => {
-      const today = new Date().toISOString().split("T")[0]!;
+      const today = new Date().toISOString().slice(0, 10);
       upsertCard(db, { uuid: "abc-123", name: "Test", commanderLegal: true });
       upsertPrice(db, {
         uuid: "abc-123",
@@ -104,7 +104,7 @@ describe("database queries", () => {
 
       const history = getPriceHistory(db, "abc-123", 30);
       expect(history).toHaveLength(1);
-      expect(history[0]!.cm_trend).toBe(16.0);
+      expect(history[0]?.cm_trend).toBe(16.0);
     });
   });
 
@@ -116,7 +116,7 @@ describe("database queries", () => {
       for (let i = 5; i >= 1; i--) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split("T")[0]!;
+        const dateStr = d.toISOString().slice(0, 10);
         upsertPrice(db, {
           uuid: "abc-123",
           date: dateStr,
@@ -138,13 +138,13 @@ describe("database queries", () => {
 
     it("getLatestPrice returns most recent", () => {
       const latest = getLatestPrice(db, "abc-123");
-      expect(latest!.cm_trend).toBe(11); // most recent = 1 day ago, value 10+1
+      expect(latest?.cm_trend).toBe(11); // most recent = 1 day ago, value 10+1
     });
   });
 
   describe("deals", () => {
     it("inserts and retrieves unnotified deals", () => {
-      const today = new Date().toISOString().split("T")[0]!;
+      const today = new Date().toISOString().slice(0, 10);
       upsertCard(db, { uuid: "abc-123", name: "Test", commanderLegal: true });
       upsertDeal(db, {
         uuid: "abc-123",
@@ -157,7 +157,7 @@ describe("database queries", () => {
 
       const deals = getUnnotifiedDeals(db);
       expect(deals).toHaveLength(1);
-      expect(deals[0]!.deal_type).toBe("trend_drop");
+      expect(deals[0]?.deal_type).toBe("trend_drop");
 
       markDealsNotified(
         db,
