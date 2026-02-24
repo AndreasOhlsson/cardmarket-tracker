@@ -124,8 +124,9 @@ export async function downloadMtgjsonGzToDisk(url: string, outputPath: string): 
   const gunzip = createGunzip();
   const fileStream = createWriteStream(outputPath);
 
-  // Node 18+ fetch returns a web ReadableStream, convert to Node stream
-  const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
+  // Node 18+ fetch returns a web ReadableStream, convert to Node stream.
+  // Type mismatch between web and Node ReadableStream — safe at runtime.
+  const nodeStream = Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0]);
 
   await pipeline(nodeStream, gunzip, fileStream);
 }
@@ -141,31 +142,29 @@ export async function downloadMtgjsonGzToDisk(url: string, outputPath: string): 
 export async function* streamJsonDataEntries(
   filePath: string,
 ): AsyncGenerator<{ key: string; value: unknown }> {
+  // stream-json is CJS with no subpath type declarations.
+  // Dynamic imports + interop: named exports may live on the module or on .default.
   const parserMod = await import("stream-json");
-  const pickMod = await import("stream-json/filters/Pick");
-  const streamObjectMod = await import("stream-json/streamers/StreamObject");
+  // @ts-expect-error — stream-json subpath has no type declarations
+  const pickMod: Record<string, unknown> = await import("stream-json/filters/Pick");
+  // @ts-expect-error — stream-json subpath has no type declarations
+  const streamObjectMod: Record<string, unknown> = await import("stream-json/streamers/StreamObject"); // prettier-ignore
 
-  // CJS-to-ESM interop: try named export, fall back to default.named
-  type ParserFn = typeof parserMod.parser;
-  type PickFn = typeof pickMod.pick;
-  type StreamObjectFn = typeof streamObjectMod.streamObject;
+  type PipeFn = (...args: unknown[]) => NodeJS.ReadWriteStream;
 
-  const parserFn: ParserFn =
-    parserMod.parser ?? (parserMod as unknown as { default: { parser: ParserFn } }).default.parser;
-  const pickFn: PickFn =
-    pickMod.pick ?? (pickMod as unknown as { default: { pick: PickFn } }).default.pick;
-  const streamObjectFn: StreamObjectFn =
-    streamObjectMod.streamObject ??
-    (streamObjectMod as unknown as { default: { streamObject: StreamObjectFn } }).default
-      .streamObject;
+  const parserFn =
+    parserMod.parser ?? (parserMod as unknown as { default: { parser: PipeFn } }).default.parser;
+  const pickFn = (pickMod.pick ?? (pickMod.default as { pick: PipeFn }).pick) as PipeFn;
+  const streamObjectFn = (streamObjectMod.streamObject ??
+    (streamObjectMod.default as { streamObject: PipeFn }).streamObject) as PipeFn;
 
   const stream = createReadStream(filePath)
     .pipe(parserFn())
-    .pipe(pickFn({ filter: "data" }))
-    .pipe(streamObjectFn());
+    .pipe(pickFn({ filter: "data" }) as NodeJS.ReadWriteStream)
+    .pipe(streamObjectFn() as NodeJS.ReadWriteStream);
 
   for await (const entry of stream) {
-    yield entry as { key: string; value: unknown };
+    yield entry as unknown as { key: string; value: unknown };
   }
 }
 

@@ -122,7 +122,7 @@ describe("fetchWithRetry", () => {
 });
 
 describe("streamJsonDataEntries", () => {
-  const TMP_DIR = "tests/tmp";
+  const TMP_DIR = "tests/tmp-mtgjson";
   const TMP_FILE = `${TMP_DIR}/test-stream.json`;
 
   afterEach(() => {
