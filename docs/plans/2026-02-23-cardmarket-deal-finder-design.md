@@ -38,10 +38,11 @@ Seed (one-time)                     Scheduler (daily)
                           (cached monthly)
 ```
 
-### Bootstrap: `npm run seed`
+### Bootstrap: `yarn seed`
 
-- Download MTGJSON `AllPrices` (~136MB gzipped, 90-day history)
-- Download MTGJSON `AllIdentifiers` (~500MB+, card metadata)
+- Download MTGJSON `AllPrices` (~136MB gzipped, 90-day history) to disk
+- Download MTGJSON `AllIdentifiers` (~500MB+, card metadata) to disk
+- Stream-parse both files using `stream-json` (constant memory, no OOM)
 - Populate `cards` table with names, set codes, mcmId, scryfall_id, format legality
 - Populate `prices` table with 90-day Cardmarket price history
 - Filter to Commander-legal cards only
@@ -155,7 +156,7 @@ Batch deals into a single message per run to avoid spam. Slack webhooks have no 
 ```
 cardmarket-tracker/
 ├── src/
-│   ├── index.ts              # Entry point, scheduler
+│   ├── index.ts              # Entry point (run-once, exit)
 │   ├── seed.ts               # Bootstrap: download AllPrices + AllIdentifiers
 │   ├── fetchers/
 │   │   ├── mtgjson.ts        # MTGJSON download + parse
@@ -182,12 +183,14 @@ cardmarket-tracker/
 ## Tech Stack
 
 - **Runtime:** Node.js + TypeScript (ESM, strict mode)
-- **Validation:** Zod (config, API responses, watchlist)
+- **Validation:** Zod (config, watchlist, small payloads only — not used on large data files)
 - **Database:** better-sqlite3 (sync, fast, zero-config)
 - **HTTP:** native fetch (Node 18+)
-- **Scheduling:** node-cron
+- **Scheduling:** External (system cron / systemd timer / Docker). Run-once architecture.
 - **Slack:** Incoming Webhook POST (no library needed)
 - **Compression:** zlib (for MTGJSON gzip handling)
+- **JSON Streaming:** stream-json (for parsing multi-GB MTGJSON files without OOM)
+- **Env Loading:** dotenv (loads .env file on startup)
 - **Code Quality:** ESLint (typescript-eslint strict), Prettier, `noUncheckedIndexedAccess`
 
 ## Resolved Design Decisions
@@ -197,11 +200,15 @@ cardmarket-tracker/
 | 1 | AllPricesToday file size | ~5MB gzipped, ~50MB uncompressed. Load fully into memory. |
 | 2 | Card identity (names, metadata) | Download AllIdentifiers separately (~500MB+), cache locally, refresh monthly. |
 | 3 | Cardmarket URL construction | Build from mcmId (product ID) in AllIdentifiers. |
-| 4 | Large file memory handling | Load into memory — simplest approach, Node.js handles it fine. |
+| 4 | Large file memory handling | Stream-parse from disk using stream-json. AllPricesToday (~50MB) loads into memory; AllPrices/AllIdentifiers (multi-GB) stream. |
 | 5 | Multiple printings of same card | Track all printings separately (unique UUID per printing). |
-| 6 | Cold start (no history) | Separate `npm run seed` command bootstraps 90-day history from AllPrices. |
+| 6 | Cold start (no history) | Separate `yarn seed` command bootstraps 90-day history from AllPrices. |
 | 7 | MTGJSON buylist data | Empty for Cardmarket — ignore. |
 | 8 | Format filtering | Commander-legal cards only. |
+
+| 9 | Run-once vs long-running | Run-once script. External scheduler handles timing. Removes node-cron. |
+| 10 | dotenv or external env vars | Add dotenv for local dev convenience. |
+| 11 | Zod on large data files | Skip Zod for multi-MB payloads (AllPricesToday). Validate defensively in parser. |
 
 ## Open Questions for Implementation
 
