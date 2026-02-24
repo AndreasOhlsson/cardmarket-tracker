@@ -18,6 +18,7 @@ describe("getConfig", () => {
 
   afterEach(() => {
     for (const key of CONFIG_ENV_KEYS) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete process.env[key];
     }
   });
@@ -56,6 +57,11 @@ describe("getConfig", () => {
     const config = getConfig();
     expect(config.priceFloorEur).toBe(25);
     expect(config.trendDropPct).toBe(0.2);
+  });
+
+  it("rejects out-of-range percentage values", () => {
+    process.env.TREND_DROP_PCT = "2.0";
+    expect(() => getConfig()).toThrow();
   });
 
   it("accepts overrides for retry and refresh config fields", () => {

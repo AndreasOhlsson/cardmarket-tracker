@@ -64,6 +64,18 @@ describe("initializeDatabase", () => {
     ).toThrow();
   });
 
+  it("enforces foreign key constraints", () => {
+    initializeDatabase(db);
+
+    expect(() =>
+      db
+        .prepare(
+          "INSERT INTO prices (uuid, date, cm_trend, source) VALUES ('no-such-card', '2026-01-01', 5.0, 'mtgjson')",
+        )
+        .run(),
+    ).toThrow(/FOREIGN KEY/);
+  });
+
   it("is idempotent — safe to call multiple times", () => {
     initializeDatabase(db);
     initializeDatabase(db);

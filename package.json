@@ -1,6 +1,7 @@
 {
   "name": "cardmarket-tracker",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "description": "Track MTG card prices from Cardmarket and get notified of deals via Slack",
   "main": "dist/index.js",
