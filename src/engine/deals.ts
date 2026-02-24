@@ -108,8 +108,8 @@ export function detectDeals(db: Database.Database, config: DealDetectionConfig):
       });
     }
 
-    // Rule 3: Watchlist alert — any change >5%
-    if (isWatchlisted && avg_30d && avg_30d > 0) {
+    // Rule 3: Watchlist alert — any change >5% (also requires price floor)
+    if (isWatchlisted && aboveFloor && avg_30d && avg_30d > 0) {
       const pctChange = (latest_price - avg_30d) / avg_30d;
       if (Math.abs(pctChange) > config.watchlistAlertPct) {
         // Avoid duplicate if already triggered as trend_drop

@@ -18,7 +18,11 @@ import {
   type AllIdentifiersCard,
 } from "./fetchers/mtgjson.js";
 import { detectDeals, type DealDetectionConfig } from "./engine/deals.js";
-import { batchDeals, sendSlackNotification, type DealForSlack } from "./notifications/slack.js";
+import {
+  formatDealBatch,
+  sendSlackNotification,
+  type DealForSlack,
+} from "./notifications/slack.js";
 import type { Config } from "./config.js";
 
 function safeParseInt(str: string | undefined): number | null {
@@ -206,28 +210,32 @@ export async function runDailyPipeline(db: Database.Database, config: Config): P
   });
   console.log(`Detected ${dealCount} deals`);
 
-  // 5. Send Slack notification for any unnotified deals (includes new + orphaned from previous runs)
+  // 5. Send Slack notification for any unnotified deals (includes new + orphaned from previous runs).
+  // Mark deals notified per-batch so partial failures don't cause duplicates on retry.
   const unnotified: DealWithCardRow[] = getUnnotifiedDeals(db);
   if (unnotified.length > 0) {
-    const slackDeals: DealForSlack[] = unnotified.map((d) => ({
-      name: d.name,
-      setCode: d.set_code ?? undefined,
-      dealType: d.deal_type,
-      currentPrice: d.current_price,
-      referencePrice: d.reference_price,
-      pctChange: d.pct_change,
-      mcmId: d.mcm_id ?? undefined,
-    }));
+    const maxDealsPerBatch = 48;
+    for (let i = 0; i < unnotified.length; i += maxDealsPerBatch) {
+      const batchDeals_: DealWithCardRow[] = unnotified.slice(i, i + maxDealsPerBatch);
+      const slackDeals: DealForSlack[] = batchDeals_.map((d) => ({
+        name: d.name,
+        setCode: d.set_code ?? undefined,
+        dealType: d.deal_type,
+        currentPrice: d.current_price,
+        referencePrice: d.reference_price,
+        pctChange: d.pct_change,
+        mcmId: d.mcm_id ?? undefined,
+      }));
 
-    const batches = batchDeals(slackDeals);
-    for (const payload of batches) {
+      const payload = formatDealBatch(slackDeals);
       await sendSlackNotification(config.slackWebhookUrl, payload);
-    }
 
-    markDealsNotified(
-      db,
-      unnotified.map((d) => d.id),
-    );
+      // Mark this batch as notified immediately after successful send
+      markDealsNotified(
+        db,
+        batchDeals_.map((d) => d.id),
+      );
+    }
   }
 
   console.log(

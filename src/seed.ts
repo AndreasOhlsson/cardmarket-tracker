@@ -158,12 +158,12 @@ async function main() {
           source: "mtgjson",
         });
         priceCount++;
-      }
 
-      if (priceCount % 50000 === 0) {
-        db.exec("COMMIT");
-        db.exec("BEGIN");
-        console.log(`  ${priceCount} price records inserted...`);
+        if (priceCount % 50000 === 0) {
+          db.exec("COMMIT");
+          db.exec("BEGIN");
+          console.log(`  ${priceCount} price records inserted...`);
+        }
       }
     }
     db.exec("COMMIT");
