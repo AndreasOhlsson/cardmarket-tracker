@@ -82,6 +82,20 @@ Fix: Keep naming (it likely IS the Cardmarket trend price). Add clarifying comme
 
 Fix: Add explicit `beforeEach`/`afterEach` imports to match all other test files.
 
+### Gaps (identified during full flow review)
+
+**14. No mechanism to refresh AllIdentifiers for new sets**
+
+Problem: AllIdentifiers is only downloaded during `yarn seed`. New MTG sets release quarterly, but the daily pipeline never re-downloads, so new cards are invisible to deal detection.
+
+Fix: Add `refreshCardMetadataIfStale()` to pipeline. Checks cache file mtime — if >30 days old (configurable via `identifiersMaxAgeDays`), re-downloads AllIdentifiers and stream-parses/upserts new Commander-legal cards. Runs before price fetching.
+
+**15. No retry on pipeline failure**
+
+Problem: If the daily pipeline fails mid-run (network error, MTGJSON down), the process exits and no retry happens until the next scheduled run (next day).
+
+Fix: Wrap `runDailyPipeline()` in a retry loop in `index.ts`. 3 attempts max (configurable via `pipelineMaxRetries`), 15-minute delay between retries (configurable via `pipelineRetryDelayMs`). DB connection is closed and reopened between attempts. Exit code 1 after all retries exhausted.
+
 ## Dependency Changes
 
 | Action | Package | Reason |
@@ -95,10 +109,12 @@ Fix: Add explicit `beforeEach`/`afterEach` imports to match all other test files
 ## Files Affected
 
 - **package.json** — dependency changes, remove dev script, yarn
-- **src/config.ts** — add `allPricesCachePath`, dotenv import
+- **src/config.ts** — add `allPricesCachePath`, retry config fields, dotenv import
 - **src/seed.ts** — streaming JSON parser, null guards, dotenv import
 - **src/fetchers/mtgjson.ts** — remove Zod on big data, null guards, fix `as any`
 - **src/engine/deals.ts** — fix new_low SQL, remove dead prev CTE
-- **src/index.ts** — run-once (remove cron), dotenv import
+- **src/pipeline.ts** — add `refreshCardMetadataIfStale()`, auto-refresh AllIdentifiers
+- **src/index.ts** — run-once with retry loop (remove cron), dotenv import
+- **tests/pipeline.test.ts** — add test for fresh cache skipping refresh
 - **tests/fetchers/mtgjson.test.ts** — add fetchWithRetry tests
 - **tests/watchlist.test.ts** — add missing imports

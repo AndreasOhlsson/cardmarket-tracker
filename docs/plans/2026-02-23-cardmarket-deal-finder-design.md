@@ -50,6 +50,7 @@ Seed (one-time)                     Scheduler (daily)
 
 ### Phase 1: MTGJSON daily pipeline
 
+- Auto-refresh AllIdentifiers if cache is >30 days old (check file mtime), re-download and upsert new Commander-legal cards
 - Download MTGJSON `AllPricesToday` (JSON, ~5MB gzipped, ~50MB uncompressed)
 - Load full file into memory and parse Cardmarket paper prices
 - Path: `data.<uuid>.paper.cardmarket.retail.normal: { "YYYY-MM-DD": price }`
@@ -57,6 +58,7 @@ Seed (one-time)                     Scheduler (daily)
 - Store daily snapshots in SQLite
 - Run deal detection against accumulated history
 - Send Slack webhook for triggered alerts
+- Built-in retry: on failure, retry up to 3 times with 15-minute delay between attempts
 
 ### Phase 2: Cardmarket CSV enrichment (runs alongside Phase 1)
 
@@ -69,7 +71,8 @@ Seed (one-time)                     Scheduler (daily)
 
 - MTGJSON price files are keyed by UUID but do NOT contain card names or metadata
 - AllIdentifiers provides: name, setCode, setName, mcmId, mcmMetaId, scryfallId, legalities
-- Cached locally, refreshed monthly (new sets release ~quarterly)
+- Cached locally, auto-refreshed when cache file mtime is >30 days old
+- Daily pipeline checks staleness before fetching prices — ensures new set cards are tracked
 - mcmId used to construct Cardmarket URLs: `https://www.cardmarket.com/en/Magic/Products/Singles/<set>/<name>`
 
 ## Data Model (SQLite)
@@ -209,6 +212,8 @@ cardmarket-tracker/
 | 9 | Run-once vs long-running | Run-once script. External scheduler handles timing. Removes node-cron. |
 | 10 | dotenv or external env vars | Add dotenv for local dev convenience. |
 | 11 | Zod on large data files | Skip Zod for multi-MB payloads (AllPricesToday). Validate defensively in parser. |
+| 12 | AllIdentifiers staleness | Auto-refresh in daily pipeline if cache mtime >30 days. Stream-parse and upsert new cards. |
+| 13 | Pipeline failure retry | Built-in retry loop: 3 attempts max, 15-minute delay between retries. Exit code 1 after exhausting retries. |
 
 ## Open Questions for Implementation
 

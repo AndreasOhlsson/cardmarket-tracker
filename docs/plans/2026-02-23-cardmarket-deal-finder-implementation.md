@@ -206,6 +206,9 @@ describe("getConfig", () => {
     expect(config.watchlistPath).toBe("data/watchlist.json");
     expect(config.identifiersCachePath).toBe("data/cache/AllIdentifiers.json");
     expect(config.allPricesCachePath).toBe("data/cache/AllPrices.json");
+    expect(config.identifiersMaxAgeDays).toBe(30);
+    expect(config.pipelineMaxRetries).toBe(3);
+    expect(config.pipelineRetryDelayMs).toBe(15 * 60 * 1000);
   });
 
   it("reads SLACK_WEBHOOK_URL from env", () => {
@@ -249,6 +252,9 @@ const configSchema = z.object({
   watchlistPath: z.string().default("data/watchlist.json"),
   identifiersCachePath: z.string().default("data/cache/AllIdentifiers.json"),
   allPricesCachePath: z.string().default("data/cache/AllPrices.json"),
+  identifiersMaxAgeDays: z.number().min(1).default(30),
+  pipelineMaxRetries: z.number().min(1).default(3),
+  pipelineRetryDelayMs: z.number().min(0).default(15 * 60 * 1000), // 15 minutes
   mtgjson: z.object({
     allPricesTodayUrl: z.string().url(),
     allPricesUrl: z.string().url(),
@@ -277,6 +283,9 @@ export function getConfig(): Config {
     watchlistPath: process.env.WATCHLIST_PATH,
     identifiersCachePath: process.env.IDENTIFIERS_CACHE_PATH,
     allPricesCachePath: process.env.ALL_PRICES_CACHE_PATH,
+    identifiersMaxAgeDays: parseNumericEnv(process.env.IDENTIFIERS_MAX_AGE_DAYS),
+    pipelineMaxRetries: parseNumericEnv(process.env.PIPELINE_MAX_RETRIES),
+    pipelineRetryDelayMs: parseNumericEnv(process.env.PIPELINE_RETRY_DELAY_MS),
     mtgjson: {
       allPricesTodayUrl: "https://mtgjson.com/api/v5/AllPricesToday.json.gz",
       allPricesUrl: "https://mtgjson.com/api/v5/AllPrices.json.gz",
@@ -2172,7 +2181,32 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import Database from "better-sqlite3";
 import { initializeDatabase } from "../src/db/schema.js";
 import { upsertCard, upsertPrice, getUnnotifiedDeals } from "../src/db/queries.js";
-import { runDealDetection } from "../src/pipeline.js";
+import { runDealDetection, refreshCardMetadataIfStale } from "../src/pipeline.js";
+
+describe("refreshCardMetadataIfStale", () => {
+  it("returns 0 when cache file is fresh", async () => {
+    const db = new Database(":memory:");
+    initializeDatabase(db);
+
+    // Create a dummy cache file that's fresh (just written)
+    const tmpDir = "tests/tmp";
+    const tmpFile = `${tmpDir}/AllIdentifiers.json`;
+    const { mkdirSync, writeFileSync, rmSync } = await import("node:fs");
+    mkdirSync(tmpDir, { recursive: true });
+    writeFileSync(tmpFile, "{}");
+
+    const result = await refreshCardMetadataIfStale(db, {
+      identifiersCachePath: tmpFile,
+      identifiersMaxAgeDays: 30,
+      mtgjson: { allIdentifiersUrl: "", allPricesTodayUrl: "", allPricesUrl: "" },
+    } as any);
+
+    expect(result).toBe(0);
+
+    rmSync(tmpDir, { recursive: true, force: true });
+    db.close();
+  });
+});
 
 describe("runDealDetection", () => {
   let db: Database.Database;
@@ -2242,6 +2276,9 @@ Expected: FAIL — cannot find `../src/pipeline.js`
 ```typescript
 // src/pipeline.ts
 import Database from "better-sqlite3";
+import { statSync, existsSync } from "node:fs";
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import {
   upsertPrice,
   getUnnotifiedDeals,
@@ -2254,6 +2291,8 @@ import {
 import {
   fetchAllPricesToday,
   parseCardmarketPrices,
+  downloadMtgjsonGzToDisk,
+  streamJsonDataEntries,
 } from "./fetchers/mtgjson.js";
 import {
   detectDeals,
@@ -2265,6 +2304,93 @@ import {
   type DealForSlack,
 } from "./notifications/slack.js";
 import type { Config } from "./config.js";
+
+interface AllIdentifiersCard {
+  name: string;
+  setCode: string;
+  setName: string;
+  identifiers?: {
+    scryfallId?: string;
+    mcmId?: string;
+    mcmMetaId?: string;
+  };
+  legalities?: Record<string, string>;
+}
+
+/**
+ * Refresh AllIdentifiers cache if it's older than config.identifiersMaxAgeDays.
+ * Stream-parses the file and upserts any new Commander-legal cards.
+ * Returns the number of cards upserted (0 if cache is fresh).
+ */
+export async function refreshCardMetadataIfStale(
+  db: Database.Database,
+  config: Config,
+): Promise<number> {
+  const cachePath = config.identifiersCachePath;
+  const maxAgeMs = config.identifiersMaxAgeDays * 24 * 60 * 60 * 1000;
+
+  if (existsSync(cachePath)) {
+    const stat = statSync(cachePath);
+    const ageMs = Date.now() - stat.mtimeMs;
+    if (ageMs < maxAgeMs) {
+      console.log(
+        `AllIdentifiers cache is ${Math.floor(ageMs / 86400000)}d old (max ${config.identifiersMaxAgeDays}d), skipping refresh`,
+      );
+      return 0;
+    }
+    console.log(
+      `AllIdentifiers cache is ${Math.floor(ageMs / 86400000)}d old (max ${config.identifiersMaxAgeDays}d), refreshing...`,
+    );
+  } else {
+    console.log("AllIdentifiers cache not found, downloading...");
+  }
+
+  mkdirSync(dirname(cachePath), { recursive: true });
+  await downloadMtgjsonGzToDisk(config.mtgjson.allIdentifiersUrl, cachePath);
+
+  const upsertCardStmt = db.prepare(`
+    INSERT INTO cards (uuid, name, set_code, set_name, scryfall_id, mcm_id, mcm_meta_id, commander_legal)
+    VALUES (@uuid, @name, @setCode, @setName, @scryfallId, @mcmId, @mcmMetaId, @commanderLegal)
+    ON CONFLICT(uuid) DO UPDATE SET
+      name = excluded.name,
+      set_code = excluded.set_code,
+      set_name = excluded.set_name,
+      scryfall_id = excluded.scryfall_id,
+      mcm_id = excluded.mcm_id,
+      mcm_meta_id = excluded.mcm_meta_id,
+      commander_legal = excluded.commander_legal
+  `);
+
+  let cardCount = 0;
+  db.exec("BEGIN");
+  for await (const { key: uuid, value } of streamJsonDataEntries(cachePath)) {
+    const card = value as AllIdentifiersCard;
+    if (card.legalities?.commander !== "Legal") continue;
+
+    const mcmIdStr = card.identifiers?.mcmId;
+    const mcmMetaIdStr = card.identifiers?.mcmMetaId;
+
+    upsertCardStmt.run({
+      uuid,
+      name: card.name,
+      setCode: card.setCode ?? null,
+      setName: card.setName ?? null,
+      scryfallId: card.identifiers?.scryfallId ?? null,
+      mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
+      mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
+      commanderLegal: 1,
+    });
+    cardCount++;
+
+    if (cardCount % 10000 === 0) {
+      db.exec("COMMIT");
+      db.exec("BEGIN");
+    }
+  }
+  db.exec("COMMIT");
+  console.log(`Refreshed card metadata: ${cardCount} Commander-legal cards upserted`);
+  return cardCount;
+}
 
 export function runDealDetection(
   db: Database.Database,
@@ -2291,6 +2417,9 @@ export async function runDailyPipeline(
   config: Config,
 ): Promise<void> {
   console.log(`[${new Date().toISOString()}] Starting daily pipeline...`);
+
+  // 0. Refresh card metadata if stale
+  await refreshCardMetadataIfStale(db, config);
 
   // 1. Fetch today's prices
   const priceData = await fetchAllPricesToday(config.mtgjson.allPricesTodayUrl);
@@ -2361,7 +2490,7 @@ export async function runDailyPipeline(
 }
 ```
 
-**Step 4: Write entry point (run-once, exit)**
+**Step 4: Write entry point (run-once with retry, exit)**
 
 ```typescript
 // src/index.ts
@@ -2373,19 +2502,43 @@ import { getConfig } from "./config.js";
 import { initializeDatabase } from "./db/schema.js";
 import { runDailyPipeline } from "./pipeline.js";
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function main() {
   const config = getConfig();
+  const maxRetries = config.pipelineMaxRetries;
+  const retryDelayMs = config.pipelineRetryDelayMs;
 
   mkdirSync(dirname(config.dbPath), { recursive: true });
 
-  const db = new Database(config.dbPath);
-  db.pragma("journal_mode = WAL");
-  initializeDatabase(db);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const db = new Database(config.dbPath);
+    db.pragma("journal_mode = WAL");
+    initializeDatabase(db);
 
-  try {
-    await runDailyPipeline(db, config);
-  } finally {
-    db.close();
+    try {
+      await runDailyPipeline(db, config);
+      db.close();
+      return; // Success — exit cleanly
+    } catch (err) {
+      db.close();
+      if (attempt < maxRetries) {
+        const delayMin = Math.round(retryDelayMs / 60000);
+        console.error(
+          `Attempt ${attempt}/${maxRetries} failed: ${err instanceof Error ? err.message : err}`,
+        );
+        console.error(`Retrying in ${delayMin} minutes...`);
+        await sleep(retryDelayMs);
+      } else {
+        console.error(
+          `All ${maxRetries} attempts failed. Last error:`,
+          err,
+        );
+        process.exit(1);
+      }
+    }
   }
 }
 
@@ -2447,6 +2600,9 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 # TREND_DROP_PCT=0.15
 # WATCHLIST_ALERT_PCT=0.05
 # DB_PATH=data/tracker.db
+# IDENTIFIERS_MAX_AGE_DAYS=30
+# PIPELINE_MAX_RETRIES=3
+# PIPELINE_RETRY_DELAY_MS=900000
 ```
 
 **Step 7: Commit**
@@ -2463,7 +2619,7 @@ git commit -m "feat: add .env.example with configuration reference"
 After all tasks are complete:
 
 1. **Seed the database:** `yarn seed` — downloads MTGJSON data, stream-parses, populates SQLite
-2. **Run the pipeline:** `SLACK_WEBHOOK_URL=https://hooks.slack.com/test yarn start` — fetches today's prices, detects deals, attempts Slack notification, exits
+2. **Run the pipeline:** `SLACK_WEBHOOK_URL=https://hooks.slack.com/test yarn start` — refreshes card metadata if stale, fetches today's prices, detects deals, attempts Slack notification, retries up to 3 times on failure, exits
 3. **Check the database:** `yarn tsx -e "import Database from 'better-sqlite3'; const db = new Database('data/tracker.db'); console.log('Cards:', db.prepare('SELECT COUNT(*) as c FROM cards').get()); console.log('Prices:', db.prepare('SELECT COUNT(*) as c FROM prices').get()); console.log('Deals:', db.prepare('SELECT COUNT(*) as c FROM deals').get());"`
 4. **Set up scheduling:** Add `0 8 * * * cd /path/to/cardmarket-tracker && node dist/index.js` to system crontab, or equivalent systemd timer / Docker cron
 
@@ -2476,7 +2632,7 @@ Remove duplicate "Fierce Guardianship" from `data/watchlist.json` (appears on bo
 | Task | Component | Tests |
 |------|-----------|-------|
 | 1 | Project scaffolding | — |
-| 2 | Config module (with `allPricesCachePath`) | 4 |
+| 2 | Config module (with `allPricesCachePath`, retry config) | 4 |
 | 3 | Database schema (with UNIQUE on deals) | 4 |
 | 4 | Database queries (upsert deals, watchlist, DealWithCardRow) | 7 |
 | 5 | MTGJSON fetcher (stream-to-disk, streaming parser, retry, `fetchWithRetry` tests) | 6 |
@@ -2484,7 +2640,7 @@ Remove duplicate "Fierce Guardianship" from `data/watchlist.json` (appears on bo
 | 7 | Slack notifications | 3 |
 | 8 | Watchlist loader | 2 |
 | 9 | Seed command (stream-json parsing, constant memory) | integration |
-| 10 | Daily pipeline (run-once) + entry point (dotenv) | 1 |
+| 10 | Daily pipeline (auto-refresh, retry) + entry point (dotenv) | 2 |
 | 11 | Full verification | — |
 
 ## All Issues Fixed in This Revision
@@ -2504,6 +2660,8 @@ Remove duplicate "Fierce Guardianship" from `data/watchlist.json` (appears on bo
 | 11 | No graceful shutdown | Run-once architecture, `node-cron` removed |
 | 12 | Misleading `cmTrend` field name | Clarifying comments in schema and types |
 | 13 | Watchlist test missing imports | Explicit `beforeEach`/`afterEach` imports |
+| 14 | No mechanism to refresh AllIdentifiers for new sets | Auto-refresh in pipeline if cache mtime >30 days old |
+| 15 | No retry on pipeline failure | Built-in retry loop: 3 attempts, 15-minute delay, exit code 1 after exhausting |
 
 ## Previous Issues (already fixed in earlier revision)
 
