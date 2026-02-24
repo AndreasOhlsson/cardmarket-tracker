@@ -223,9 +223,19 @@ export async function runDailyPipeline(db: Database.Database, config: Config): P
   });
   console.log(`Detected ${dealCount} deals`);
 
-  // 5. Send Slack notification for any unnotified deals (includes new + orphaned from previous runs).
-  // Mark deals notified per-batch so partial failures don't cause duplicates on retry.
+  // 5. Log and send notifications for unnotified deals
   const unnotified: DealWithCardRow[] = getUnnotifiedDeals(db);
+  if (unnotified.length > 0) {
+    console.log("\n--- Deals found ---");
+    for (const d of unnotified) {
+      const pct = (d.pct_change * 100).toFixed(1);
+      const set = d.set_code ? ` (${d.set_code})` : "";
+      console.log(
+        `  [${d.deal_type}] ${d.name}${set}: €${d.current_price.toFixed(2)} ← €${d.reference_price.toFixed(2)} (${pct}%)`,
+      );
+    }
+    console.log("---\n");
+  }
   if (unnotified.length > 0) {
     const maxDealsPerBatch = 48;
     for (let i = 0; i < unnotified.length; i += maxDealsPerBatch) {
