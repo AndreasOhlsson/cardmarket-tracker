@@ -197,7 +197,7 @@ export function upsertDeal(db: Database.Database, deal: DealInput): void {
       current_price = excluded.current_price,
       reference_price = excluded.reference_price,
       pct_change = excluded.pct_change,
-      notified = 0
+      notified = CASE WHEN excluded.current_price != deals.current_price THEN 0 ELSE deals.notified END
   `,
   ).run({
     uuid: deal.uuid,

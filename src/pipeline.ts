@@ -21,6 +21,20 @@ import { detectDeals, type DealDetectionConfig } from "./engine/deals.js";
 import { batchDeals, sendSlackNotification, type DealForSlack } from "./notifications/slack.js";
 import type { Config } from "./config.js";
 
+function safeParseInt(str: string | undefined): number | null {
+  if (!str) return null;
+  const n = parseInt(str, 10);
+  return Number.isNaN(n) ? null : n;
+}
+
+function safeRollback(db: Database.Database): void {
+  try {
+    db.exec("ROLLBACK");
+  } catch {
+    // No active transaction (e.g., after a periodic COMMIT) — safe to ignore
+  }
+}
+
 /**
  * Refresh AllIdentifiers cache if it's older than config.identifiersMaxAgeDays.
  * Stream-parses the file and upserts any new Commander-legal cards.
@@ -85,8 +99,8 @@ export async function refreshCardMetadataIfStale(
         setCode: card.setCode ?? null,
         setName: card.setName ?? null,
         scryfallId: card.identifiers?.scryfallId ?? null,
-        mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
-        mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
+        mcmId: safeParseInt(mcmIdStr),
+        mcmMetaId: safeParseInt(mcmMetaIdStr),
         commanderLegal: 1,
       });
       cardCount++;
@@ -98,7 +112,7 @@ export async function refreshCardMetadataIfStale(
     }
     db.exec("COMMIT");
   } catch (err) {
-    db.exec("ROLLBACK");
+    safeRollback(db);
     throw err;
   }
   console.log(`Refreshed card metadata: ${cardCount} Commander-legal cards upserted`);
@@ -192,10 +206,9 @@ export async function runDailyPipeline(db: Database.Database, config: Config): P
   });
   console.log(`Detected ${dealCount} deals`);
 
-  // 5. Send Slack notification (batch into max 48 deals per message)
-  if (dealCount > 0) {
-    const unnotified: DealWithCardRow[] = getUnnotifiedDeals(db);
-
+  // 5. Send Slack notification for any unnotified deals (includes new + orphaned from previous runs)
+  const unnotified: DealWithCardRow[] = getUnnotifiedDeals(db);
+  if (unnotified.length > 0) {
     const slackDeals: DealForSlack[] = unnotified.map((d) => ({
       name: d.name,
       setCode: d.set_code ?? undefined,
@@ -218,6 +231,6 @@ export async function runDailyPipeline(db: Database.Database, config: Config): P
   }
 
   console.log(
-    `[${new Date().toISOString()}] Pipeline complete. Prices stored: ${stored}, Deals found: ${dealCount}, Notifications sent: ${dealCount > 0 ? "yes" : "no"}`,
+    `[${new Date().toISOString()}] Pipeline complete. Prices stored: ${stored}, Deals found: ${dealCount}, Notifications sent: ${unnotified.length > 0 ? "yes" : "no"}`,
   );
 }

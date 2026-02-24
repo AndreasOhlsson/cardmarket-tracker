@@ -102,5 +102,6 @@ export async function sendSlackNotification(
     throw new Error(`Slack webhook failed: ${response.status} ${response.statusText}`);
   }
 
-  console.log(`Slack notification sent (${payload.blocks.length - 2} deals)`);
+  const dealCount = Math.max(0, payload.blocks.length - 2);
+  console.log(`Slack notification sent (${dealCount} block${dealCount !== 1 ? "s" : ""})`);
 }

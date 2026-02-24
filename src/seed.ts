@@ -13,6 +13,20 @@ import {
 } from "./fetchers/mtgjson.js";
 import { loadWatchlist } from "./watchlist.js";
 
+function safeParseInt(str: string | undefined): number | null {
+  if (!str) return null;
+  const n = parseInt(str, 10);
+  return Number.isNaN(n) ? null : n;
+}
+
+function safeRollback(db: Database.Database): void {
+  try {
+    db.exec("ROLLBACK");
+  } catch {
+    // No active transaction (e.g., after a periodic COMMIT) — safe to ignore
+  }
+}
+
 async function main() {
   const config = getConfig();
 
@@ -73,8 +87,8 @@ async function main() {
         setCode: card.setCode ?? null,
         setName: card.setName ?? null,
         scryfallId: card.identifiers?.scryfallId ?? null,
-        mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
-        mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
+        mcmId: safeParseInt(mcmIdStr),
+        mcmMetaId: safeParseInt(mcmMetaIdStr),
         commanderLegal: 1,
       });
       cardCount++;
@@ -87,7 +101,7 @@ async function main() {
     }
     db.exec("COMMIT");
   } catch (err) {
-    db.exec("ROLLBACK");
+    safeRollback(db);
     throw err;
   }
   console.log(`Inserted ${cardCount} Commander-legal cards (skipped ${skipped} non-legal)`);
@@ -154,7 +168,7 @@ async function main() {
     }
     db.exec("COMMIT");
   } catch (err) {
-    db.exec("ROLLBACK");
+    safeRollback(db);
     throw err;
   }
   console.log(`Inserted ${priceCount} price records (skipped ${priceSkipped} non-Commander UUIDs)`);
