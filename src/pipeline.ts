@@ -3,7 +3,6 @@ import { statSync, existsSync } from "node:fs";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import {
-  upsertPrice,
   getUnnotifiedDeals,
   markDealsNotified,
   upsertDeal,
@@ -126,16 +125,19 @@ export async function refreshCardMetadataIfStale(
 export function runDealDetection(db: Database.Database, config: DealDetectionConfig): number {
   const deals = detectDeals(db, config);
 
-  for (const deal of deals) {
-    upsertDeal(db, {
-      uuid: deal.uuid,
-      date: deal.date,
-      dealType: deal.dealType,
-      currentPrice: deal.currentPrice,
-      referencePrice: deal.referencePrice,
-      pctChange: deal.pctChange,
-    });
-  }
+  const insertDeals = db.transaction(() => {
+    for (const deal of deals) {
+      upsertDeal(db, {
+        uuid: deal.uuid,
+        date: deal.date,
+        dealType: deal.dealType,
+        currentPrice: deal.currentPrice,
+        referencePrice: deal.referencePrice,
+        pctChange: deal.pctChange,
+      });
+    }
+  });
+  insertDeals();
 
   return deals.length;
 }
@@ -177,6 +179,15 @@ export async function runDailyPipeline(db: Database.Database, config: Config): P
 
   let stored = 0;
   let skipped = 0;
+  const upsertPriceStmt = db.prepare(`
+    INSERT INTO prices (uuid, date, cm_trend, cm_avg, cm_low, cm_foil_trend, source)
+    VALUES (@uuid, @date, @cmTrend, @cmAvg, @cmLow, @cmFoilTrend, @source)
+    ON CONFLICT(uuid, date, source) DO UPDATE SET
+      cm_trend = excluded.cm_trend,
+      cm_avg = excluded.cm_avg,
+      cm_low = excluded.cm_low,
+      cm_foil_trend = excluded.cm_foil_trend
+  `);
   const storePrices = db.transaction(() => {
     for (const price of prices) {
       if (!knownUuids.has(price.uuid)) {
@@ -184,11 +195,13 @@ export async function runDailyPipeline(db: Database.Database, config: Config): P
         continue;
       }
 
-      upsertPrice(db, {
+      upsertPriceStmt.run({
         uuid: price.uuid,
         date: price.date,
-        cmTrend: price.cmTrend,
-        cmFoilTrend: price.cmFoilTrend,
+        cmTrend: price.cmTrend ?? null,
+        cmAvg: null,
+        cmLow: null,
+        cmFoilTrend: price.cmFoilTrend ?? null,
         source: "mtgjson",
       });
       stored++;

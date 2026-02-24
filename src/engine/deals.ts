@@ -112,9 +112,11 @@ export function detectDeals(db: Database.Database, config: DealDetectionConfig):
     if (isWatchlisted && aboveFloor && avg_30d && avg_30d > 0) {
       const pctChange = (latest_price - avg_30d) / avg_30d;
       if (Math.abs(pctChange) > config.watchlistAlertPct) {
-        // Avoid duplicate if already triggered as trend_drop
-        const alreadyTrend = deals.some((d) => d.uuid === uuid && d.dealType === "trend_drop");
-        if (!alreadyTrend) {
+        // Avoid duplicate if already triggered as trend_drop or new_low
+        const alreadyReported = deals.some(
+          (d) => d.uuid === uuid && (d.dealType === "trend_drop" || d.dealType === "new_low"),
+        );
+        if (!alreadyReported) {
           deals.push({
             uuid,
             date: latest_date,

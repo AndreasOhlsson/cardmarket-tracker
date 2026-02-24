@@ -7,7 +7,7 @@ import { detectDeals } from "../../src/engine/deals.js";
 // Helper to generate date strings relative to today (UTC)
 function daysAgo(n: number): string {
   const d = new Date();
-  d.setDate(d.getDate() - n);
+  d.setUTCDate(d.getUTCDate() - n);
   return d.toISOString().slice(0, 10);
 }
 
@@ -121,10 +121,11 @@ describe("detectDeals", () => {
   });
 
   it("detects watchlist_alert for watchlisted cards with >5% change", () => {
+    // Use a price increase to avoid triggering new_low (historical low is ~49)
     upsertPrice(db, {
       uuid: "card-1",
       date: daysAgo(0),
-      cmTrend: 46.0, // ~8% drop from ~50
+      cmTrend: 54.0, // ~8% rise from ~50 avg — triggers watchlist but not trend_drop
       source: "mtgjson",
     });
 
@@ -210,6 +211,29 @@ describe("detectDeals", () => {
     const trendDrops = card1Deals.filter((d) => d.dealType === "trend_drop");
     const watchlistAlerts = card1Deals.filter((d) => d.dealType === "watchlist_alert");
     expect(trendDrops).toHaveLength(1);
+    expect(watchlistAlerts).toHaveLength(0);
+  });
+
+  it("does NOT produce duplicate watchlist_alert when new_low already fires", () => {
+    // Watchlisted card at a new historical low should produce new_low but NOT watchlist_alert
+    upsertPrice(db, {
+      uuid: "card-1",
+      date: daysAgo(0),
+      cmTrend: 35.0, // below previous low of 49, also >5% change from avg
+      source: "mtgjson",
+    });
+
+    const deals = detectDeals(db, {
+      priceFloorEur: 10,
+      trendDropPct: 0.15,
+      watchlistAlertPct: 0.05,
+      watchlistUuids: new Set(["card-1"]),
+    });
+
+    const card1Deals = deals.filter((d) => d.uuid === "card-1");
+    const newLows = card1Deals.filter((d) => d.dealType === "new_low");
+    const watchlistAlerts = card1Deals.filter((d) => d.dealType === "watchlist_alert");
+    expect(newLows).toHaveLength(1);
     expect(watchlistAlerts).toHaveLength(0);
   });
 });
