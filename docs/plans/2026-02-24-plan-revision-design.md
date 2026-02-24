@@ -115,6 +115,150 @@ Fix: Wrap `runDailyPipeline()` in a retry loop in `index.ts`. 3 attempts max (co
 - **src/engine/deals.ts** — fix new_low SQL, remove dead prev CTE
 - **src/pipeline.ts** — add `refreshCardMetadataIfStale()`, auto-refresh AllIdentifiers
 - **src/index.ts** — run-once with retry loop (remove cron), dotenv import
-- **tests/pipeline.test.ts** — add test for fresh cache skipping refresh
-- **tests/fetchers/mtgjson.test.ts** — add fetchWithRetry tests
+- **tests/pipeline.test.ts** — add test for fresh cache skipping refresh, add missing cache test
+- **tests/fetchers/mtgjson.test.ts** — add fetchWithRetry tests, add streamJsonDataEntries test
 - **tests/watchlist.test.ts** — add missing imports
+- **tests/engine/deals.test.ts** — add watchlist+trend_drop dedup test
+- **tests/notifications/slack.test.ts** — add mcmId URL test, batching tests, sendSlackNotification mock tests
+
+## Second Evaluation Round (Fixes 16–25)
+
+Evaluation after applying fixes 1–15 identified 25 additional issues (5 critical, 7 high, 7 moderate, 6 minor). All have been applied.
+
+### Critical
+
+**16. stream-json ESM import paths**
+
+Problem: Import paths used `.js` extension (e.g., `stream-json/streamers/StreamObject.js`) which don't resolve correctly.
+
+Fix: Remove `.js` extensions, add CJS-to-ESM interop with default export fallbacks.
+
+**17. `as any` cast in pipeline test**
+
+Problem: `refreshCardMetadataIfStale` test used `as any` to bypass type checking.
+
+Fix: Construct full config via `{ ...getConfig(), overrides }`.
+
+**18. `markDealsNotified` crashes on empty array**
+
+Problem: SQL `IN ()` with empty array produces invalid SQL.
+
+Fix: Add `if (dealIds.length === 0) return;` guard.
+
+**19. O(N) SELECT per price in daily pipeline**
+
+Problem: `getCardByUuid` called per-price (~100K queries per run).
+
+Fix: Build `Set<string>` of known UUIDs upfront, use `knownUuids.has()`.
+
+**20. `avgs` CTE includes today's price**
+
+Problem: 30-day average includes today, diluting drop detection signal.
+
+Fix: Add `AND p.date < l.date` to exclude today from average calculation.
+
+### High
+
+**21. No transaction safety on stream errors**
+
+Problem: Streaming loops use `BEGIN`/`COMMIT` without `ROLLBACK` on error.
+
+Fix: Wrap both seed.ts streaming loops and `refreshCardMetadataIfStale` in try/catch with `db.exec("ROLLBACK")`.
+
+**22. Foreign keys never enforced**
+
+Problem: SQLite doesn't enforce FK constraints by default.
+
+Fix: Add `db.pragma("foreign_keys = ON")` in schema.ts, seed.ts, and index.ts.
+
+**23. No data quality validation**
+
+Problem: Pipeline proceeds even with 0 prices parsed (data corruption/API failure).
+
+Fix: Throw if 0 prices. Warn if <100 prices.
+
+**24. No Slack failure notification**
+
+Problem: When all retries fail, no notification is sent.
+
+Fix: Send Slack notification with failure message before `process.exit(1)`.
+
+**25. No database pruning**
+
+Problem: Price table grows unbounded.
+
+Fix: Delete records older than 180 days at start of each pipeline run.
+
+**26. Wrong `moduleResolution`**
+
+Problem: `"node"` is CJS-era. ESM projects need `"node16"`.
+
+Fix: Change to `"moduleResolution": "node16"`.
+
+**27. AllPrices cache never cleaned**
+
+Problem: Multi-GB AllPrices file remains on disk after seed.
+
+Fix: `unlinkSync(config.allPricesCachePath)` after price streaming completes.
+
+### Moderate
+
+**28. Broken Cardmarket URLs**
+
+Problem: `encodeURIComponent(name)` doesn't match Cardmarket URL scheme.
+
+Fix: Use `mcmId` for direct product links with name-based fallback.
+
+**29. No Slack message batching**
+
+Problem: >50 deals overflow Block Kit's 50-block limit.
+
+Fix: `batchDeals()` splits into chunks of 48 deals. Multiple webhook POSTs.
+
+**30. Misleading fetchWithRetry test name**
+
+Problem: Test named "retries on failure" but didn't use fake timers.
+
+Fix: Rename, add `vi.useFakeTimers()` and `vi.advanceTimersByTimeAsync()`.
+
+**31. Duplicate types across files**
+
+Problem: `AllIdentifiersCard` defined in both seed.ts and pipeline.ts.
+
+Fix: Export from `mtgjson.ts`, import in both files. Remove `AllPricesEntry` (reuse `MtgjsonPriceEntry`).
+
+**32. Missing query tests**
+
+Problem: No tests for multiple printings, watchlist round-trip, or empty DB edge cases.
+
+Fix: Added 6 tests to queries.test.ts.
+
+**33. Config afterEach incomplete**
+
+Problem: Only 3 of 11 env vars cleaned up in afterEach.
+
+Fix: Loop over all `CONFIG_ENV_KEYS` (11 keys).
+
+**34. No watchlist+trend_drop dedup test**
+
+Problem: Dedup logic existed but wasn't tested.
+
+Fix: Test that card on watchlist with >15% drop produces exactly 1 deal (trend_drop).
+
+### Minor
+
+**35. No env var override tests for new fields**
+
+Fix: Added test for `IDENTIFIERS_MAX_AGE_DAYS`, `PIPELINE_MAX_RETRIES`, `PIPELINE_RETRY_DELAY_MS`.
+
+**36. Heartbeat logging**
+
+Fix: Pipeline complete log now includes prices stored, deals found, notifications sent.
+
+**37. Missing pipeline test for stale cache**
+
+Fix: Added test: when cache missing and URL empty, `refreshCardMetadataIfStale` throws.
+
+**38. `sendSlackNotification` untested**
+
+Fix: Added 3 tests with mocked fetch (POST payload, empty URL skip, non-200 throw).

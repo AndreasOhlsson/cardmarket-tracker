@@ -72,7 +72,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
@@ -188,10 +188,18 @@ import { describe, it, expect, afterEach } from "vitest";
 import { getConfig } from "../src/config.js";
 
 describe("getConfig", () => {
+  const CONFIG_ENV_KEYS = [
+    "SLACK_WEBHOOK_URL", "PRICE_FLOOR_EUR", "TREND_DROP_PCT",
+    "WATCHLIST_ALERT_PCT", "DB_PATH", "WATCHLIST_PATH",
+    "IDENTIFIERS_CACHE_PATH", "ALL_PRICES_CACHE_PATH",
+    "IDENTIFIERS_MAX_AGE_DAYS", "PIPELINE_MAX_RETRIES",
+    "PIPELINE_RETRY_DELAY_MS",
+  ] as const;
+
   afterEach(() => {
-    delete process.env.SLACK_WEBHOOK_URL;
-    delete process.env.PRICE_FLOOR_EUR;
-    delete process.env.TREND_DROP_PCT;
+    for (const key of CONFIG_ENV_KEYS) {
+      delete process.env[key];
+    }
   });
 
   it("returns default config values", () => {
@@ -228,6 +236,16 @@ describe("getConfig", () => {
     const config = getConfig();
     expect(config.priceFloorEur).toBe(25);
     expect(config.trendDropPct).toBe(0.2);
+  });
+
+  it("accepts overrides for retry and refresh config fields", () => {
+    process.env.IDENTIFIERS_MAX_AGE_DAYS = "7";
+    process.env.PIPELINE_MAX_RETRIES = "5";
+    process.env.PIPELINE_RETRY_DELAY_MS = "60000";
+    const config = getConfig();
+    expect(config.identifiersMaxAgeDays).toBe(7);
+    expect(config.pipelineMaxRetries).toBe(5);
+    expect(config.pipelineRetryDelayMs).toBe(60000);
   });
 });
 ```
@@ -302,7 +320,7 @@ export function getConfig(): Config {
 **Step 4: Run test to verify it passes**
 
 Run: `yarn vitest run tests/config.test.ts`
-Expected: PASS (4 tests)
+Expected: PASS (5 tests)
 
 **Step 5: Format and lint**
 
@@ -422,6 +440,7 @@ Expected: FAIL — cannot find module
 import Database from "better-sqlite3";
 
 export function initializeDatabase(db: Database.Database): void {
+  db.pragma("foreign_keys = ON");
   db.exec(`
     CREATE TABLE IF NOT EXISTS cards (
       uuid TEXT PRIMARY KEY,
@@ -509,6 +528,7 @@ import {
   get30DayAvgPrice,
   getHistoricalLowPrice,
   getWatchlistUuids,
+  upsertWatchlistEntry,
   upsertDeal,
   getUnnotifiedDeals,
   markDealsNotified,
@@ -660,6 +680,46 @@ describe("database queries", () => {
 
       const after = getUnnotifiedDeals(db);
       expect(after).toHaveLength(0);
+    });
+
+    it("markDealsNotified does not throw on empty array", () => {
+      expect(() => markDealsNotified(db, [])).not.toThrow();
+    });
+  });
+
+  describe("getCardsByName", () => {
+    it("returns multiple printings of the same card", () => {
+      upsertCard(db, { uuid: "bolt-a25", name: "Lightning Bolt", setCode: "A25", commanderLegal: true });
+      upsertCard(db, { uuid: "bolt-sta", name: "Lightning Bolt", setCode: "STA", commanderLegal: true });
+      upsertCard(db, { uuid: "other", name: "Other Card", commanderLegal: true });
+
+      const bolts = getCardsByName(db, "Lightning Bolt");
+      expect(bolts).toHaveLength(2);
+      expect(bolts.map((c) => c.set_code).sort()).toEqual(["A25", "STA"]);
+    });
+  });
+
+  describe("watchlist", () => {
+    it("upsertWatchlistEntry + getWatchlistUuids round-trip", () => {
+      upsertCard(db, { uuid: "abc-123", name: "Test", commanderLegal: true });
+      upsertWatchlistEntry(db, "abc-123", "test notes");
+
+      const uuids = getWatchlistUuids(db);
+      expect(uuids).toEqual(["abc-123"]);
+    });
+  });
+
+  describe("edge cases on empty DB", () => {
+    it("get30DayAvgPrice returns null for unknown UUID", () => {
+      expect(get30DayAvgPrice(db, "nonexistent")).toBeNull();
+    });
+
+    it("getHistoricalLowPrice returns null for unknown UUID", () => {
+      expect(getHistoricalLowPrice(db, "nonexistent")).toBeNull();
+    });
+
+    it("getLatestPrice returns undefined for unknown UUID", () => {
+      expect(getLatestPrice(db, "nonexistent")).toBeUndefined();
     });
   });
 });
@@ -921,6 +981,7 @@ export function markDealsNotified(
   db: Database.Database,
   dealIds: number[]
 ): void {
+  if (dealIds.length === 0) return;
   const placeholders = dealIds.map(() => "?").join(",");
   db.prepare(
     `UPDATE deals SET notified = 1 WHERE id IN (${placeholders})`
@@ -931,7 +992,7 @@ export function markDealsNotified(
 **Step 4: Run test to verify it passes**
 
 Run: `yarn vitest run tests/db/queries.test.ts`
-Expected: PASS (all tests)
+Expected: PASS (13 tests)
 
 **Step 5: Commit**
 
@@ -1055,19 +1116,60 @@ describe("fetchWithRetry", () => {
     await expect(promise).rejects.toThrow("Network error");
   });
 
-  it("throws on HTTP error without retry", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
+  it("retries on HTTP error and throws after exhausting retries", async () => {
+    vi.useFakeTimers();
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValue({
         ok: false,
         status: 500,
         statusText: "Internal Server Error",
+      });
+
+    vi.stubGlobal("fetch", mockFetch);
+
+    const promise = fetchWithRetry("https://example.com", 2);
+    await vi.advanceTimersByTimeAsync(10000);
+
+    await expect(promise).rejects.toThrow("HTTP 500");
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("streamJsonDataEntries", () => {
+  const TMP_DIR = "tests/tmp";
+  const TMP_FILE = `${TMP_DIR}/test-stream.json`;
+
+  afterEach(() => {
+    const { rmSync } = require("node:fs");
+    rmSync(TMP_DIR, { recursive: true, force: true });
+  });
+
+  it("yields key-value pairs from the 'data' key of a JSON file", async () => {
+    const { mkdirSync, writeFileSync } = require("node:fs");
+    const { streamJsonDataEntries } = await import("../../src/fetchers/mtgjson.js");
+
+    mkdirSync(TMP_DIR, { recursive: true });
+    writeFileSync(
+      TMP_FILE,
+      JSON.stringify({
+        meta: { version: "1.0" },
+        data: {
+          "uuid-001": { name: "Card A" },
+          "uuid-002": { name: "Card B" },
+        },
       }),
     );
 
-    await expect(fetchWithRetry("https://example.com")).rejects.toThrow(
-      "HTTP 500",
-    );
+    const entries: { key: string; value: unknown }[] = [];
+    for await (const entry of streamJsonDataEntries(TMP_FILE)) {
+      entries.push(entry);
+    }
+
+    expect(entries).toHaveLength(2);
+    expect(entries[0]!.key).toBe("uuid-001");
+    expect((entries[0]!.value as { name: string }).name).toBe("Card A");
+    expect(entries[1]!.key).toBe("uuid-002");
   });
 });
 ```
@@ -1104,6 +1206,18 @@ export interface MtgjsonPriceEntry {
     [key: string]: unknown;
   };
   [key: string]: unknown;
+}
+
+export interface AllIdentifiersCard {
+  name: string;
+  setCode: string;
+  setName: string;
+  identifiers?: {
+    scryfallId?: string;
+    mcmId?: string;
+    mcmMetaId?: string;
+  };
+  legalities?: Record<string, string>;
 }
 
 export interface ParsedPrice {
@@ -1215,17 +1329,31 @@ export async function downloadMtgjsonGzToDisk(
  * Stream-parse entries from a JSON file's "data" key without loading the
  * entire file into memory. Uses stream-json for constant memory usage.
  */
+/**
+ * Stream-parse entries from a JSON file's "data" key without loading the
+ * entire file into memory. Uses stream-json for constant memory usage.
+ *
+ * NOTE: stream-json is CJS. Dynamic imports use default export destructuring
+ * with fallbacks for CJS-to-ESM interop. If named exports fail on your Node
+ * version, fall back to `createRequire(import.meta.url)` from `node:module`.
+ * Verify these imports work in Task 5 BEFORE proceeding to later tasks.
+ */
 export async function* streamJsonDataEntries(
   filePath: string,
 ): AsyncGenerator<{ key: string; value: unknown }> {
-  const { parser } = await import("stream-json");
-  const { pick } = await import("stream-json/filters/Pick.js");
-  const { streamObject } = await import("stream-json/streamers/StreamObject.js");
+  const parserMod = await import("stream-json");
+  const pickMod = await import("stream-json/filters/Pick");
+  const streamObjectMod = await import("stream-json/streamers/StreamObject");
+
+  // CJS-to-ESM interop: named export or default.default
+  const parserFn = parserMod.parser ?? (parserMod as { default: { parser: typeof parserMod.parser } }).default.parser;
+  const pickFn = pickMod.pick ?? (pickMod as { default: { pick: typeof pickMod.pick } }).default.pick;
+  const streamObjectFn = streamObjectMod.streamObject ?? (streamObjectMod as { default: { streamObject: typeof streamObjectMod.streamObject } }).default.streamObject;
 
   const stream = createReadStream(filePath)
-    .pipe(parser())
-    .pipe(pick({ filter: "data" }))
-    .pipe(streamObject());
+    .pipe(parserFn())
+    .pipe(pickFn({ filter: "data" }))
+    .pipe(streamObjectFn());
 
   for await (const entry of stream) {
     yield entry as { key: string; value: unknown };
@@ -1250,7 +1378,7 @@ export async function fetchAllPricesToday(
 **Step 4: Run test to verify it passes**
 
 Run: `yarn vitest run tests/fetchers/mtgjson.test.ts`
-Expected: PASS (6 tests)
+Expected: PASS (7 tests)
 
 **Step 5: Commit**
 
@@ -1463,6 +1591,32 @@ describe("detectDeals", () => {
     const modernDeals = deals.filter((d) => d.uuid === "modern-only");
     expect(modernDeals).toHaveLength(0);
   });
+
+  it("does NOT produce duplicate watchlist_alert when trend_drop already fires", () => {
+    // Card on watchlist with >15% drop should produce exactly 1 deal (trend_drop),
+    // not both trend_drop AND watchlist_alert
+    upsertPrice(db, {
+      uuid: "card-1",
+      date: daysAgo(0),
+      cmTrend: 40.0, // ~20% drop from ~50 avg — triggers both thresholds
+      source: "mtgjson",
+    });
+
+    const deals = detectDeals(db, {
+      priceFloorEur: 10,
+      trendDropPct: 0.15,
+      watchlistAlertPct: 0.05,
+      watchlistUuids: new Set(["card-1"]),
+    });
+
+    const card1Deals = deals.filter((d) => d.uuid === "card-1");
+    const trendDrops = card1Deals.filter((d) => d.dealType === "trend_drop");
+    const watchlistAlerts = card1Deals.filter(
+      (d) => d.dealType === "watchlist_alert",
+    );
+    expect(trendDrops).toHaveLength(1);
+    expect(watchlistAlerts).toHaveLength(0);
+  });
 });
 ```
 
@@ -1523,11 +1677,14 @@ export function detectDeals(
       WHERE p.cm_trend IS NOT NULL
     ),
     avgs AS (
-      SELECT p.uuid, AVG(p.cm_trend) as avg_30d
-      FROM prices p
-      JOIN commander_cards cc ON p.uuid = cc.uuid
-      WHERE p.cm_trend IS NOT NULL AND p.date >= date('now', '-30 days')
-      GROUP BY p.uuid
+      SELECT l.uuid, AVG(p.cm_trend) as avg_30d
+      FROM latest l
+      JOIN prices p ON l.uuid = p.uuid
+      WHERE l.rn = 1
+        AND p.cm_trend IS NOT NULL
+        AND p.date >= date('now', '-30 days')
+        AND p.date < l.date
+      GROUP BY l.uuid
     ),
     prev_lows AS (
       SELECT l.uuid, MIN(p2.cm_trend) as prev_low
@@ -1614,7 +1771,7 @@ export function detectDeals(
 **Step 4: Run test to verify it passes**
 
 Run: `yarn vitest run tests/engine/deals.test.ts`
-Expected: PASS (7 tests)
+Expected: PASS (8 tests)
 
 **Step 5: Commit**
 
@@ -1635,8 +1792,14 @@ git commit -m "feat: add deal detection engine with trend drop, new low, watchli
 
 ```typescript
 // tests/notifications/slack.test.ts
-import { describe, it, expect } from "vitest";
-import { formatDealMessage, formatDealBatch } from "../../src/notifications/slack.js";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  formatDealMessage,
+  formatDealBatch,
+  batchDeals,
+  sendSlackNotification,
+  type DealForSlack,
+} from "../../src/notifications/slack.js";
 
 describe("formatDealMessage", () => {
   it("formats a single deal into a Slack block", () => {
@@ -1655,7 +1818,20 @@ describe("formatDealMessage", () => {
     expect(msg).toContain("48.50");
     expect(msg).toContain("57.80");
     expect(msg).toContain("-16.1%");
-    expect(msg).toContain("cardmarket.com");
+    expect(msg).toContain("cardmarket.com/en/Magic/Products/Singles/12345");
+  });
+
+  it("falls back to name-based URL when mcmId is missing", () => {
+    const msg = formatDealMessage({
+      name: "Sol Ring",
+      setCode: "C21",
+      dealType: "watchlist_alert",
+      currentPrice: 3.0,
+      referencePrice: 4.0,
+      pctChange: -0.25,
+    });
+
+    expect(msg).toContain("cardmarket.com/en/Magic/Cards/Sol%20Ring");
   });
 });
 
@@ -1690,6 +1866,96 @@ describe("formatDealBatch", () => {
     expect(payload.blocks).toHaveLength(0);
   });
 });
+
+describe("batchDeals", () => {
+  function makeDeal(i: number): DealForSlack {
+    return {
+      name: `Card ${i}`,
+      setCode: "SET",
+      dealType: "trend_drop",
+      currentPrice: 10,
+      referencePrice: 15,
+      pctChange: -0.33,
+    };
+  }
+
+  it("returns a single batch for <=48 deals", () => {
+    const deals = Array.from({ length: 48 }, (_, i) => makeDeal(i));
+    const batches = batchDeals(deals);
+    expect(batches).toHaveLength(1);
+    // 48 deal blocks + header + divider = 50 blocks
+    expect(batches[0]!.blocks).toHaveLength(50);
+  });
+
+  it("splits into multiple batches for >48 deals", () => {
+    const deals = Array.from({ length: 60 }, (_, i) => makeDeal(i));
+    const batches = batchDeals(deals);
+    expect(batches).toHaveLength(2);
+    // First batch: 48 deals + 2 overhead = 50 blocks
+    expect(batches[0]!.blocks).toHaveLength(50);
+    // Second batch: 12 deals + 2 overhead = 14 blocks
+    expect(batches[1]!.blocks).toHaveLength(14);
+  });
+
+  it("returns empty array for no deals", () => {
+    expect(batchDeals([])).toHaveLength(0);
+  });
+});
+
+describe("sendSlackNotification", () => {
+  const mockFetch = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", mockFetch);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("sends POST with correct payload", async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    const payload = formatDealBatch([
+      {
+        name: "Test Card",
+        setCode: "TST",
+        dealType: "trend_drop",
+        currentPrice: 10,
+        referencePrice: 15,
+        pctChange: -0.33,
+      },
+    ]);
+
+    await sendSlackNotification("https://hooks.slack.com/test", payload);
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+    const [url, options] = mockFetch.mock.calls[0]!;
+    expect(url).toBe("https://hooks.slack.com/test");
+    expect(options.method).toBe("POST");
+    expect(options.headers["Content-Type"]).toBe("application/json");
+    expect(JSON.parse(options.body)).toEqual(payload);
+  });
+
+  it("skips notification when webhook URL is empty", async () => {
+    await sendSlackNotification("", { blocks: [{ type: "section" }] });
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it("throws on non-200 response", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: "Internal Server Error",
+    });
+
+    await expect(
+      sendSlackNotification("https://hooks.slack.com/test", {
+        blocks: [{ type: "section" }],
+      }),
+    ).rejects.toThrow("Slack webhook failed: 500");
+  });
+});
 ```
 
 **Step 2: Run test to verify it fails**
@@ -1718,7 +1984,10 @@ const DEAL_TYPE_LABELS: Record<string, string> = {
   watchlist_alert: "WATCHLIST",
 };
 
-function cardmarketUrl(name: string): string {
+function cardmarketUrl(name: string, mcmId?: number): string {
+  if (mcmId) {
+    return `https://www.cardmarket.com/en/Magic/Products/Singles/${mcmId}`;
+  }
   const encodedName = encodeURIComponent(name);
   return `https://www.cardmarket.com/en/Magic/Cards/${encodedName}`;
 }
@@ -1727,7 +1996,7 @@ export function formatDealMessage(deal: DealForSlack): string {
   const label = DEAL_TYPE_LABELS[deal.dealType] ?? deal.dealType;
   const pctStr = `${(deal.pctChange * 100).toFixed(1)}%`;
   const setStr = deal.setCode ? ` (${deal.setCode})` : "";
-  const url = cardmarketUrl(deal.name);
+  const url = cardmarketUrl(deal.name, deal.mcmId);
   const urlLine = `\n<${url}|View on Cardmarket>`;
 
   return (
@@ -1766,6 +2035,23 @@ export function formatDealBatch(
   return { blocks };
 }
 
+// Slack Block Kit allows max 50 blocks per message.
+// Reserve 2 for header + divider = 48 deal blocks per message.
+const MAX_DEALS_PER_MESSAGE = 48;
+
+export function batchDeals(
+  deals: DealForSlack[],
+): { blocks: unknown[] }[] {
+  if (deals.length === 0) return [];
+
+  const batches: { blocks: unknown[] }[] = [];
+  for (let i = 0; i < deals.length; i += MAX_DEALS_PER_MESSAGE) {
+    const chunk = deals.slice(i, i + MAX_DEALS_PER_MESSAGE);
+    batches.push(formatDealBatch(chunk));
+  }
+  return batches;
+}
+
 export async function sendSlackNotification(
   webhookUrl: string,
   payload: { blocks: unknown[] },
@@ -1797,7 +2083,7 @@ export async function sendSlackNotification(
 **Step 4: Run test to verify it passes**
 
 Run: `yarn vitest run tests/notifications/slack.test.ts`
-Expected: PASS (3 tests)
+Expected: PASS (10 tests)
 
 **Step 5: Commit**
 
@@ -1924,7 +2210,7 @@ This is a CLI script. Uses `stream-json` to stream-parse AllIdentifiers and AllP
 // src/seed.ts
 import "dotenv/config";
 import Database from "better-sqlite3";
-import { mkdirSync, existsSync } from "node:fs";
+import { mkdirSync, existsSync, unlinkSync } from "node:fs";
 import { dirname } from "node:path";
 import { getConfig } from "./config.js";
 import { initializeDatabase } from "./db/schema.js";
@@ -1937,31 +2223,10 @@ import {
 import {
   downloadMtgjsonGzToDisk,
   streamJsonDataEntries,
+  type AllIdentifiersCard,
+  type MtgjsonPriceEntry,
 } from "./fetchers/mtgjson.js";
 import { loadWatchlist } from "./watchlist.js";
-
-interface AllIdentifiersCard {
-  name: string;
-  setCode: string;
-  setName: string;
-  identifiers?: {
-    scryfallId?: string;
-    mcmId?: string;
-    mcmMetaId?: string;
-  };
-  legalities?: Record<string, string>;
-}
-
-interface AllPricesEntry {
-  paper?: {
-    cardmarket?: {
-      retail?: {
-        normal?: Record<string, number>;
-        foil?: Record<string, number>;
-      };
-    };
-  };
-}
 
 async function main() {
   const config = getConfig();
@@ -1973,6 +2238,7 @@ async function main() {
 
   const db = new Database(config.dbPath);
   db.pragma("journal_mode = WAL");
+  db.pragma("foreign_keys = ON");
   initializeDatabase(db);
 
   // Step 1: Download AllIdentifiers to disk
@@ -2008,39 +2274,44 @@ async function main() {
   `);
 
   db.exec("BEGIN");
-  for await (const { key: uuid, value } of streamJsonDataEntries(
-    config.identifiersCachePath,
-  )) {
-    const card = value as AllIdentifiersCard;
-    const isCommanderLegal = card.legalities?.commander === "Legal";
+  try {
+    for await (const { key: uuid, value } of streamJsonDataEntries(
+      config.identifiersCachePath,
+    )) {
+      const card = value as AllIdentifiersCard;
+      const isCommanderLegal = card.legalities?.commander === "Legal";
 
-    if (!isCommanderLegal) {
-      skipped++;
-      continue;
+      if (!isCommanderLegal) {
+        skipped++;
+        continue;
+      }
+
+      const mcmIdStr = card.identifiers?.mcmId;
+      const mcmMetaIdStr = card.identifiers?.mcmMetaId;
+
+      upsertCardStmt.run({
+        uuid,
+        name: card.name,
+        setCode: card.setCode ?? null,
+        setName: card.setName ?? null,
+        scryfallId: card.identifiers?.scryfallId ?? null,
+        mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
+        mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
+        commanderLegal: 1,
+      });
+      cardCount++;
+
+      if (cardCount % 10000 === 0) {
+        db.exec("COMMIT");
+        db.exec("BEGIN");
+        console.log(`  ${cardCount} cards inserted...`);
+      }
     }
-
-    const mcmIdStr = card.identifiers?.mcmId;
-    const mcmMetaIdStr = card.identifiers?.mcmMetaId;
-
-    upsertCardStmt.run({
-      uuid,
-      name: card.name,
-      setCode: card.setCode ?? null,
-      setName: card.setName ?? null,
-      scryfallId: card.identifiers?.scryfallId ?? null,
-      mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
-      mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
-      commanderLegal: 1,
-    });
-    cardCount++;
-
-    if (cardCount % 10000 === 0) {
-      db.exec("COMMIT");
-      db.exec("BEGIN");
-      console.log(`  ${cardCount} cards inserted...`);
-    }
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
   }
-  db.exec("COMMIT");
   console.log(
     `Inserted ${cardCount} Commander-legal cards (skipped ${skipped} non-legal)`,
   );
@@ -2080,43 +2351,52 @@ async function main() {
   `);
 
   db.exec("BEGIN");
-  for await (const { key: uuid, value } of streamJsonDataEntries(
-    config.allPricesCachePath,
-  )) {
-    if (!knownUuids.has(uuid)) {
-      priceSkipped++;
-      continue;
+  try {
+    for await (const { key: uuid, value } of streamJsonDataEntries(
+      config.allPricesCachePath,
+    )) {
+      if (!knownUuids.has(uuid)) {
+        priceSkipped++;
+        continue;
+      }
+
+      const entry = value as MtgjsonPriceEntry;
+      const retail = entry.paper?.cardmarket?.retail;
+      if (!retail?.normal) continue;
+
+      const normalPrices = retail.normal;
+      const foilPrices = retail.foil;
+
+      for (const [date, price] of Object.entries(normalPrices)) {
+        if (price === undefined) continue;
+        upsertPriceStmt.run({
+          uuid,
+          date,
+          cmTrend: price,
+          cmFoilTrend: foilPrices?.[date] ?? null,
+          source: "mtgjson",
+        });
+        priceCount++;
+      }
+
+      if (priceCount % 50000 === 0) {
+        db.exec("COMMIT");
+        db.exec("BEGIN");
+        console.log(`  ${priceCount} price records inserted...`);
+      }
     }
-
-    const entry = value as AllPricesEntry;
-    const retail = entry.paper?.cardmarket?.retail;
-    if (!retail?.normal) continue;
-
-    const normalPrices = retail.normal;
-    const foilPrices = retail.foil;
-
-    for (const [date, price] of Object.entries(normalPrices)) {
-      if (price === undefined) continue;
-      upsertPriceStmt.run({
-        uuid,
-        date,
-        cmTrend: price,
-        cmFoilTrend: foilPrices?.[date] ?? null,
-        source: "mtgjson",
-      });
-      priceCount++;
-    }
-
-    if (priceCount % 50000 === 0) {
-      db.exec("COMMIT");
-      db.exec("BEGIN");
-      console.log(`  ${priceCount} price records inserted...`);
-    }
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
   }
-  db.exec("COMMIT");
   console.log(
     `Inserted ${priceCount} price records (skipped ${priceSkipped} non-Commander UUIDs)`,
   );
+
+  // Step 5b: Remove AllPrices cache (multi-GB file, no longer needed after seed)
+  console.log("Removing AllPrices cache (no longer needed)...");
+  unlinkSync(config.allPricesCachePath);
 
   // Step 6: Populate watchlist table from JSON
   const watchlist = loadWatchlist(config.watchlistPath);
@@ -2140,9 +2420,12 @@ async function main() {
   db.close();
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error("Seed failed:", err);
   process.exit(1);
+  // Note: DB is closed in the streaming try/catch via ROLLBACK, then
+  // db.close() runs at the end of main(). If an error escapes main(),
+  // the process exits anyway — SQLite WAL handles recovery on next open.
 });
 ```
 
@@ -2182,6 +2465,7 @@ import Database from "better-sqlite3";
 import { initializeDatabase } from "../src/db/schema.js";
 import { upsertCard, upsertPrice, getUnnotifiedDeals } from "../src/db/queries.js";
 import { runDealDetection, refreshCardMetadataIfStale } from "../src/pipeline.js";
+import { getConfig } from "../src/config.js";
 
 describe("refreshCardMetadataIfStale", () => {
   it("returns 0 when cache file is fresh", async () => {
@@ -2195,15 +2479,36 @@ describe("refreshCardMetadataIfStale", () => {
     mkdirSync(tmpDir, { recursive: true });
     writeFileSync(tmpFile, "{}");
 
-    const result = await refreshCardMetadataIfStale(db, {
+    const config = {
+      ...getConfig(),
       identifiersCachePath: tmpFile,
       identifiersMaxAgeDays: 30,
-      mtgjson: { allIdentifiersUrl: "", allPricesTodayUrl: "", allPricesUrl: "" },
-    } as any);
+    };
+    const result = await refreshCardMetadataIfStale(db, config);
 
     expect(result).toBe(0);
 
     rmSync(tmpDir, { recursive: true, force: true });
+    db.close();
+  });
+
+  it("throws when cache is missing and download URL is empty", async () => {
+    const db = new Database(":memory:");
+    initializeDatabase(db);
+
+    const config = {
+      ...getConfig(),
+      identifiersCachePath: "tests/tmp/nonexistent.json",
+      mtgjson: {
+        ...getConfig().mtgjson,
+        allIdentifiersUrl: "",
+      },
+    };
+
+    await expect(
+      refreshCardMetadataIfStale(db, config),
+    ).rejects.toThrow();
+
     db.close();
   });
 });
@@ -2284,7 +2589,6 @@ import {
   getUnnotifiedDeals,
   markDealsNotified,
   upsertDeal,
-  getCardByUuid,
   getWatchlistUuids,
   type DealWithCardRow,
 } from "./db/queries.js";
@@ -2293,6 +2597,7 @@ import {
   parseCardmarketPrices,
   downloadMtgjsonGzToDisk,
   streamJsonDataEntries,
+  type AllIdentifiersCard,
 } from "./fetchers/mtgjson.js";
 import {
   detectDeals,
@@ -2300,22 +2605,11 @@ import {
 } from "./engine/deals.js";
 import {
   formatDealBatch,
+  batchDeals,
   sendSlackNotification,
   type DealForSlack,
 } from "./notifications/slack.js";
 import type { Config } from "./config.js";
-
-interface AllIdentifiersCard {
-  name: string;
-  setCode: string;
-  setName: string;
-  identifiers?: {
-    scryfallId?: string;
-    mcmId?: string;
-    mcmMetaId?: string;
-  };
-  legalities?: Record<string, string>;
-}
 
 /**
  * Refresh AllIdentifiers cache if it's older than config.identifiersMaxAgeDays.
@@ -2363,31 +2657,36 @@ export async function refreshCardMetadataIfStale(
 
   let cardCount = 0;
   db.exec("BEGIN");
-  for await (const { key: uuid, value } of streamJsonDataEntries(cachePath)) {
-    const card = value as AllIdentifiersCard;
-    if (card.legalities?.commander !== "Legal") continue;
+  try {
+    for await (const { key: uuid, value } of streamJsonDataEntries(cachePath)) {
+      const card = value as AllIdentifiersCard;
+      if (card.legalities?.commander !== "Legal") continue;
 
-    const mcmIdStr = card.identifiers?.mcmId;
-    const mcmMetaIdStr = card.identifiers?.mcmMetaId;
+      const mcmIdStr = card.identifiers?.mcmId;
+      const mcmMetaIdStr = card.identifiers?.mcmMetaId;
 
-    upsertCardStmt.run({
-      uuid,
-      name: card.name,
-      setCode: card.setCode ?? null,
-      setName: card.setName ?? null,
-      scryfallId: card.identifiers?.scryfallId ?? null,
-      mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
-      mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
-      commanderLegal: 1,
-    });
-    cardCount++;
+      upsertCardStmt.run({
+        uuid,
+        name: card.name,
+        setCode: card.setCode ?? null,
+        setName: card.setName ?? null,
+        scryfallId: card.identifiers?.scryfallId ?? null,
+        mcmId: mcmIdStr ? parseInt(mcmIdStr, 10) : null,
+        mcmMetaId: mcmMetaIdStr ? parseInt(mcmMetaIdStr, 10) : null,
+        commanderLegal: 1,
+      });
+      cardCount++;
 
-    if (cardCount % 10000 === 0) {
-      db.exec("COMMIT");
-      db.exec("BEGIN");
+      if (cardCount % 10000 === 0) {
+        db.exec("COMMIT");
+        db.exec("BEGIN");
+      }
     }
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
   }
-  db.exec("COMMIT");
   console.log(`Refreshed card metadata: ${cardCount} Commander-legal cards upserted`);
   return cardCount;
 }
@@ -2421,18 +2720,46 @@ export async function runDailyPipeline(
   // 0. Refresh card metadata if stale
   await refreshCardMetadataIfStale(db, config);
 
+  // 0b. Prune old price records (>180 days)
+  const pruned = db.prepare(
+    "DELETE FROM prices WHERE date < date('now', '-180 days')",
+  ).run();
+  if (pruned.changes > 0) {
+    console.log(`Pruned ${pruned.changes} price records older than 180 days`);
+  }
+
   // 1. Fetch today's prices
   const priceData = await fetchAllPricesToday(config.mtgjson.allPricesTodayUrl);
   const prices = parseCardmarketPrices(priceData);
   console.log(`Parsed ${prices.length} Cardmarket prices`);
 
+  // 1b. Data quality validation
+  if (prices.length === 0) {
+    throw new Error(
+      "AllPricesToday returned 0 Cardmarket prices — aborting pipeline",
+    );
+  }
+  if (prices.length < 100) {
+    console.warn(
+      `WARNING: Only ${prices.length} Cardmarket prices parsed. Expected 10,000+. Data may be incomplete.`,
+    );
+  }
+
   // 2. Store prices only for Commander-legal cards already in DB
+  // Build UUID Set for O(1) lookups instead of per-price SELECT
+  const knownUuids = new Set(
+    (
+      db
+        .prepare("SELECT uuid FROM cards WHERE commander_legal = 1")
+        .all() as { uuid: string }[]
+    ).map((r) => r.uuid),
+  );
+
   let stored = 0;
   let skipped = 0;
   const storePrices = db.transaction(() => {
     for (const price of prices) {
-      const card = getCardByUuid(db, price.uuid);
-      if (!card) {
+      if (!knownUuids.has(price.uuid)) {
         skipped++;
         continue;
       }
@@ -2463,7 +2790,7 @@ export async function runDailyPipeline(
   });
   console.log(`Detected ${dealCount} deals`);
 
-  // 5. Send Slack notification
+  // 5. Send Slack notification (batch into max 48 deals per message)
   if (dealCount > 0) {
     const unnotified: DealWithCardRow[] = getUnnotifiedDeals(db);
 
@@ -2477,8 +2804,10 @@ export async function runDailyPipeline(
       mcmId: d.mcm_id ?? undefined,
     }));
 
-    const payload = formatDealBatch(slackDeals);
-    await sendSlackNotification(config.slackWebhookUrl, payload);
+    const batches = batchDeals(slackDeals);
+    for (const payload of batches) {
+      await sendSlackNotification(config.slackWebhookUrl, payload);
+    }
 
     markDealsNotified(
       db,
@@ -2486,7 +2815,9 @@ export async function runDailyPipeline(
     );
   }
 
-  console.log(`[${new Date().toISOString()}] Pipeline complete`);
+  console.log(
+    `[${new Date().toISOString()}] Pipeline complete. Prices stored: ${stored}, Deals found: ${dealCount}, Notifications sent: ${dealCount > 0 ? "yes" : "no"}`,
+  );
 }
 ```
 
@@ -2501,6 +2832,7 @@ import { dirname } from "node:path";
 import { getConfig } from "./config.js";
 import { initializeDatabase } from "./db/schema.js";
 import { runDailyPipeline } from "./pipeline.js";
+import { sendSlackNotification } from "./notifications/slack.js";
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -2516,6 +2848,7 @@ async function main() {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     const db = new Database(config.dbPath);
     db.pragma("journal_mode = WAL");
+    db.pragma("foreign_keys = ON");
     initializeDatabase(db);
 
     try {
@@ -2536,13 +2869,31 @@ async function main() {
           `All ${maxRetries} attempts failed. Last error:`,
           err,
         );
+
+        // Attempt to notify via Slack that the pipeline has failed
+        try {
+          await sendSlackNotification(config.slackWebhookUrl, {
+            blocks: [
+              {
+                type: "section",
+                text: {
+                  type: "mrkdwn",
+                  text: `*Pipeline Failed*\nAll ${maxRetries} attempts exhausted.\nLast error: ${err instanceof Error ? err.message : String(err)}`,
+                },
+              },
+            ],
+          });
+        } catch {
+          // Don't let notification failure mask the real error
+        }
+
         process.exit(1);
       }
     }
   }
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error("Fatal:", err);
   process.exit(1);
 });
@@ -2551,7 +2902,7 @@ main().catch((err) => {
 **Step 5: Run test to verify it passes**
 
 Run: `yarn vitest run tests/pipeline.test.ts`
-Expected: PASS
+Expected: PASS (3 tests)
 
 **Step 6: Commit**
 

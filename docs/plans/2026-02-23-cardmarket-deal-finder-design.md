@@ -143,7 +143,7 @@ DEAL: Ragavan, Nimble Pilferer (MH2)
   https://www.cardmarket.com/en/Magic/Products/Singles/...
 ```
 
-Batch deals into a single message per run to avoid spam. Slack webhooks have no meaningful rate limit for daily batched messages.
+Batch deals into max 48 per message (Block Kit limit is 50 blocks; 2 reserved for header + divider). Send multiple webhook POSTs if needed. Slack webhooks have no meaningful rate limit for daily batched messages.
 
 ## Filters
 
@@ -202,7 +202,7 @@ cardmarket-tracker/
 |---|---|---|
 | 1 | AllPricesToday file size | ~5MB gzipped, ~50MB uncompressed. Load fully into memory. |
 | 2 | Card identity (names, metadata) | Download AllIdentifiers separately (~500MB+), cache locally, refresh monthly. |
-| 3 | Cardmarket URL construction | Build from mcmId (product ID) in AllIdentifiers. |
+| 3 | Cardmarket URL construction | Build from mcmId when available, fall back to card name search URL. |
 | 4 | Large file memory handling | Stream-parse from disk using stream-json. AllPricesToday (~50MB) loads into memory; AllPrices/AllIdentifiers (multi-GB) stream. |
 | 5 | Multiple printings of same card | Track all printings separately (unique UUID per printing). |
 | 6 | Cold start (no history) | Separate `yarn seed` command bootstraps 90-day history from AllPrices. |
@@ -214,7 +214,10 @@ cardmarket-tracker/
 | 11 | Zod on large data files | Skip Zod for multi-MB payloads (AllPricesToday). Validate defensively in parser. |
 | 12 | AllIdentifiers staleness | Auto-refresh in daily pipeline if cache mtime >30 days. Stream-parse and upsert new cards. |
 | 13 | Pipeline failure retry | Built-in retry loop: 3 attempts max, 15-minute delay between retries. Exit code 1 after exhausting retries. |
+| 14 | Foreign key enforcement | Enable `PRAGMA foreign_keys = ON` in all DB connection sites (schema, seed, index). |
+| 15 | Price history pruning | Delete records older than 180 days on each pipeline run. |
+| 16 | Slack message batching | Batch into max 48 deals per message to stay within Block Kit's 50-block limit. Multiple POSTs if needed. |
 
 ## Open Questions for Implementation
 
-1. Slack webhook message size limits — batch appropriately (max ~50 attachments per message)
+None remaining — all resolved.
