@@ -69,6 +69,10 @@ function MoverRow({ card, rank }: { card: WatchlistRow; rank: number }) {
   );
 }
 
+const STAT_SKELETONS = Array.from({ length: 4 }, (_, i) => (
+  <Skeleton key={i} className="h-24" />
+));
+
 export default function StatsPage() {
   const { data: stats, isPending: statsPending } = useQuery({
     queryKey: ["pipeline-stats"],
@@ -91,7 +95,7 @@ export default function StatsPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {statsPending ? (
-          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)
+          STAT_SKELETONS
         ) : (
           <>
             <Card className="animate-fade-in-up" style={{ animationDelay: "0s" }}>
@@ -138,12 +142,12 @@ export default function StatsPage() {
           <CardContent>
             {losers ? (
               <div className="space-y-1">
-                {losers.filter(c => c.pct_change != null && c.pct_change < 0).map((card, i) => (
-                  <MoverRow key={card.uuid} card={card} rank={i + 1} />
-                ))}
-                {losers.filter(c => c.pct_change != null && c.pct_change < 0).length === 0 && (
-                  <p className="text-sm text-muted-foreground py-4 text-center">No losers right now</p>
-                )}
+                {(() => {
+                  const filtered = losers.filter(c => c.pct_change != null && c.pct_change < 0);
+                  return filtered.length > 0
+                    ? filtered.map((card, i) => <MoverRow key={card.uuid} card={card} rank={i + 1} />)
+                    : <p className="text-sm text-muted-foreground py-4 text-center">No losers right now</p>;
+                })()}
               </div>
             ) : (
               <Skeleton className="h-48" />
@@ -158,12 +162,12 @@ export default function StatsPage() {
           <CardContent>
             {gainers ? (
               <div className="space-y-1">
-                {gainers.filter(c => c.pct_change != null && c.pct_change > 0).map((card, i) => (
-                  <MoverRow key={card.uuid} card={card} rank={i + 1} />
-                ))}
-                {gainers.filter(c => c.pct_change != null && c.pct_change > 0).length === 0 && (
-                  <p className="text-sm text-muted-foreground py-4 text-center">No gainers right now</p>
-                )}
+                {(() => {
+                  const filtered = gainers.filter(c => c.pct_change != null && c.pct_change > 0);
+                  return filtered.length > 0
+                    ? filtered.map((card, i) => <MoverRow key={card.uuid} card={card} rank={i + 1} />)
+                    : <p className="text-sm text-muted-foreground py-4 text-center">No gainers right now</p>;
+                })()}
               </div>
             ) : (
               <Skeleton className="h-48" />

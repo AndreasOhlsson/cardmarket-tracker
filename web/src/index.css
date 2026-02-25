@@ -224,3 +224,13 @@
 .animate-toggle-pulse {
     animation: toggle-pulse 0.3s ease-out;
 }
+
+/* content-visibility for off-screen list items */
+.cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 7rem;
+}
+.cv-auto-row {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 5rem;
+}

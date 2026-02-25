@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState, useDeferredValue, useEffect } from "react";
+import { useState, useDeferredValue, useEffect, useTransition } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
 import DealCard from "@/components/deal-card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface DealRow {
   id: number;
@@ -24,8 +25,13 @@ interface DealRow {
 const VALID_SORTS = ["date", "pct_change", "current_price"];
 const VALID_TYPES = ["all", "trend_drop", "new_low", "watchlist_alert"];
 
+const DEAL_SKELETONS = Array.from({ length: 6 }, (_, i) => (
+  <Skeleton key={i} className="h-28 rounded-lg" />
+));
+
 export default function DealsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isFilterPending, startFilterTransition] = useTransition();
 
   // Read state from URL
   const dealType = VALID_TYPES.includes(searchParams.get("type") ?? "all")
@@ -57,18 +63,20 @@ export default function DealsPage() {
   }, [deferredMinPrice, searchParams, setSearchParams]);
 
   function updateParam(key: string, value: string) {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      const isDefault =
-        (key === "type" && value === "all") ||
-        (key === "sort" && value === "date");
-      if (isDefault) {
-        next.delete(key);
-      } else {
-        next.set(key, value);
-      }
-      return next;
-    }, { replace: true });
+    startFilterTransition(() => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        const isDefault =
+          (key === "type" && value === "all") ||
+          (key === "sort" && value === "date");
+        if (isDefault) {
+          next.delete(key);
+        } else {
+          next.set(key, value);
+        }
+        return next;
+      }, { replace: true });
+    });
   }
 
   const sortDir = sort === "date" ? "desc" : "asc";
@@ -128,11 +136,8 @@ export default function DealsPage() {
         </p>
       )}
 
-      <div className="space-y-3">
-        {isPending &&
-          Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 rounded-lg" />
-          ))}
+      <div className={cn("space-y-3 transition-opacity duration-150", isFilterPending && "opacity-50")}>
+        {isPending && DEAL_SKELETONS}
         {deals?.map((deal, i) => (
           <DealCard
             key={deal.id}

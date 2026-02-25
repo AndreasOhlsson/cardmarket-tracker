@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import CardHoverPreview from "@/components/card-hover-preview";
@@ -42,7 +43,7 @@ function scryfallImageUrl(scryfallId: string | null, size: "small" | "normal" = 
   return `https://cards.scryfall.io/${size}/front/${scryfallId[0]}/${scryfallId[1]}/${scryfallId}.jpg`;
 }
 
-export default function DealCard(props: DealCardProps) {
+const DealCard = memo(function DealCard(props: DealCardProps) {
   const config = DEAL_TYPE_CONFIG[props.dealType] ?? {
     label: props.dealType,
     className: "bg-muted text-muted-foreground",
@@ -53,7 +54,7 @@ export default function DealCard(props: DealCardProps) {
   return (
     <Link
       to={`/card/${props.uuid}`}
-      className="block animate-fade-in-up deal-card-hover rounded-lg"
+      className="block animate-fade-in-up deal-card-hover rounded-lg cv-auto"
       style={{ animationDelay: `${(props.index ?? 0) * 0.04}s` }}
     >
       <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-colors cursor-pointer">
@@ -119,4 +120,6 @@ export default function DealCard(props: DealCardProps) {
       </Card>
     </Link>
   );
-}
+});
+
+export default DealCard;

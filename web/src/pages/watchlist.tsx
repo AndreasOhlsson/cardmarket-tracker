@@ -1,5 +1,5 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useState, useDeferredValue, useCallback, useEffect } from "react";
+import { useState, useDeferredValue, useCallback, useEffect, useTransition } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
 import CardHoverPreview from "@/components/card-hover-preview";
@@ -69,9 +69,18 @@ function SortableHead({
   );
 }
 
+const TABLE_SKELETONS = Array.from({ length: 10 }, (_, i) => (
+  <TableRow key={i}>
+    <TableCell colSpan={7}>
+      <Skeleton className="h-10" />
+    </TableCell>
+  </TableRow>
+));
+
 export default function WatchlistPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isSortPending, startSortTransition] = useTransition();
   const pageSize = 50;
 
   // Read state from URL
@@ -103,19 +112,21 @@ export default function WatchlistPage() {
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        for (const [k, v] of Object.entries(updates)) {
-          if (v == null || v === "" || (k === "sort" && v === "name") || (k === "dir" && v === "asc") || (k === "page" && v === "0")) {
-            next.delete(k);
-          } else {
-            next.set(k, v);
+      startSortTransition(() => {
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [k, v] of Object.entries(updates)) {
+            if (v == null || v === "" || (k === "sort" && v === "name") || (k === "dir" && v === "asc") || (k === "page" && v === "0")) {
+              next.delete(k);
+            } else {
+              next.set(k, v);
+            }
           }
-        }
-        return next;
-      }, { replace: true });
+          return next;
+        }, { replace: true });
+      });
     },
-    [setSearchParams],
+    [setSearchParams, startSortTransition],
   );
 
   function handleSort(key: SortKey) {
@@ -154,7 +165,7 @@ export default function WatchlistPage() {
         />
       </div>
 
-      <div className="rounded-lg border border-border overflow-x-auto relative">
+      <div className={cn("rounded-lg border border-border overflow-x-auto relative transition-opacity duration-150", isSortPending && "opacity-50")}>
         {isFetching && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/30 overflow-hidden z-10">
             <div className="h-full w-1/3 bg-primary animate-[slide_1s_ease-in-out_infinite]" />
@@ -173,18 +184,11 @@ export default function WatchlistPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isPending &&
-              Array.from({ length: 10 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell colSpan={7}>
-                    <Skeleton className="h-10" />
-                  </TableCell>
-                </TableRow>
-              ))}
+            {isPending && TABLE_SKELETONS}
             {cards?.map((card) => (
               <TableRow
                 key={card.uuid}
-                className="hover:bg-muted/20 h-20 cursor-pointer table-row-hover"
+                className="hover:bg-muted/20 h-20 cursor-pointer table-row-hover cv-auto-row"
                 onClick={() => navigate(`/card/${card.uuid}`)}
               >
                 <TableCell className="py-2">

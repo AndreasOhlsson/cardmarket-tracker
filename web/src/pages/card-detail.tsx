@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { apiFetch } from "@/hooks/use-api";
 import PriceChart from "@/components/price-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,6 +64,7 @@ const SIGNAL_CONFIG = {
 export default function CardDetailPage() {
   const { uuid } = useParams<{ uuid: string }>();
   const [days, setDays] = useState("90");
+  const [isChartPending, startChartTransition] = useTransition();
   const queryClient = useQueryClient();
 
   const { data: card, isPending: cardPending } = useQuery({
@@ -221,7 +222,7 @@ export default function CardDetailPage() {
       <Card className="mb-8 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="font-display text-lg">Price History</CardTitle>
-          <Tabs value={days} onValueChange={setDays}>
+          <Tabs value={days} onValueChange={(v) => startChartTransition(() => setDays(v))}>
             <TabsList>
               <TabsTrigger value="30">30d</TabsTrigger>
               <TabsTrigger value="90">90d</TabsTrigger>
@@ -230,7 +231,9 @@ export default function CardDetailPage() {
           </Tabs>
         </CardHeader>
         <CardContent>
-          {prices ? <PriceChart data={prices} /> : <Skeleton className="h-64" />}
+          <div className={cn("transition-opacity duration-150", isChartPending && "opacity-50")}>
+            {prices ? <PriceChart data={prices} /> : <Skeleton className="h-64" />}
+          </div>
         </CardContent>
       </Card>
 

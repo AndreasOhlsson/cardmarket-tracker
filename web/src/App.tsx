@@ -1,18 +1,30 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "@/components/layout";
-import DealsPage from "@/pages/deals";
-import WatchlistPage from "@/pages/watchlist";
-import CardDetailPage from "@/pages/card-detail";
-import StatsPage from "@/pages/stats";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DealsPage = lazy(() => import("@/pages/deals"));
+const WatchlistPage = lazy(() => import("@/pages/watchlist"));
+const CardDetailPage = lazy(() => import("@/pages/card-detail"));
+const StatsPage = lazy(() => import("@/pages/stats"));
+
+function PageFallback() {
+  return (
+    <div className="p-6 space-y-4">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-64" />
+    </div>
+  );
+}
 
 const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      { path: "/", element: <DealsPage /> },
-      { path: "/watchlist", element: <WatchlistPage /> },
-      { path: "/card/:uuid", element: <CardDetailPage /> },
-      { path: "/stats", element: <StatsPage /> },
+      { path: "/", element: <Suspense fallback={<PageFallback />}><DealsPage /></Suspense> },
+      { path: "/watchlist", element: <Suspense fallback={<PageFallback />}><WatchlistPage /></Suspense> },
+      { path: "/card/:uuid", element: <Suspense fallback={<PageFallback />}><CardDetailPage /></Suspense> },
+      { path: "/stats", element: <Suspense fallback={<PageFallback />}><StatsPage /></Suspense> },
     ],
   },
 ]);
