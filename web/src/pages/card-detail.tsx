@@ -76,7 +76,7 @@ export default function CardDetailPage() {
   }
 
   const imageUrl = card.scryfall_id
-    ? `https://api.scryfall.com/cards/${card.scryfall_id}?format=image&version=normal`
+    ? `https://cards.scryfall.io/normal/front/${card.scryfall_id[0]}/${card.scryfall_id[1]}/${card.scryfall_id}.jpg`
     : null;
 
   return (

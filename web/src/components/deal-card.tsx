@@ -35,9 +35,9 @@ function cardmarketUrl(name: string, mcmId: number | null): string {
   return `https://www.cardmarket.com/en/Magic/Cards/${encodeURIComponent(name)}`;
 }
 
-function scryfallImageUrl(scryfallId: string | null): string | null {
+function scryfallImageUrl(scryfallId: string | null, size: "small" | "normal" = "small"): string | null {
   if (!scryfallId) return null;
-  return `https://api.scryfall.com/cards/${scryfallId}?format=image&version=small`;
+  return `https://cards.scryfall.io/${size}/front/${scryfallId[0]}/${scryfallId[1]}/${scryfallId}.jpg`;
 }
 
 export default function DealCard(props: DealCardProps) {

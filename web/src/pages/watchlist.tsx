@@ -21,7 +21,7 @@ interface WatchlistRow {
 
 function scryfallImageUrl(scryfallId: string | null): string | null {
   if (!scryfallId) return null;
-  return `https://api.scryfall.com/cards/${scryfallId}?format=image&version=small`;
+  return `https://cards.scryfall.io/small/front/${scryfallId[0]}/${scryfallId[1]}/${scryfallId}.jpg`;
 }
 
 export default function WatchlistPage() {
