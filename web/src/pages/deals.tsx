@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useDeferredValue } from "react";
 import { apiFetch } from "@/hooks/use-api";
 import DealCard from "@/components/deal-card";
 import { Input } from "@/components/ui/input";
@@ -23,19 +23,20 @@ interface DealRow {
 export default function DealsPage() {
   const [dealType, setDealType] = useState<string>("all");
   const [minPrice, setMinPrice] = useState<string>("");
+  const deferredMinPrice = useDeferredValue(minPrice);
   const [sort, setSort] = useState<string>("date");
 
   const sortDir = sort === "date" ? "desc" : "asc";
 
   const params = new URLSearchParams();
   if (dealType !== "all") params.set("type", dealType);
-  if (minPrice) params.set("minPrice", minPrice);
+  if (deferredMinPrice) params.set("minPrice", deferredMinPrice);
   params.set("sort", sort);
   params.set("sortDir", sortDir);
   params.set("limit", "100");
 
   const { data: deals, isPending } = useQuery({
-    queryKey: ["deals", dealType, minPrice, sort, sortDir],
+    queryKey: ["deals", dealType, deferredMinPrice, sort, sortDir],
     queryFn: () => apiFetch<DealRow[]>(`/deals?${params.toString()}`),
   });
 

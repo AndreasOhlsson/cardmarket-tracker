@@ -49,6 +49,8 @@ app.get("/api/deals/stats", (_req, res) => {
 app.get("/api/watchlist", (req, res) => {
   const filter = {
     search: req.query.search as string | undefined,
+    sort: req.query.sort as "name" | "latest_price" | "avg_30d" | "pct_change" | undefined,
+    sortDir: req.query.sortDir as "asc" | "desc" | undefined,
     limit: req.query.limit ? Number(req.query.limit) : 50,
     offset: req.query.offset ? Number(req.query.offset) : 0,
   };

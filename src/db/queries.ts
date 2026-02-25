@@ -92,6 +92,8 @@ export interface DealStatRow {
 
 export interface WatchlistFilter {
   search?: string;
+  sort?: "name" | "latest_price" | "avg_30d" | "pct_change";
+  sortDir?: "asc" | "desc";
   limit?: number;
   offset?: number;
 }
@@ -347,42 +349,85 @@ export function getWatchlistWithCards(
   const limit = filter.limit ?? 50;
   const offset = filter.offset ?? 0;
 
+  const allowedSorts = ["name", "latest_price", "avg_30d", "pct_change"];
+  const sort = allowedSorts.includes(filter.sort ?? "") ? filter.sort! : "name";
+  const dir = filter.sortDir === "desc" ? "DESC" : "ASC";
+  const nullsLast = dir === "ASC" ? "999999" : "-999999";
+
+  // For name sort, paginate first (fast) then enrich only the page.
+  // For computed columns, enrich all then sort+paginate (watchlist is small enough).
+  if (sort === "name") {
+    return db
+      .prepare(
+        `WITH page AS (
+           SELECT w.uuid, w.notes
+           FROM watchlist w
+           JOIN cards c ON w.uuid = c.uuid
+           WHERE 1=1 ${where}
+           ORDER BY c.name ${dir}
+           LIMIT @limit OFFSET @offset
+         )
+         SELECT
+           page.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id, page.notes,
+           (SELECT p.cm_trend FROM prices p
+            WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+            ORDER BY p.date DESC LIMIT 1) as latest_price,
+           (SELECT AVG(p.cm_trend) FROM prices p
+            WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+            AND p.date >= date('now', '-30 days')) as avg_30d,
+           CASE
+             WHEN (SELECT AVG(p2.cm_trend) FROM prices p2
+                   WHERE p2.uuid = page.uuid AND p2.cm_trend IS NOT NULL
+                   AND p2.date >= date('now', '-30 days')) > 0
+             THEN ((SELECT p3.cm_trend FROM prices p3
+                    WHERE p3.uuid = page.uuid AND p3.cm_trend IS NOT NULL
+                    ORDER BY p3.date DESC LIMIT 1)
+                  - (SELECT AVG(p4.cm_trend) FROM prices p4
+                     WHERE p4.uuid = page.uuid AND p4.cm_trend IS NOT NULL
+                     AND p4.date >= date('now', '-30 days')))
+                 / (SELECT AVG(p5.cm_trend) FROM prices p5
+                    WHERE p5.uuid = page.uuid AND p5.cm_trend IS NOT NULL
+                    AND p5.date >= date('now', '-30 days'))
+             ELSE NULL
+           END as pct_change
+         FROM page
+         JOIN cards c ON page.uuid = c.uuid
+         ORDER BY c.name ${dir}`,
+      )
+      .all({ ...params, limit, offset }) as WatchlistCardRow[];
+  }
+
+  // Computed column sort: enrich all matching rows, then sort + paginate
   return db
     .prepare(
-      `WITH page AS (
-         SELECT w.uuid, w.notes
-         FROM watchlist w
-         JOIN cards c ON w.uuid = c.uuid
-         WHERE 1=1 ${where}
-         ORDER BY c.name ASC
-         LIMIT @limit OFFSET @offset
-       )
-       SELECT
-         page.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id, page.notes,
+      `SELECT
+         w.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id, w.notes,
          (SELECT p.cm_trend FROM prices p
-          WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+          WHERE p.uuid = w.uuid AND p.cm_trend IS NOT NULL
           ORDER BY p.date DESC LIMIT 1) as latest_price,
          (SELECT AVG(p.cm_trend) FROM prices p
-          WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+          WHERE p.uuid = w.uuid AND p.cm_trend IS NOT NULL
           AND p.date >= date('now', '-30 days')) as avg_30d,
          CASE
            WHEN (SELECT AVG(p2.cm_trend) FROM prices p2
-                 WHERE p2.uuid = page.uuid AND p2.cm_trend IS NOT NULL
+                 WHERE p2.uuid = w.uuid AND p2.cm_trend IS NOT NULL
                  AND p2.date >= date('now', '-30 days')) > 0
            THEN ((SELECT p3.cm_trend FROM prices p3
-                  WHERE p3.uuid = page.uuid AND p3.cm_trend IS NOT NULL
+                  WHERE p3.uuid = w.uuid AND p3.cm_trend IS NOT NULL
                   ORDER BY p3.date DESC LIMIT 1)
                 - (SELECT AVG(p4.cm_trend) FROM prices p4
-                   WHERE p4.uuid = page.uuid AND p4.cm_trend IS NOT NULL
+                   WHERE p4.uuid = w.uuid AND p4.cm_trend IS NOT NULL
                    AND p4.date >= date('now', '-30 days')))
                / (SELECT AVG(p5.cm_trend) FROM prices p5
-                  WHERE p5.uuid = page.uuid AND p5.cm_trend IS NOT NULL
+                  WHERE p5.uuid = w.uuid AND p5.cm_trend IS NOT NULL
                   AND p5.date >= date('now', '-30 days'))
            ELSE NULL
          END as pct_change
-       FROM page
-       JOIN cards c ON page.uuid = c.uuid
-       ORDER BY c.name ASC`,
+       FROM watchlist w
+       JOIN cards c ON w.uuid = c.uuid
+       WHERE 1=1 ${where}
+       ORDER BY COALESCE(${sort}, ${nullsLast}) ${dir}
+       LIMIT @limit OFFSET @offset`,
     )
     .all({ ...params, limit, offset }) as WatchlistCardRow[];
 }

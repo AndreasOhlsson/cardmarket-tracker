@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
 import { Input } from "@/components/ui/input";
@@ -19,21 +19,67 @@ interface WatchlistRow {
   pct_change: number | null;
 }
 
+type SortKey = "name" | "latest_price" | "avg_30d" | "pct_change";
+
 function scryfallImageUrl(scryfallId: string | null): string | null {
   if (!scryfallId) return null;
   return `https://cards.scryfall.io/small/front/${scryfallId[0]}/${scryfallId[1]}/${scryfallId}.jpg`;
 }
 
+function SortableHead({
+  label,
+  sortKey,
+  activeSort,
+  activeDir,
+  onSort,
+  className,
+}: {
+  label: string;
+  sortKey: SortKey;
+  activeSort: SortKey;
+  activeDir: "asc" | "desc";
+  onSort: (key: SortKey) => void;
+  className?: string;
+}) {
+  const isActive = activeSort === sortKey;
+  return (
+    <TableHead
+      className={cn("cursor-pointer select-none hover:text-primary transition-colors", className)}
+      onClick={() => onSort(sortKey)}
+    >
+      {label}
+      {isActive && (
+        <span className="ml-1 text-primary">{activeDir === "asc" ? "▲" : "▼"}</span>
+      )}
+    </TableHead>
+  );
+}
+
 export default function WatchlistPage() {
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState<SortKey>("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const pageSize = 50;
 
+  function handleSort(key: SortKey) {
+    if (sort === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSort(key);
+      setSortDir(key === "name" ? "asc" : "desc");
+    }
+    setPage(0);
+  }
+
   const { data: cards, isPending } = useQuery({
-    queryKey: ["watchlist", search, page],
+    queryKey: ["watchlist", deferredSearch, page, sort, sortDir],
     queryFn: () => {
       const params = new URLSearchParams();
-      if (search.length >= 2) params.set("search", search);
+      if (deferredSearch.length >= 2) params.set("search", deferredSearch);
+      params.set("sort", sort);
+      params.set("sortDir", sortDir);
       params.set("limit", String(pageSize));
       params.set("offset", String(page * pageSize));
       return apiFetch<WatchlistRow[]>(`/watchlist?${params.toString()}`);
@@ -60,11 +106,11 @@ export default function WatchlistPage() {
           <TableHeader>
             <TableRow className="bg-muted/30">
               <TableHead className="w-10"></TableHead>
-              <TableHead>Name</TableHead>
+              <SortableHead label="Name" sortKey="name" activeSort={sort} activeDir={sortDir} onSort={handleSort} />
               <TableHead>Set</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">30d Avg</TableHead>
-              <TableHead className="text-right">Change</TableHead>
+              <SortableHead label="Price" sortKey="latest_price" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortableHead label="30d Avg" sortKey="avg_30d" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortableHead label="Change" sortKey="pct_change" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right" />
             </TableRow>
           </TableHeader>
           <TableBody>
