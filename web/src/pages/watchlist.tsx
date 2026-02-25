@@ -143,24 +143,24 @@ export default function WatchlistPage() {
   });
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-3xl text-primary">Watchlist</h1>
+    <div className="p-4 md:p-6">
+      <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+        <h1 className="font-display text-2xl md:text-3xl text-primary">Watchlist</h1>
         <Input
           placeholder="Search cards..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-64"
+          className="w-full sm:w-64"
         />
       </div>
 
-      <div className="rounded-lg border border-border overflow-hidden relative">
+      <div className="rounded-lg border border-border overflow-x-auto relative">
         {isFetching && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/30 overflow-hidden z-10">
             <div className="h-full w-1/3 bg-primary animate-[slide_1s_ease-in-out_infinite]" />
           </div>
         )}
-        <Table className="table-fixed">
+        <Table className="table-fixed min-w-[700px]">
           <TableHeader>
             <TableRow className="bg-muted/30">
               <TableHead className="w-18"></TableHead>
@@ -184,7 +184,7 @@ export default function WatchlistPage() {
             {cards?.map((card) => (
               <TableRow
                 key={card.uuid}
-                className="hover:bg-muted/20 h-20 cursor-pointer"
+                className="hover:bg-muted/20 h-20 cursor-pointer table-row-hover"
                 onClick={() => navigate(`/card/${card.uuid}`)}
               >
                 <TableCell className="py-2">
@@ -212,7 +212,7 @@ export default function WatchlistPage() {
                     <Badge
                       variant="outline"
                       className={cn(
-                        "text-[10px] mt-0.5 px-1.5 py-0",
+                        "text-[10px] mt-0.5 px-1.5 py-0 animate-badge-glow",
                         card.signal === "near_low" && "text-deal-new-low border-deal-new-low/30",
                         card.signal === "below_avg" && "text-deal-trend-drop border-deal-trend-drop/30",
                       )}

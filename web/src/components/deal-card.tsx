@@ -14,6 +14,7 @@ interface DealCardProps {
   pctChange: number;
   scryfallId: string | null;
   mcmId: number | null;
+  index?: number;
 }
 
 const DEAL_TYPE_CONFIG: Record<string, { label: string; className: string }> = {
@@ -50,7 +51,11 @@ export default function DealCard(props: DealCardProps) {
   const imageUrl = scryfallImageUrl(props.scryfallId);
 
   return (
-    <Link to={`/card/${props.uuid}`} className="block">
+    <Link
+      to={`/card/${props.uuid}`}
+      className="block animate-fade-in-up deal-card-hover rounded-lg"
+      style={{ animationDelay: `${(props.index ?? 0) * 0.04}s` }}
+    >
       <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-colors cursor-pointer">
         <CardContent className="p-0 flex">
           {imageUrl && props.scryfallId && (

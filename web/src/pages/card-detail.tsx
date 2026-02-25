@@ -115,21 +115,21 @@ export default function CardDetailPage() {
     : null;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex gap-8 mb-8">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row gap-6 md:gap-8 mb-8">
         {imageUrl && (
-          <div className="shrink-0">
+          <div className="shrink-0 flex justify-center sm:block animate-fade-in-up">
             <img
               src={imageUrl}
               alt={card.name}
-              className="w-56 rounded-lg shadow-lg"
+              className="w-44 sm:w-56 rounded-lg shadow-lg hover:shadow-xl hover:shadow-primary/10 transition-shadow duration-300"
             />
           </div>
         )}
 
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="font-display text-3xl text-primary">{card.name}</h1>
+        <div className="flex-1 min-w-0 animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
+          <div className="flex items-center gap-3 mb-1 flex-wrap">
+            <h1 className="font-display text-2xl md:text-3xl text-primary">{card.name}</h1>
             <Button
               variant={card.isWatched ? "default" : "outline"}
               size="sm"
@@ -151,8 +151,8 @@ export default function CardDetailPage() {
             </a>
           </p>
 
-          <div className="grid grid-cols-4 gap-4 mb-4">
-            <Card className="border-primary/30">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
+            <Card className="border-primary/30 animate-fade-in-up" style={{ animationDelay: "0.08s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Current Price</p>
                 <p className="font-mono text-2xl font-semibold">
@@ -166,14 +166,14 @@ export default function CardDetailPage() {
                 {card.signal && (
                   <Badge
                     variant="outline"
-                    className={cn("mt-2 text-xs", SIGNAL_CONFIG[card.signal].className)}
+                    className={cn("mt-2 text-xs animate-badge-glow", SIGNAL_CONFIG[card.signal].className)}
                   >
                     {SIGNAL_CONFIG[card.signal].label}
                   </Badge>
                 )}
               </CardContent>
             </Card>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0.12s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">30d Average</p>
                 <p className="font-mono text-lg">
@@ -181,7 +181,7 @@ export default function CardDetailPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0.16s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">90d Average</p>
                 <p className="font-mono text-lg">
@@ -189,7 +189,7 @@ export default function CardDetailPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Historical Low</p>
                 <p className="font-mono text-lg">
@@ -218,7 +218,7 @@ export default function CardDetailPage() {
         </div>
       </div>
 
-      <Card className="mb-8">
+      <Card className="mb-8 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="font-display text-lg">Price History</CardTitle>
           <Tabs value={days} onValueChange={setDays}>
@@ -235,7 +235,7 @@ export default function CardDetailPage() {
       </Card>
 
       {deals && deals.length > 0 && (
-        <Card>
+        <Card className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
           <CardHeader>
             <CardTitle className="font-display text-lg">Deal History</CardTitle>
           </CardHeader>
@@ -244,7 +244,7 @@ export default function CardDetailPage() {
               {deals.map((deal) => (
                 <div
                   key={deal.id}
-                  className="flex items-center justify-between py-2 border-b border-border/30 last:border-0"
+                  className="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-border/30 last:border-0"
                 >
                   <div className="flex items-center gap-3">
                     <Badge

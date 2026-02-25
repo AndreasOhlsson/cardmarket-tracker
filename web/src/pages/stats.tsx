@@ -31,7 +31,8 @@ function MoverRow({ card, rank }: { card: WatchlistRow; rank: number }) {
   return (
     <Link
       to={`/card/${card.uuid}`}
-      className="flex items-center justify-between py-2 border-b border-border/30 last:border-0 hover:bg-muted/20 -mx-2 px-2 rounded transition-colors"
+      className="flex items-center justify-between py-2 border-b border-border/30 last:border-0 hover:bg-muted/20 -mx-2 px-2 rounded transition-colors animate-fade-in-up"
+      style={{ animationDelay: `${rank * 0.04}s` }}
     >
       <div className="flex items-center gap-3">
         <span className="text-xs text-muted-foreground w-5">{rank}.</span>
@@ -85,15 +86,15 @@ export default function StatsPage() {
   });
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="font-display text-3xl text-primary mb-6">Stats</h1>
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <h1 className="font-display text-2xl md:text-3xl text-primary mb-6">Stats</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {statsPending ? (
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)
         ) : (
           <>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Cards Tracked</p>
                 <p className="font-mono text-2xl text-foreground">
@@ -101,7 +102,7 @@ export default function StatsPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Price Records</p>
                 <p className="font-mono text-2xl text-foreground">
@@ -109,7 +110,7 @@ export default function StatsPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Watchlist Size</p>
                 <p className="font-mono text-2xl text-foreground">
@@ -117,7 +118,7 @@ export default function StatsPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">Latest Data</p>
                 <p className="font-mono text-lg text-foreground">
@@ -130,7 +131,7 @@ export default function StatsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
+        <Card className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
           <CardHeader>
             <CardTitle className="font-display text-lg">Watchlist Losers</CardTitle>
           </CardHeader>
@@ -150,7 +151,7 @@ export default function StatsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
           <CardHeader>
             <CardTitle className="font-display text-lg">Watchlist Gainers</CardTitle>
           </CardHeader>

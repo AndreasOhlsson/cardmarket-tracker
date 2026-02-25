@@ -86,10 +86,10 @@ export default function DealsPage() {
   });
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="font-display text-3xl text-primary mb-6">Today's Deals</h1>
+    <div className="p-4 md:p-6 max-w-4xl mx-auto">
+      <h1 className="font-display text-2xl md:text-3xl text-primary mb-6 animate-fade-in">Today's Deals</h1>
 
-      <div className="flex gap-3 mb-6 flex-wrap">
+      <div className="flex gap-3 mb-6 flex-wrap animate-fade-in" style={{ animationDelay: "0.05s" }}>
         <Select value={dealType} onValueChange={(v) => updateParam("type", v)}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Deal type" />
@@ -133,7 +133,7 @@ export default function DealsPage() {
           Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-28 rounded-lg" />
           ))}
-        {deals?.map((deal) => (
+        {deals?.map((deal, i) => (
           <DealCard
             key={deal.id}
             uuid={deal.uuid}
@@ -145,6 +145,7 @@ export default function DealsPage() {
             pctChange={deal.pct_change}
             scryfallId={deal.scryfall_id}
             mcmId={deal.mcm_id}
+            index={i}
           />
         ))}
         {deals?.length === 0 && (

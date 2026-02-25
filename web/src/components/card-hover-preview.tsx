@@ -49,7 +49,7 @@ export default function CardHoverPreview({ scryfallId, children }: CardHoverPrev
           <img
             src={scryfallNormalUrl(scryfallId)}
             alt=""
-            className="w-56 rounded-lg shadow-2xl shadow-black/50 ring-1 ring-border/50"
+            className="w-56 rounded-lg shadow-2xl shadow-black/50 ring-1 ring-border/50 animate-card-hover-in"
           />
         </div>,
         document.body,

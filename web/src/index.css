@@ -107,3 +107,120 @@
     0% { transform: translateX(-100%); }
     100% { transform: translateX(400%); }
 }
+
+/* ── Entrance animations ── */
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes card-hover-in {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Subtle gold shimmer on signal badges */
+@keyframes badge-glow {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 8px 1px oklch(0.72 0.12 80 / 20%); }
+}
+
+/* Backdrop fade */
+@keyframes backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ── Utility classes ── */
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.35s ease-out both;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out both;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.2s ease-out both;
+}
+
+.animate-card-hover-in {
+    animation: card-hover-in 0.15s ease-out both;
+}
+
+.animate-badge-glow {
+    animation: badge-glow 3s ease-in-out infinite;
+}
+
+.animate-backdrop-in {
+    animation: backdrop-in 0.2s ease-out both;
+}
+
+/* Stagger delays for lists — set via style={{animationDelay}} or these classes */
+.stagger-1 { animation-delay: 0.03s; }
+.stagger-2 { animation-delay: 0.06s; }
+.stagger-3 { animation-delay: 0.09s; }
+.stagger-4 { animation-delay: 0.12s; }
+.stagger-5 { animation-delay: 0.15s; }
+.stagger-6 { animation-delay: 0.18s; }
+.stagger-7 { animation-delay: 0.21s; }
+.stagger-8 { animation-delay: 0.24s; }
+.stagger-9 { animation-delay: 0.27s; }
+.stagger-10 { animation-delay: 0.30s; }
+
+/* Deal card lift on hover */
+.deal-card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.deal-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px oklch(0 0 0 / 40%), 0 0 0 1px oklch(0.72 0.12 80 / 10%);
+}
+
+/* Table row glow on hover */
+.table-row-hover {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.table-row-hover:hover {
+    box-shadow: inset 0 0 0 1px oklch(0.72 0.12 80 / 8%);
+}
+
+/* Watchlist toggle pulse */
+@keyframes toggle-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+.animate-toggle-pulse {
+    animation: toggle-pulse 0.3s ease-out;
+}
