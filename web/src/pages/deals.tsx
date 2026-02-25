@@ -25,14 +25,17 @@ export default function DealsPage() {
   const [minPrice, setMinPrice] = useState<string>("");
   const [sort, setSort] = useState<string>("date");
 
+  const sortDir = sort === "date" ? "desc" : "asc";
+
   const params = new URLSearchParams();
   if (dealType !== "all") params.set("type", dealType);
   if (minPrice) params.set("minPrice", minPrice);
   params.set("sort", sort);
+  params.set("sortDir", sortDir);
   params.set("limit", "100");
 
   const { data: deals, isPending } = useQuery({
-    queryKey: ["deals", dealType, minPrice, sort],
+    queryKey: ["deals", dealType, minPrice, sort, sortDir],
     queryFn: () => apiFetch<DealRow[]>(`/deals?${params.toString()}`),
   });
 
