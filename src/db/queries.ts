@@ -349,30 +349,40 @@ export function getWatchlistWithCards(
 
   return db
     .prepare(
-      `SELECT
-         w.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id, w.notes,
-         lp.cm_trend as latest_price,
-         avg_p.avg_30d,
-         CASE WHEN avg_p.avg_30d > 0 AND lp.cm_trend IS NOT NULL
-           THEN (lp.cm_trend - avg_p.avg_30d) / avg_p.avg_30d
+      `WITH page AS (
+         SELECT w.uuid, w.notes
+         FROM watchlist w
+         JOIN cards c ON w.uuid = c.uuid
+         WHERE 1=1 ${where}
+         ORDER BY c.name ASC
+         LIMIT @limit OFFSET @offset
+       )
+       SELECT
+         page.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id, page.notes,
+         (SELECT p.cm_trend FROM prices p
+          WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+          ORDER BY p.date DESC LIMIT 1) as latest_price,
+         (SELECT AVG(p.cm_trend) FROM prices p
+          WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+          AND p.date >= date('now', '-30 days')) as avg_30d,
+         CASE
+           WHEN (SELECT AVG(p2.cm_trend) FROM prices p2
+                 WHERE p2.uuid = page.uuid AND p2.cm_trend IS NOT NULL
+                 AND p2.date >= date('now', '-30 days')) > 0
+           THEN ((SELECT p3.cm_trend FROM prices p3
+                  WHERE p3.uuid = page.uuid AND p3.cm_trend IS NOT NULL
+                  ORDER BY p3.date DESC LIMIT 1)
+                - (SELECT AVG(p4.cm_trend) FROM prices p4
+                   WHERE p4.uuid = page.uuid AND p4.cm_trend IS NOT NULL
+                   AND p4.date >= date('now', '-30 days')))
+               / (SELECT AVG(p5.cm_trend) FROM prices p5
+                  WHERE p5.uuid = page.uuid AND p5.cm_trend IS NOT NULL
+                  AND p5.date >= date('now', '-30 days'))
            ELSE NULL
          END as pct_change
-       FROM watchlist w
-       JOIN cards c ON w.uuid = c.uuid
-       LEFT JOIN (
-         SELECT uuid, cm_trend,
-                ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY date DESC) as rn
-         FROM prices WHERE cm_trend IS NOT NULL
-       ) lp ON w.uuid = lp.uuid AND lp.rn = 1
-       LEFT JOIN (
-         SELECT uuid, AVG(cm_trend) as avg_30d
-         FROM prices
-         WHERE cm_trend IS NOT NULL AND date >= date('now', '-30 days')
-         GROUP BY uuid
-       ) avg_p ON w.uuid = avg_p.uuid
-       WHERE 1=1 ${where}
-       ORDER BY c.name ASC
-       LIMIT @limit OFFSET @offset`,
+       FROM page
+       JOIN cards c ON page.uuid = c.uuid
+       ORDER BY c.name ASC`,
     )
     .all({ ...params, limit, offset }) as WatchlistCardRow[];
 }
