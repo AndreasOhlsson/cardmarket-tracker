@@ -35,6 +35,16 @@ interface DealRow {
   pct_change: number;
 }
 
+const DEAL_TYPE_LABELS: Record<string, string> = {
+  trend_drop: "Trend Drop",
+  new_low: "New Low",
+  watchlist_alert: "Watchlist",
+};
+
+function dealTypeLabel(dealType: string): string {
+  return DEAL_TYPE_LABELS[dealType] ?? dealType;
+}
+
 function cardmarketUrl(name: string, mcmId: number | null): string {
   if (mcmId) return `https://www.cardmarket.com/en/Magic/Products/Singles/${mcmId}`;
   return `https://www.cardmarket.com/en/Magic/Cards/${encodeURIComponent(name)}`;
@@ -95,7 +105,7 @@ export default function CardDetailPage() {
         <div className="flex-1">
           <h1 className="font-display text-3xl text-primary mb-1">{card.name}</h1>
           <p className="text-muted-foreground mb-4">
-            {card.set_name} ({card.set_code})
+            {card.set_name ? `${card.set_name} (${card.set_code})` : card.set_code}
           </p>
 
           <div className="grid grid-cols-3 gap-4 mb-4">
@@ -187,7 +197,7 @@ export default function CardDetailPage() {
                         deal.deal_type === "watchlist_alert" && "text-deal-watchlist",
                       )}
                     >
-                      {deal.deal_type}
+                      {dealTypeLabel(deal.deal_type)}
                     </Badge>
                     <span className="text-sm text-muted-foreground">{deal.date}</span>
                   </div>
