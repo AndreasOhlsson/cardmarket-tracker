@@ -24,7 +24,7 @@ describe("formatDealMessage", () => {
     expect(msg).toContain("48.50");
     expect(msg).toContain("57.80");
     expect(msg).toContain("-16.1%");
-    expect(msg).toContain("cardmarket.com/en/Magic/Products/Singles/12345");
+    expect(msg).toContain("cardmarket.com/en/Magic/Products?idProduct=12345");
   });
 
   it("falls back to name-based URL when mcmId is missing", () => {
@@ -37,7 +37,7 @@ describe("formatDealMessage", () => {
       pctChange: -0.25,
     });
 
-    expect(msg).toContain("cardmarket.com/en/Magic/Cards/Sol%20Ring");
+    expect(msg).toContain("cardmarket.com/en/Magic/Products/Search?searchString=Sol%20Ring");
   });
 });
 

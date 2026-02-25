@@ -16,10 +16,9 @@ const DEAL_TYPE_LABELS: Record<string, string> = {
 
 function cardmarketUrl(name: string, mcmId?: number): string {
   if (mcmId) {
-    return `https://www.cardmarket.com/en/Magic/Products/Singles/${mcmId}`;
+    return `https://www.cardmarket.com/en/Magic/Products?idProduct=${mcmId}`;
   }
-  const encodedName = encodeURIComponent(name);
-  return `https://www.cardmarket.com/en/Magic/Cards/${encodedName}`;
+  return `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(name)}`;
 }
 
 export function formatDealMessage(deal: DealForSlack): string {

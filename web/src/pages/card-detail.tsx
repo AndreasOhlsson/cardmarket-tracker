@@ -46,8 +46,8 @@ function dealTypeLabel(dealType: string): string {
 }
 
 function cardmarketUrl(name: string, mcmId: number | null): string {
-  if (mcmId) return `https://www.cardmarket.com/en/Magic/Products/Singles/${mcmId}`;
-  return `https://www.cardmarket.com/en/Magic/Cards/${encodeURIComponent(name)}`;
+  if (mcmId) return `https://www.cardmarket.com/en/Magic/Products?idProduct=${mcmId}`;
+  return `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(name)}`;
 }
 
 export default function CardDetailPage() {
