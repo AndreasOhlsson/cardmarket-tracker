@@ -50,7 +50,7 @@ export default function PriceChart({ data }: PriceChartProps) {
             fontFamily: "JetBrains Mono",
             fontSize: "12px",
           }}
-          formatter={(value: number) => [`€${value.toFixed(2)}`, "Trend"]}
+          formatter={(value: number | undefined) => value != null ? [`€${value.toFixed(2)}`, "Trend"] : []}
         />
         <Area
           type="monotone"
