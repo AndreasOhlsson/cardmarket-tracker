@@ -18,20 +18,6 @@ interface PipelineStats {
   latestPriceDate: string | null;
 }
 
-interface DealRow {
-  id: number;
-  uuid: string;
-  date: string;
-  deal_type: string;
-  current_price: number;
-  reference_price: number;
-  pct_change: number;
-  name: string;
-  set_code: string | null;
-  mcm_id: number | null;
-  scryfall_id: string | null;
-}
-
 interface WatchlistRow {
   uuid: string;
   name: string;
@@ -86,11 +72,6 @@ export default function StatsPage() {
   const { data: stats, isPending: statsPending } = useQuery({
     queryKey: ["pipeline-stats"],
     queryFn: () => apiFetch<PipelineStats>("/stats/pipeline"),
-  });
-
-  const { data: topDrops } = useQuery({
-    queryKey: ["top-drops"],
-    queryFn: () => apiFetch<DealRow[]>("/deals?sort=pct_change&sortDir=asc&limit=10"),
   });
 
   const { data: losers } = useQuery({
@@ -190,52 +171,6 @@ export default function StatsPage() {
         </Card>
       </div>
 
-      {topDrops && topDrops.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-display text-lg">Biggest Drops</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {topDrops.map((deal, i) => (
-                <Link
-                  key={deal.id}
-                  to={`/card/${deal.uuid}`}
-                  className="flex items-center justify-between py-2 border-b border-border/30 last:border-0 hover:bg-muted/20 -mx-2 px-2 rounded transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground w-5">{i + 1}.</span>
-                    {deal.scryfall_id && (
-                      <CardHoverPreview scryfallId={deal.scryfall_id}>
-                        <img
-                          src={scryfallSmallUrl(deal.scryfall_id)}
-                          alt=""
-                          className="w-10 h-auto rounded-sm"
-                          loading="lazy"
-                        />
-                      </CardHoverPreview>
-                    )}
-                    <span className="text-sm font-medium">
-                      {deal.name}
-                    </span>
-                    {deal.set_code && (
-                      <span className="text-xs text-muted-foreground">{deal.set_code}</span>
-                    )}
-                  </div>
-                  <div className="font-mono text-sm">
-                    <span className="text-deal-trend-drop">
-                      {(deal.pct_change * 100).toFixed(1)}%
-                    </span>
-                    <span className="text-muted-foreground ml-2">
-                      €{deal.current_price.toFixed(2)}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
