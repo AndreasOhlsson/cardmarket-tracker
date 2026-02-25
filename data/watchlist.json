@@ -1,191 +1,5007 @@
 {
-  "description": "Initial Commander-focused watchlist for Cardmarket deal tracking",
+  "description": "Commander-focused watchlist — top 1000 cards by price and popularity",
   "created": "2026-02-23",
+  "updated": "2026-02-24",
   "cards": [
-    { "name": "Sheoldred, the Apocalypse", "category": "creature", "notes": "Most expensive Standard-era creature, volatile" },
-    { "name": "Ancient Tomb", "category": "land", "notes": "Colorless staple, reprint-sensitive" },
-    { "name": "Rhystic Study", "category": "enchantment", "notes": "Commander tax, huge reprint target" },
-    { "name": "Cyclonic Rift", "category": "spell", "notes": "Most hated Commander card" },
-    { "name": "Smothering Tithe", "category": "enchantment", "notes": "White staple, reprint dips" },
-    { "name": "Demonic Tutor", "category": "spell", "notes": "Classic tutor" },
-    { "name": "Roaming Throne", "category": "creature", "notes": "Tribal staple, recent and volatile" },
-    { "name": "Orcish Bowmasters", "category": "creature", "notes": "Cross-format staple" },
-    { "name": "Esper Sentinel", "category": "creature", "notes": "White Rhystic Study" },
-    { "name": "Thassa's Oracle", "category": "creature", "notes": "cEDH win-con" },
-    { "name": "Dauthi Voidwalker", "category": "creature", "notes": "Graveyard hate + value" },
-    { "name": "Ragavan, Nimble Pilferer", "category": "creature", "notes": "Cross-format demand" },
-    { "name": "Mondrak, Glory Dominus", "category": "creature", "notes": "Token doubler" },
-    { "name": "Craterhoof Behemoth", "category": "creature", "notes": "Classic finisher" },
-    { "name": "Mox Jasper", "category": "artifact", "notes": "New, price settling" },
-
-    { "name": "Polluted Delta", "category": "fetchland", "notes": "UB fetch" },
-    { "name": "Misty Rainforest", "category": "fetchland", "notes": "GU fetch" },
-    { "name": "Scalding Tarn", "category": "fetchland", "notes": "UR fetch" },
-    { "name": "Verdant Catacombs", "category": "fetchland", "notes": "BG fetch" },
-    { "name": "Arid Mesa", "category": "fetchland", "notes": "RW fetch" },
-    { "name": "Marsh Flats", "category": "fetchland", "notes": "WB fetch" },
-    { "name": "Flooded Strand", "category": "fetchland", "notes": "WU fetch" },
-    { "name": "Bloodstained Mire", "category": "fetchland", "notes": "BR fetch" },
-    { "name": "Wooded Foothills", "category": "fetchland", "notes": "RG fetch" },
-    { "name": "Windswept Heath", "category": "fetchland", "notes": "GW fetch" },
-
-    { "name": "The One Ring", "category": "artifact", "notes": "Cross-format powerhouse" },
-    { "name": "The Great Henge", "category": "artifact", "notes": "Green staple" },
-    { "name": "Mana Vault", "category": "artifact", "notes": "Fast mana" },
-    { "name": "Chrome Mox", "category": "artifact", "notes": "Fast mana" },
-    { "name": "Mox Opal", "category": "artifact", "notes": "Artifact decks" },
-    { "name": "Mox Amber", "category": "artifact", "notes": "Legendary-matters" },
-    { "name": "Mox Diamond", "category": "artifact", "notes": "cEDH staple, reserved-adjacent pricing" },
-    { "name": "Sensei's Divining Top", "category": "artifact", "notes": "Top-deck manipulation" },
-    { "name": "Phyrexian Altar", "category": "artifact", "notes": "Combo piece" },
-    { "name": "Ashnod's Altar", "category": "artifact", "notes": "Combo piece" },
-    { "name": "Skullclamp", "category": "artifact", "notes": "Best draw equipment" },
-    { "name": "Lightning Greaves", "category": "artifact", "notes": "Commander protection" },
-    { "name": "Lotus Petal", "category": "artifact", "notes": "Fast mana" },
-    { "name": "Basilisk Collar", "category": "artifact", "notes": "Equipment staple" },
-    { "name": "Mithril Coat", "category": "artifact", "notes": "Commander protection, LotR" },
-    { "name": "Talisman of Dominance", "category": "artifact", "notes": "UB mana rock" },
-    { "name": "Talisman of Indulgence", "category": "artifact", "notes": "BR mana rock" },
-    { "name": "Talisman of Progress", "category": "artifact", "notes": "WU mana rock" },
-    { "name": "Urza's Saga", "category": "enchantment-land", "notes": "Artifact tutor land" },
-
-    { "name": "Mystic Remora", "category": "enchantment", "notes": "cEDH draw engine" },
-    { "name": "Sylvan Library", "category": "enchantment", "notes": "Green card advantage" },
-    { "name": "Doubling Season", "category": "enchantment", "notes": "Token/counter doubler" },
-    { "name": "Parallel Lives", "category": "enchantment", "notes": "Token doubler" },
-    { "name": "Anointed Procession", "category": "enchantment", "notes": "White token doubler" },
-    { "name": "Land Tax", "category": "enchantment", "notes": "White card advantage" },
-    { "name": "Exploration", "category": "enchantment", "notes": "Extra land drops" },
-    { "name": "Necropotence", "category": "enchantment", "notes": "Power draw" },
-    { "name": "Exquisite Blood", "category": "enchantment", "notes": "Combo with Sanguine Bond" },
-    { "name": "The Meathook Massacre", "category": "enchantment", "notes": "Board wipe + drain" },
-    { "name": "Underworld Breach", "category": "enchantment", "notes": "Combo enabler" },
-    { "name": "Bitterblossom", "category": "enchantment", "notes": "Token producer" },
-    { "name": "Black Market Connections", "category": "enchantment", "notes": "Black value engine" },
-    { "name": "Guardian Project", "category": "enchantment", "notes": "Green draw engine" },
-    { "name": "Kindred Discovery", "category": "enchantment", "notes": "Tribal draw engine" },
-    { "name": "Grave Pact", "category": "enchantment", "notes": "Sacrifice synergy" },
-    { "name": "Trouble in Pairs", "category": "enchantment", "notes": "White draw, recent" },
-    { "name": "Blind Obedience", "category": "enchantment", "notes": "Stax piece" },
-    { "name": "Growing Rites of Itlimoc", "category": "enchantment", "notes": "Budget Gaea's Cradle" },
-    { "name": "Beastmaster Ascension", "category": "enchantment", "notes": "Go-wide finisher" },
-    { "name": "Goblin Bombardment", "category": "enchantment", "notes": "Sacrifice outlet" },
-    { "name": "Phyrexian Arena", "category": "enchantment", "notes": "Black card draw" },
-
-    { "name": "Fierce Guardianship", "category": "spell", "notes": "Free counterspell" },
-    { "name": "Deflecting Swat", "category": "spell", "notes": "Free redirect" },
-    { "name": "Deadly Rollick", "category": "spell", "notes": "Free removal" },
-    { "name": "Teferi's Protection", "category": "spell", "notes": "Ultimate protection" },
-    { "name": "Vampiric Tutor", "category": "spell", "notes": "Best tutor" },
-    { "name": "Mana Drain", "category": "spell", "notes": "Best counterspell" },
-    { "name": "Enlightened Tutor", "category": "spell", "notes": "Artifact/enchantment tutor" },
-    { "name": "Mystical Tutor", "category": "spell", "notes": "Instant/sorcery tutor" },
-    { "name": "Swan Song", "category": "spell", "notes": "Efficient counter" },
-    { "name": "Jeska's Will", "category": "spell", "notes": "Red ritual + impulse" },
-    { "name": "Toxic Deluge", "category": "spell", "notes": "Scalable board wipe" },
-    { "name": "Farewell", "category": "spell", "notes": "Flexible exile wipe" },
-    { "name": "Reanimate", "category": "spell", "notes": "Cheapest reanimation" },
-    { "name": "Heroic Intervention", "category": "spell", "notes": "Green protection" },
-    { "name": "Assassin's Trophy", "category": "spell", "notes": "Flexible removal" },
-    { "name": "Chaos Warp", "category": "spell", "notes": "Red permanent removal" },
-    { "name": "Nature's Lore", "category": "spell", "notes": "Efficient ramp" },
-    { "name": "Three Visits", "category": "spell", "notes": "Nature's Lore twin" },
-    { "name": "Generous Gift", "category": "spell", "notes": "White Beast Within" },
-    { "name": "Beast Within", "category": "spell", "notes": "Green removal" },
-
-    { "name": "Sheoldred, Whispering One", "category": "creature", "notes": "Classic reanimation target" },
-    { "name": "Elesh Norn, Grand Cenobite", "category": "creature", "notes": "White anthem + wipe" },
-    { "name": "Elesh Norn, Mother of Machines", "category": "creature", "notes": "ETB doubler/stopper" },
-    { "name": "Vorinclex, Monstrous Raider", "category": "creature", "notes": "Counter doubler" },
-    { "name": "Old Gnawbone", "category": "creature", "notes": "Treasure generator" },
-    { "name": "Avacyn, Angel of Hope", "category": "creature", "notes": "Board-wide indestructible" },
-    { "name": "Yawgmoth, Thran Physician", "category": "creature", "notes": "Aristocrats commander" },
-    { "name": "Urza, Lord High Artificer", "category": "creature", "notes": "Artifact commander" },
-    { "name": "Kozilek, Butcher of Truth", "category": "creature", "notes": "Eldrazi finisher" },
-    { "name": "Purphoros, God of the Forge", "category": "creature", "notes": "ETB damage" },
-    { "name": "Heliod, Sun-Crowned", "category": "creature", "notes": "Lifegain combo" },
-    { "name": "Selvala, Heart of the Wilds", "category": "creature", "notes": "Green mana + draw" },
-    { "name": "Azusa, Lost but Seeking", "category": "creature", "notes": "Extra land drops" },
-    { "name": "Delney, Streetwise Lookout", "category": "creature", "notes": "Trigger doubler, recent" },
-    { "name": "Bristly Bill, Spine Sower", "category": "creature", "notes": "+1/+1 counter doubler, recent" },
-    { "name": "Etali, Primal Storm", "category": "creature", "notes": "Free spells on attack" },
-    { "name": "Birgi, God of Storytelling", "category": "creature", "notes": "Storm enabler" },
-    { "name": "The Gitrog Monster", "category": "creature", "notes": "Lands combo" },
-    { "name": "Muldrotha, the Gravetide", "category": "creature", "notes": "Graveyard value" },
-    { "name": "Sakashima of a Thousand Faces", "category": "creature", "notes": "Clone + partner" },
-    { "name": "Chatterfang, Squirrel General", "category": "creature", "notes": "Token commander" },
-    { "name": "Karlach, Fury of Avernus", "category": "creature", "notes": "Extra combats" },
-    { "name": "Ojer Taq, Deepest Foundation", "category": "creature", "notes": "Token tripler" },
-    { "name": "Veyran, Voice of Duality", "category": "creature", "notes": "Spellslinger doubler" },
-    { "name": "Xenagos, God of Revels", "category": "creature", "notes": "Gruul power doubler" },
-    { "name": "Seedborn Muse", "category": "creature", "notes": "Untap engine" },
-    { "name": "Bloom Tender", "category": "creature", "notes": "Multi-color mana dork" },
-    { "name": "Lotus Cobra", "category": "creature", "notes": "Landfall mana" },
-    { "name": "Walking Ballista", "category": "creature", "notes": "Combo finisher" },
-    { "name": "Syr Konrad, the Grim", "category": "creature", "notes": "Graveyard pinger" },
-    { "name": "Vito, Thorn of the Dusk Rose", "category": "creature", "notes": "Lifegain combo" },
-
-    { "name": "Godless Shrine", "category": "shockland", "notes": "WB shock" },
-    { "name": "Watery Grave", "category": "shockland", "notes": "UB shock" },
-    { "name": "Breeding Pool", "category": "shockland", "notes": "GU shock" },
-    { "name": "Blood Crypt", "category": "shockland", "notes": "BR shock" },
-    { "name": "Hallowed Fountain", "category": "shockland", "notes": "WU shock" },
-    { "name": "Overgrown Tomb", "category": "shockland", "notes": "BG shock" },
-    { "name": "Steam Vents", "category": "shockland", "notes": "UR shock" },
-    { "name": "Temple Garden", "category": "shockland", "notes": "GW shock" },
-    { "name": "Stomping Ground", "category": "shockland", "notes": "RG shock" },
-    { "name": "Sacred Foundry", "category": "shockland", "notes": "RW shock" },
-
-    { "name": "Bojuka Bog", "category": "land", "notes": "Free graveyard hate" },
-    { "name": "Urborg, Tomb of Yawgmoth", "category": "land", "notes": "Swamp enabler" },
-    { "name": "Cabal Coffers", "category": "land", "notes": "Black mana engine" },
-    { "name": "Nykthos, Shrine to Nyx", "category": "land", "notes": "Devotion mana" },
-    { "name": "Cavern of Souls", "category": "land", "notes": "Tribal uncounterable" },
-    { "name": "Boseiju, Who Endures", "category": "land", "notes": "Free removal" },
-    { "name": "Otawara, Soaring City", "category": "land", "notes": "Free bounce" },
-    { "name": "Yavimaya, Cradle of Growth", "category": "land", "notes": "Forest enabler" },
-    { "name": "Strip Mine", "category": "land", "notes": "Land destruction" },
-    { "name": "Gemstone Caverns", "category": "land", "notes": "Free mana on draw" },
-
-    { "name": "Vampiric Link", "category": "enchantment", "notes": "Budget Aura, combo with Vito" },
-    { "name": "Animate Dead", "category": "enchantment", "notes": "Cheap reanimation" },
-    { "name": "Dance of the Dead", "category": "enchantment", "notes": "Reanimation variant" },
-    { "name": "Necromancy", "category": "enchantment", "notes": "Flash reanimation" },
-    { "name": "Food Chain", "category": "enchantment", "notes": "cEDH combo piece" },
-    { "name": "Concordant Crossroads", "category": "enchantment", "notes": "Green haste" },
-
-    { "name": "Entomb", "category": "spell", "notes": "Graveyard enabler" },
-    { "name": "Worldly Tutor", "category": "spell", "notes": "Green creature tutor" },
-    { "name": "Finale of Devastation", "category": "spell", "notes": "Creature tutor + finisher" },
-    { "name": "Green Sun's Zenith", "category": "spell", "notes": "Green creature tutor" },
-    { "name": "Torment of Hailfire", "category": "spell", "notes": "Black finisher" },
-    { "name": "Exsanguinate", "category": "spell", "notes": "Black drain finisher" },
-    { "name": "Bolas's Citadel", "category": "artifact", "notes": "Top-deck engine" },
-    { "name": "Sword of Feast and Famine", "category": "artifact", "notes": "Best sword" },
-    { "name": "Sword of Fire and Ice", "category": "artifact", "notes": "Card advantage sword" },
-    { "name": "Altar of Dementia", "category": "artifact", "notes": "Mill combo piece" },
-    { "name": "Aetherflux Reservoir", "category": "artifact", "notes": "Storm/lifegain wincon" },
-    { "name": "Cloudstone Curio", "category": "artifact", "notes": "Bounce combo" },
-    { "name": "Staff of Domination", "category": "artifact", "notes": "Infinite mana payoff" },
-
-    { "name": "Force of Will", "category": "spell", "notes": "Free counterspell" },
-    { "name": "Force of Negation", "category": "spell", "notes": "Modern free counter" },
-    { "name": "Pact of Negation", "category": "spell", "notes": "Zero-mana counter" },
-    { "name": "Flawless Maneuver", "category": "spell", "notes": "Free protection" },
-    { "name": "Obscuring Haze", "category": "spell", "notes": "Free fog" },
-
-    { "name": "Solphim, Mayhem Dominus", "category": "creature", "notes": "Damage doubler" },
-    { "name": "Aurelia, the Warleader", "category": "creature", "notes": "Extra combat" },
-    { "name": "Titania, Protector of Argoth", "category": "creature", "notes": "Lands commander" },
-    { "name": "Krenko, Tin Street Kingpin", "category": "creature", "notes": "Goblin token generator" },
-    { "name": "Ashaya, Soul of the Wild", "category": "creature", "notes": "Creature-land synergy" },
-    { "name": "Kodama of the West Tree", "category": "creature", "notes": "Modified ramp" },
-    { "name": "Emrakul, the World Anew", "category": "creature", "notes": "MH3 Eldrazi" },
-    { "name": "Ulamog, the Defiler", "category": "creature", "notes": "MH3 Eldrazi" },
-
-    { "name": "Dockside Extortionist", "category": "creature", "notes": "Banned but may unban, volatile" },
-    { "name": "Jeweled Lotus", "category": "artifact", "notes": "Banned but may unban, volatile" },
-    { "name": "Nadu, Winged Wisdom", "category": "creature", "notes": "Banned, volatile" },
-    { "name": "Mana Crypt", "category": "artifact", "notes": "Banned but iconic, volatile" }
+    {
+      "name": "Sheoldred, the Apocalypse",
+      "category": "creature",
+      "notes": "Most expensive Standard-era creature, volatile"
+    },
+    {
+      "name": "Ancient Tomb",
+      "category": "land",
+      "notes": "Colorless staple, reprint-sensitive"
+    },
+    {
+      "name": "Rhystic Study",
+      "category": "enchantment",
+      "notes": "Commander tax, huge reprint target"
+    },
+    {
+      "name": "Cyclonic Rift",
+      "category": "spell",
+      "notes": "Most hated Commander card"
+    },
+    {
+      "name": "Smothering Tithe",
+      "category": "enchantment",
+      "notes": "White staple, reprint dips"
+    },
+    {
+      "name": "Demonic Tutor",
+      "category": "spell",
+      "notes": "Classic tutor"
+    },
+    {
+      "name": "Roaming Throne",
+      "category": "creature",
+      "notes": "Tribal staple, recent and volatile"
+    },
+    {
+      "name": "Orcish Bowmasters",
+      "category": "creature",
+      "notes": "Cross-format staple"
+    },
+    {
+      "name": "Esper Sentinel",
+      "category": "creature",
+      "notes": "White Rhystic Study"
+    },
+    {
+      "name": "Thassa's Oracle",
+      "category": "creature",
+      "notes": "cEDH win-con"
+    },
+    {
+      "name": "Dauthi Voidwalker",
+      "category": "creature",
+      "notes": "Graveyard hate + value"
+    },
+    {
+      "name": "Ragavan, Nimble Pilferer",
+      "category": "creature",
+      "notes": "Cross-format demand"
+    },
+    {
+      "name": "Mondrak, Glory Dominus",
+      "category": "creature",
+      "notes": "Token doubler"
+    },
+    {
+      "name": "Craterhoof Behemoth",
+      "category": "creature",
+      "notes": "Classic finisher"
+    },
+    {
+      "name": "Mox Jasper",
+      "category": "artifact",
+      "notes": "New, price settling"
+    },
+    {
+      "name": "Polluted Delta",
+      "category": "fetchland",
+      "notes": "UB fetch"
+    },
+    {
+      "name": "Misty Rainforest",
+      "category": "fetchland",
+      "notes": "GU fetch"
+    },
+    {
+      "name": "Scalding Tarn",
+      "category": "fetchland",
+      "notes": "UR fetch"
+    },
+    {
+      "name": "Verdant Catacombs",
+      "category": "fetchland",
+      "notes": "BG fetch"
+    },
+    {
+      "name": "Arid Mesa",
+      "category": "fetchland",
+      "notes": "RW fetch"
+    },
+    {
+      "name": "Marsh Flats",
+      "category": "fetchland",
+      "notes": "WB fetch"
+    },
+    {
+      "name": "Flooded Strand",
+      "category": "fetchland",
+      "notes": "WU fetch"
+    },
+    {
+      "name": "Bloodstained Mire",
+      "category": "fetchland",
+      "notes": "BR fetch"
+    },
+    {
+      "name": "Wooded Foothills",
+      "category": "fetchland",
+      "notes": "RG fetch"
+    },
+    {
+      "name": "Windswept Heath",
+      "category": "fetchland",
+      "notes": "GW fetch"
+    },
+    {
+      "name": "The One Ring",
+      "category": "artifact",
+      "notes": "Cross-format powerhouse"
+    },
+    {
+      "name": "The Great Henge",
+      "category": "artifact",
+      "notes": "Green staple"
+    },
+    {
+      "name": "Mana Vault",
+      "category": "artifact",
+      "notes": "Fast mana"
+    },
+    {
+      "name": "Chrome Mox",
+      "category": "artifact",
+      "notes": "Fast mana"
+    },
+    {
+      "name": "Mox Opal",
+      "category": "artifact",
+      "notes": "Artifact decks"
+    },
+    {
+      "name": "Mox Amber",
+      "category": "artifact",
+      "notes": "Legendary-matters"
+    },
+    {
+      "name": "Mox Diamond",
+      "category": "artifact",
+      "notes": "cEDH staple, reserved-adjacent pricing"
+    },
+    {
+      "name": "Sensei's Divining Top",
+      "category": "artifact",
+      "notes": "Top-deck manipulation"
+    },
+    {
+      "name": "Phyrexian Altar",
+      "category": "artifact",
+      "notes": "Combo piece"
+    },
+    {
+      "name": "Ashnod's Altar",
+      "category": "artifact",
+      "notes": "Combo piece"
+    },
+    {
+      "name": "Skullclamp",
+      "category": "artifact",
+      "notes": "Best draw equipment"
+    },
+    {
+      "name": "Lightning Greaves",
+      "category": "artifact",
+      "notes": "Commander protection"
+    },
+    {
+      "name": "Lotus Petal",
+      "category": "artifact",
+      "notes": "Fast mana"
+    },
+    {
+      "name": "Basilisk Collar",
+      "category": "artifact",
+      "notes": "Equipment staple"
+    },
+    {
+      "name": "Mithril Coat",
+      "category": "artifact",
+      "notes": "Commander protection, LotR"
+    },
+    {
+      "name": "Talisman of Dominance",
+      "category": "artifact",
+      "notes": "UB mana rock"
+    },
+    {
+      "name": "Talisman of Indulgence",
+      "category": "artifact",
+      "notes": "BR mana rock"
+    },
+    {
+      "name": "Talisman of Progress",
+      "category": "artifact",
+      "notes": "WU mana rock"
+    },
+    {
+      "name": "Urza's Saga",
+      "category": "enchantment-land",
+      "notes": "Artifact tutor land"
+    },
+    {
+      "name": "Mystic Remora",
+      "category": "enchantment",
+      "notes": "cEDH draw engine"
+    },
+    {
+      "name": "Sylvan Library",
+      "category": "enchantment",
+      "notes": "Green card advantage"
+    },
+    {
+      "name": "Doubling Season",
+      "category": "enchantment",
+      "notes": "Token/counter doubler"
+    },
+    {
+      "name": "Parallel Lives",
+      "category": "enchantment",
+      "notes": "Token doubler"
+    },
+    {
+      "name": "Anointed Procession",
+      "category": "enchantment",
+      "notes": "White token doubler"
+    },
+    {
+      "name": "Land Tax",
+      "category": "enchantment",
+      "notes": "White card advantage"
+    },
+    {
+      "name": "Exploration",
+      "category": "enchantment",
+      "notes": "Extra land drops"
+    },
+    {
+      "name": "Necropotence",
+      "category": "enchantment",
+      "notes": "Power draw"
+    },
+    {
+      "name": "Exquisite Blood",
+      "category": "enchantment",
+      "notes": "Combo with Sanguine Bond"
+    },
+    {
+      "name": "The Meathook Massacre",
+      "category": "enchantment",
+      "notes": "Board wipe + drain"
+    },
+    {
+      "name": "Underworld Breach",
+      "category": "enchantment",
+      "notes": "Combo enabler"
+    },
+    {
+      "name": "Bitterblossom",
+      "category": "enchantment",
+      "notes": "Token producer"
+    },
+    {
+      "name": "Black Market Connections",
+      "category": "enchantment",
+      "notes": "Black value engine"
+    },
+    {
+      "name": "Guardian Project",
+      "category": "enchantment",
+      "notes": "Green draw engine"
+    },
+    {
+      "name": "Kindred Discovery",
+      "category": "enchantment",
+      "notes": "Tribal draw engine"
+    },
+    {
+      "name": "Grave Pact",
+      "category": "enchantment",
+      "notes": "Sacrifice synergy"
+    },
+    {
+      "name": "Trouble in Pairs",
+      "category": "enchantment",
+      "notes": "White draw, recent"
+    },
+    {
+      "name": "Blind Obedience",
+      "category": "enchantment",
+      "notes": "Stax piece"
+    },
+    {
+      "name": "Growing Rites of Itlimoc",
+      "category": "enchantment",
+      "notes": "Budget Gaea's Cradle"
+    },
+    {
+      "name": "Beastmaster Ascension",
+      "category": "enchantment",
+      "notes": "Go-wide finisher"
+    },
+    {
+      "name": "Goblin Bombardment",
+      "category": "enchantment",
+      "notes": "Sacrifice outlet"
+    },
+    {
+      "name": "Phyrexian Arena",
+      "category": "enchantment",
+      "notes": "Black card draw"
+    },
+    {
+      "name": "Fierce Guardianship",
+      "category": "spell",
+      "notes": "Free counterspell"
+    },
+    {
+      "name": "Deflecting Swat",
+      "category": "spell",
+      "notes": "Free redirect"
+    },
+    {
+      "name": "Deadly Rollick",
+      "category": "spell",
+      "notes": "Free removal"
+    },
+    {
+      "name": "Teferi's Protection",
+      "category": "spell",
+      "notes": "Ultimate protection"
+    },
+    {
+      "name": "Vampiric Tutor",
+      "category": "spell",
+      "notes": "Best tutor"
+    },
+    {
+      "name": "Mana Drain",
+      "category": "spell",
+      "notes": "Best counterspell"
+    },
+    {
+      "name": "Enlightened Tutor",
+      "category": "spell",
+      "notes": "Artifact/enchantment tutor"
+    },
+    {
+      "name": "Mystical Tutor",
+      "category": "spell",
+      "notes": "Instant/sorcery tutor"
+    },
+    {
+      "name": "Swan Song",
+      "category": "spell",
+      "notes": "Efficient counter"
+    },
+    {
+      "name": "Jeska's Will",
+      "category": "spell",
+      "notes": "Red ritual + impulse"
+    },
+    {
+      "name": "Toxic Deluge",
+      "category": "spell",
+      "notes": "Scalable board wipe"
+    },
+    {
+      "name": "Farewell",
+      "category": "spell",
+      "notes": "Flexible exile wipe"
+    },
+    {
+      "name": "Reanimate",
+      "category": "spell",
+      "notes": "Cheapest reanimation"
+    },
+    {
+      "name": "Heroic Intervention",
+      "category": "spell",
+      "notes": "Green protection"
+    },
+    {
+      "name": "Assassin's Trophy",
+      "category": "spell",
+      "notes": "Flexible removal"
+    },
+    {
+      "name": "Chaos Warp",
+      "category": "spell",
+      "notes": "Red permanent removal"
+    },
+    {
+      "name": "Nature's Lore",
+      "category": "spell",
+      "notes": "Efficient ramp"
+    },
+    {
+      "name": "Three Visits",
+      "category": "spell",
+      "notes": "Nature's Lore twin"
+    },
+    {
+      "name": "Generous Gift",
+      "category": "spell",
+      "notes": "White Beast Within"
+    },
+    {
+      "name": "Beast Within",
+      "category": "spell",
+      "notes": "Green removal"
+    },
+    {
+      "name": "Sheoldred, Whispering One",
+      "category": "creature",
+      "notes": "Classic reanimation target"
+    },
+    {
+      "name": "Elesh Norn, Grand Cenobite",
+      "category": "creature",
+      "notes": "White anthem + wipe"
+    },
+    {
+      "name": "Elesh Norn, Mother of Machines",
+      "category": "creature",
+      "notes": "ETB doubler/stopper"
+    },
+    {
+      "name": "Vorinclex, Monstrous Raider",
+      "category": "creature",
+      "notes": "Counter doubler"
+    },
+    {
+      "name": "Old Gnawbone",
+      "category": "creature",
+      "notes": "Treasure generator"
+    },
+    {
+      "name": "Avacyn, Angel of Hope",
+      "category": "creature",
+      "notes": "Board-wide indestructible"
+    },
+    {
+      "name": "Yawgmoth, Thran Physician",
+      "category": "creature",
+      "notes": "Aristocrats commander"
+    },
+    {
+      "name": "Urza, Lord High Artificer",
+      "category": "creature",
+      "notes": "Artifact commander"
+    },
+    {
+      "name": "Kozilek, Butcher of Truth",
+      "category": "creature",
+      "notes": "Eldrazi finisher"
+    },
+    {
+      "name": "Purphoros, God of the Forge",
+      "category": "creature",
+      "notes": "ETB damage"
+    },
+    {
+      "name": "Heliod, Sun-Crowned",
+      "category": "creature",
+      "notes": "Lifegain combo"
+    },
+    {
+      "name": "Selvala, Heart of the Wilds",
+      "category": "creature",
+      "notes": "Green mana + draw"
+    },
+    {
+      "name": "Azusa, Lost but Seeking",
+      "category": "creature",
+      "notes": "Extra land drops"
+    },
+    {
+      "name": "Delney, Streetwise Lookout",
+      "category": "creature",
+      "notes": "Trigger doubler, recent"
+    },
+    {
+      "name": "Bristly Bill, Spine Sower",
+      "category": "creature",
+      "notes": "+1/+1 counter doubler, recent"
+    },
+    {
+      "name": "Etali, Primal Storm",
+      "category": "creature",
+      "notes": "Free spells on attack"
+    },
+    {
+      "name": "Birgi, God of Storytelling",
+      "category": "creature",
+      "notes": "Storm enabler"
+    },
+    {
+      "name": "The Gitrog Monster",
+      "category": "creature",
+      "notes": "Lands combo"
+    },
+    {
+      "name": "Muldrotha, the Gravetide",
+      "category": "creature",
+      "notes": "Graveyard value"
+    },
+    {
+      "name": "Sakashima of a Thousand Faces",
+      "category": "creature",
+      "notes": "Clone + partner"
+    },
+    {
+      "name": "Chatterfang, Squirrel General",
+      "category": "creature",
+      "notes": "Token commander"
+    },
+    {
+      "name": "Karlach, Fury of Avernus",
+      "category": "creature",
+      "notes": "Extra combats"
+    },
+    {
+      "name": "Ojer Taq, Deepest Foundation",
+      "category": "creature",
+      "notes": "Token tripler"
+    },
+    {
+      "name": "Veyran, Voice of Duality",
+      "category": "creature",
+      "notes": "Spellslinger doubler"
+    },
+    {
+      "name": "Xenagos, God of Revels",
+      "category": "creature",
+      "notes": "Gruul power doubler"
+    },
+    {
+      "name": "Seedborn Muse",
+      "category": "creature",
+      "notes": "Untap engine"
+    },
+    {
+      "name": "Bloom Tender",
+      "category": "creature",
+      "notes": "Multi-color mana dork"
+    },
+    {
+      "name": "Lotus Cobra",
+      "category": "creature",
+      "notes": "Landfall mana"
+    },
+    {
+      "name": "Walking Ballista",
+      "category": "creature",
+      "notes": "Combo finisher"
+    },
+    {
+      "name": "Syr Konrad, the Grim",
+      "category": "creature",
+      "notes": "Graveyard pinger"
+    },
+    {
+      "name": "Vito, Thorn of the Dusk Rose",
+      "category": "creature",
+      "notes": "Lifegain combo"
+    },
+    {
+      "name": "Godless Shrine",
+      "category": "shockland",
+      "notes": "WB shock"
+    },
+    {
+      "name": "Watery Grave",
+      "category": "shockland",
+      "notes": "UB shock"
+    },
+    {
+      "name": "Breeding Pool",
+      "category": "shockland",
+      "notes": "GU shock"
+    },
+    {
+      "name": "Blood Crypt",
+      "category": "shockland",
+      "notes": "BR shock"
+    },
+    {
+      "name": "Hallowed Fountain",
+      "category": "shockland",
+      "notes": "WU shock"
+    },
+    {
+      "name": "Overgrown Tomb",
+      "category": "shockland",
+      "notes": "BG shock"
+    },
+    {
+      "name": "Steam Vents",
+      "category": "shockland",
+      "notes": "UR shock"
+    },
+    {
+      "name": "Temple Garden",
+      "category": "shockland",
+      "notes": "GW shock"
+    },
+    {
+      "name": "Stomping Ground",
+      "category": "shockland",
+      "notes": "RG shock"
+    },
+    {
+      "name": "Sacred Foundry",
+      "category": "shockland",
+      "notes": "RW shock"
+    },
+    {
+      "name": "Bojuka Bog",
+      "category": "land",
+      "notes": "Free graveyard hate"
+    },
+    {
+      "name": "Urborg, Tomb of Yawgmoth",
+      "category": "land",
+      "notes": "Swamp enabler"
+    },
+    {
+      "name": "Cabal Coffers",
+      "category": "land",
+      "notes": "Black mana engine"
+    },
+    {
+      "name": "Nykthos, Shrine to Nyx",
+      "category": "land",
+      "notes": "Devotion mana"
+    },
+    {
+      "name": "Cavern of Souls",
+      "category": "land",
+      "notes": "Tribal uncounterable"
+    },
+    {
+      "name": "Boseiju, Who Endures",
+      "category": "land",
+      "notes": "Free removal"
+    },
+    {
+      "name": "Otawara, Soaring City",
+      "category": "land",
+      "notes": "Free bounce"
+    },
+    {
+      "name": "Yavimaya, Cradle of Growth",
+      "category": "land",
+      "notes": "Forest enabler"
+    },
+    {
+      "name": "Strip Mine",
+      "category": "land",
+      "notes": "Land destruction"
+    },
+    {
+      "name": "Gemstone Caverns",
+      "category": "land",
+      "notes": "Free mana on draw"
+    },
+    {
+      "name": "Vampiric Link",
+      "category": "enchantment",
+      "notes": "Budget Aura, combo with Vito"
+    },
+    {
+      "name": "Animate Dead",
+      "category": "enchantment",
+      "notes": "Cheap reanimation"
+    },
+    {
+      "name": "Dance of the Dead",
+      "category": "enchantment",
+      "notes": "Reanimation variant"
+    },
+    {
+      "name": "Necromancy",
+      "category": "enchantment",
+      "notes": "Flash reanimation"
+    },
+    {
+      "name": "Food Chain",
+      "category": "enchantment",
+      "notes": "cEDH combo piece"
+    },
+    {
+      "name": "Concordant Crossroads",
+      "category": "enchantment",
+      "notes": "Green haste"
+    },
+    {
+      "name": "Entomb",
+      "category": "spell",
+      "notes": "Graveyard enabler"
+    },
+    {
+      "name": "Worldly Tutor",
+      "category": "spell",
+      "notes": "Green creature tutor"
+    },
+    {
+      "name": "Finale of Devastation",
+      "category": "spell",
+      "notes": "Creature tutor + finisher"
+    },
+    {
+      "name": "Green Sun's Zenith",
+      "category": "spell",
+      "notes": "Green creature tutor"
+    },
+    {
+      "name": "Torment of Hailfire",
+      "category": "spell",
+      "notes": "Black finisher"
+    },
+    {
+      "name": "Exsanguinate",
+      "category": "spell",
+      "notes": "Black drain finisher"
+    },
+    {
+      "name": "Bolas's Citadel",
+      "category": "artifact",
+      "notes": "Top-deck engine"
+    },
+    {
+      "name": "Sword of Feast and Famine",
+      "category": "artifact",
+      "notes": "Best sword"
+    },
+    {
+      "name": "Sword of Fire and Ice",
+      "category": "artifact",
+      "notes": "Card advantage sword"
+    },
+    {
+      "name": "Altar of Dementia",
+      "category": "artifact",
+      "notes": "Mill combo piece"
+    },
+    {
+      "name": "Aetherflux Reservoir",
+      "category": "artifact",
+      "notes": "Storm/lifegain wincon"
+    },
+    {
+      "name": "Cloudstone Curio",
+      "category": "artifact",
+      "notes": "Bounce combo"
+    },
+    {
+      "name": "Staff of Domination",
+      "category": "artifact",
+      "notes": "Infinite mana payoff"
+    },
+    {
+      "name": "Force of Will",
+      "category": "spell",
+      "notes": "Free counterspell"
+    },
+    {
+      "name": "Force of Negation",
+      "category": "spell",
+      "notes": "Modern free counter"
+    },
+    {
+      "name": "Pact of Negation",
+      "category": "spell",
+      "notes": "Zero-mana counter"
+    },
+    {
+      "name": "Flawless Maneuver",
+      "category": "spell",
+      "notes": "Free protection"
+    },
+    {
+      "name": "Obscuring Haze",
+      "category": "spell",
+      "notes": "Free fog"
+    },
+    {
+      "name": "Solphim, Mayhem Dominus",
+      "category": "creature",
+      "notes": "Damage doubler"
+    },
+    {
+      "name": "Aurelia, the Warleader",
+      "category": "creature",
+      "notes": "Extra combat"
+    },
+    {
+      "name": "Titania, Protector of Argoth",
+      "category": "creature",
+      "notes": "Lands commander"
+    },
+    {
+      "name": "Krenko, Tin Street Kingpin",
+      "category": "creature",
+      "notes": "Goblin token generator"
+    },
+    {
+      "name": "Ashaya, Soul of the Wild",
+      "category": "creature",
+      "notes": "Creature-land synergy"
+    },
+    {
+      "name": "Kodama of the West Tree",
+      "category": "creature",
+      "notes": "Modified ramp"
+    },
+    {
+      "name": "Emrakul, the World Anew",
+      "category": "creature",
+      "notes": "MH3 Eldrazi"
+    },
+    {
+      "name": "Ulamog, the Defiler",
+      "category": "creature",
+      "notes": "MH3 Eldrazi"
+    },
+    {
+      "name": "Dockside Extortionist",
+      "category": "creature",
+      "notes": "Banned but may unban, volatile"
+    },
+    {
+      "name": "Jeweled Lotus",
+      "category": "artifact",
+      "notes": "Banned but may unban, volatile"
+    },
+    {
+      "name": "Nadu, Winged Wisdom",
+      "category": "creature",
+      "notes": "Banned, volatile"
+    },
+    {
+      "name": "Mana Crypt",
+      "category": "artifact",
+      "notes": "Banned but iconic, volatile"
+    },
+    {
+      "name": "Timetwister",
+      "category": "auto-added",
+      "notes": "High-value (avg €9932.62), 3 printings"
+    },
+    {
+      "name": "Underground Sea",
+      "category": "auto-added",
+      "notes": "High-value (avg €3859.99), 6 printings"
+    },
+    {
+      "name": "Volcanic Island",
+      "category": "auto-added",
+      "notes": "High-value (avg €3259.17), 4 printings"
+    },
+    {
+      "name": "Taiga",
+      "category": "auto-added",
+      "notes": "High-value (avg €2169.76), 6 printings"
+    },
+    {
+      "name": "Tropical Island",
+      "category": "auto-added",
+      "notes": "High-value (avg €2325.08), 5 printings"
+    },
+    {
+      "name": "Savannah",
+      "category": "auto-added",
+      "notes": "High-value (avg €1793.01), 6 printings"
+    },
+    {
+      "name": "Tundra",
+      "category": "auto-added",
+      "notes": "High-value (avg €1719.41), 6 printings"
+    },
+    {
+      "name": "Bayou",
+      "category": "auto-added",
+      "notes": "High-value (avg €1451.31), 5 printings"
+    },
+    {
+      "name": "Scrubland",
+      "category": "auto-added",
+      "notes": "High-value (avg €1170.85), 6 printings"
+    },
+    {
+      "name": "Plateau",
+      "category": "auto-added",
+      "notes": "High-value (avg €1218.79), 5 printings"
+    },
+    {
+      "name": "Badlands",
+      "category": "auto-added",
+      "notes": "High-value (avg €1166.28), 6 printings"
+    },
+    {
+      "name": "Wheel of Fortune",
+      "category": "auto-added",
+      "notes": "High-value (avg €1155.37), 6 printings"
+    },
+    {
+      "name": "Winter Orb",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €406.26), 11 printings"
+    },
+    {
+      "name": "Armageddon",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €283.88), 16 printings"
+    },
+    {
+      "name": "Copy Artifact",
+      "category": "auto-added",
+      "notes": "High-value (avg €625.53), 5 printings"
+    },
+    {
+      "name": "Sedge Troll",
+      "category": "auto-added",
+      "notes": "High-value (avg €624.99), 6 printings"
+    },
+    {
+      "name": "Birds of Paradise",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €169.15), 32 printings"
+    },
+    {
+      "name": "Gauntlet of Might",
+      "category": "auto-added",
+      "notes": "High-value (avg €972.43), 3 printings"
+    },
+    {
+      "name": "Braingeyser",
+      "category": "auto-added",
+      "notes": "High-value (avg €621.95), 5 printings"
+    },
+    {
+      "name": "The Tabernacle at Pendrell Vale",
+      "category": "auto-added",
+      "notes": "High-value (avg €2426.73), 1 printings"
+    },
+    {
+      "name": "Fork",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €438.77), 5 printings"
+    },
+    {
+      "name": "Gandalf the White",
+      "category": "auto-added",
+      "notes": "High-value (avg €513.09), 5 printings"
+    },
+    {
+      "name": "Forcefield",
+      "category": "auto-added",
+      "notes": "High-value (avg €683.26), 3 printings"
+    },
+    {
+      "name": "Dragon Whelp",
+      "category": "auto-added",
+      "notes": "High-value (avg €681.49), 19 printings"
+    },
+    {
+      "name": "Mishra's Workshop",
+      "category": "auto-added",
+      "notes": "High-value (avg €2038.75), 1 printings"
+    },
+    {
+      "name": "Lich",
+      "category": "auto-added",
+      "notes": "High-value (avg €622.51), 3 printings"
+    },
+    {
+      "name": "Vesuvan Doppelganger",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €442.21), 5 printings"
+    },
+    {
+      "name": "Cyclopean Tomb",
+      "category": "auto-added",
+      "notes": "High-value (avg €587.58), 3 printings"
+    },
+    {
+      "name": "Granite Gargoyle",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €351.8), 6 printings"
+    },
+    {
+      "name": "Shivan Dragon",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €286.86), 30 printings"
+    },
+    {
+      "name": "Candelabra of Tawnos",
+      "category": "auto-added",
+      "notes": "High-value (avg €1673.76), 1 printings"
+    },
+    {
+      "name": "Word of Command",
+      "category": "auto-added",
+      "notes": "High-value (avg €514.78), 3 printings"
+    },
+    {
+      "name": "Mind Twist",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €306.4), 9 printings"
+    },
+    {
+      "name": "Stasis",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €244.68), 9 printings"
+    },
+    {
+      "name": "Juzám Djinn",
+      "category": "auto-added",
+      "notes": "High-value (avg €1414.66), 1 printings"
+    },
+    {
+      "name": "Bazaar of Baghdad",
+      "category": "auto-added",
+      "notes": "High-value (avg €1378.45), 1 printings"
+    },
+    {
+      "name": "Natural Selection",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €456.76), 3 printings"
+    },
+    {
+      "name": "Raging River",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €455.29), 3 printings"
+    },
+    {
+      "name": "Nevinyrral's Disk",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €221.3), 19 printings"
+    },
+    {
+      "name": "Hurricane",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €405.97), 19 printings"
+    },
+    {
+      "name": "The Soul Stone",
+      "category": "auto-added",
+      "notes": "High-value (avg €560.27), 2 printings"
+    },
+    {
+      "name": "Jayemdae Tome",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €219.56), 15 printings"
+    },
+    {
+      "name": "Illusionary Mask",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €344.13), 3 printings"
+    },
+    {
+      "name": "Sol Ring",
+      "category": "auto-added",
+      "notes": "Staple (avg €53.87), 82 printings"
+    },
+    {
+      "name": "Royal Assassin",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €196.4), 18 printings"
+    },
+    {
+      "name": "Timber Wolves",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €189.05), 8 printings"
+    },
+    {
+      "name": "Chains of Mephistopheles",
+      "category": "auto-added",
+      "notes": "High-value (avg €930.91), 1 printings"
+    },
+    {
+      "name": "Zombie Master",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €153.95), 12 printings"
+    },
+    {
+      "name": "Snapcaster Mage",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €152.66), 6 printings"
+    },
+    {
+      "name": "Nightmare",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €151.05), 22 printings"
+    },
+    {
+      "name": "Blaze of Glory",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €298.97), 3 printings"
+    },
+    {
+      "name": "Savannah Lions",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €175.36), 17 printings"
+    },
+    {
+      "name": "Berserk",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €145.9), 6 printings"
+    },
+    {
+      "name": "Two-Headed Giant of Foriys",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €269.05), 3 printings"
+    },
+    {
+      "name": "City of Brass",
+      "category": "auto-added",
+      "notes": "Staple (avg €53.61), 15 printings"
+    },
+    {
+      "name": "Serra Angel",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €160.3), 39 printings"
+    },
+    {
+      "name": "Nether Shadow",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €193.73), 9 printings"
+    },
+    {
+      "name": "Counterspell",
+      "category": "auto-added",
+      "notes": "Staple (avg €76.98), 46 printings"
+    },
+    {
+      "name": "Mahamoti Djinn",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €150.94), 20 printings"
+    },
+    {
+      "name": "Moat",
+      "category": "auto-added",
+      "notes": "High-value (avg €752.7), 1 printings"
+    },
+    {
+      "name": "Farmstead",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €186.06), 6 printings"
+    },
+    {
+      "name": "Wrath of God",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €106.03), 27 printings"
+    },
+    {
+      "name": "Elvish Archers",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €147.52), 12 printings"
+    },
+    {
+      "name": "Rock Hydra",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €239.62), 5 printings"
+    },
+    {
+      "name": "Gaea's Cradle",
+      "category": "auto-added",
+      "notes": "High-value (avg €714.91), 1 printings"
+    },
+    {
+      "name": "Demonic Hordes",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €234.04), 6 printings"
+    },
+    {
+      "name": "Force of Nature",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €227.57), 10 printings"
+    },
+    {
+      "name": "Ankh of Mishra",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €136.45), 10 printings"
+    },
+    {
+      "name": "Lord of the Pit",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €167.49), 13 printings"
+    },
+    {
+      "name": "Disrupting Scepter",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €166.71), 13 printings"
+    },
+    {
+      "name": "Imperial Seal",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €165.53), 4 printings"
+    },
+    {
+      "name": "The Abyss",
+      "category": "auto-added",
+      "notes": "High-value (avg €655.41), 1 printings"
+    },
+    {
+      "name": "Pirate Ship",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €158.36), 10 printings"
+    },
+    {
+      "name": "Ivory Tower",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €156.26), 8 printings"
+    },
+    {
+      "name": "Lord of Atlantis",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €102.46), 13 printings"
+    },
+    {
+      "name": "Thoughtlace",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €199.43), 8 printings"
+    },
+    {
+      "name": "Goblin King",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €117.5), 18 printings"
+    },
+    {
+      "name": "Sleight of Mind",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €145.74), 10 printings"
+    },
+    {
+      "name": "Swords to Plowshares",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (60 printings), avg €38.48"
+    },
+    {
+      "name": "Island Sanctuary",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €136.14), 9 printings"
+    },
+    {
+      "name": "Drain Power",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €132.39), 9 printings"
+    },
+    {
+      "name": "Cockatrice",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €131.48), 10 printings"
+    },
+    {
+      "name": "Mana Short",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €104.4), 10 printings"
+    },
+    {
+      "name": "Kormus Bell",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €130.02), 8 printings"
+    },
+    {
+      "name": "Howling Mine",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €102.73), 21 printings"
+    },
+    {
+      "name": "Meekstone",
+      "category": "auto-added",
+      "notes": "Staple (avg €98.62), 11 printings"
+    },
+    {
+      "name": "Roc of Kher Ridges",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €159.52), 5 printings"
+    },
+    {
+      "name": "Diamond Valley",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €477.63), 1 printings"
+    },
+    {
+      "name": "Guardian Beast",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €472.16), 1 printings"
+    },
+    {
+      "name": "Bad Moon",
+      "category": "auto-added",
+      "notes": "Staple (avg €93.28), 13 printings"
+    },
+    {
+      "name": "Will-o'-the-Wisp",
+      "category": "auto-added",
+      "notes": "Staple (avg €92.92), 11 printings"
+    },
+    {
+      "name": "Red Elemental Blast",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €108.29), 9 printings"
+    },
+    {
+      "name": "Nazgûl",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (16 printings), avg €26.39"
+    },
+    {
+      "name": "Basalt Monolith",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €103.07), 13 printings"
+    },
+    {
+      "name": "Lifelace",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €134.39), 8 printings"
+    },
+    {
+      "name": "Power Surge",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €132.87), 7 printings"
+    },
+    {
+      "name": "Tiamat",
+      "category": "auto-added",
+      "notes": "Staple (avg €79.4), 5 printings"
+    },
+    {
+      "name": "Black Knight",
+      "category": "auto-added",
+      "notes": "Staple (avg €79.24), 14 printings"
+    },
+    {
+      "name": "City in a Bottle",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €390.36), 1 printings"
+    },
+    {
+      "name": "Nether Void",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €385.57), 1 printings"
+    },
+    {
+      "name": "Hypnotic Specter",
+      "category": "auto-added",
+      "notes": "Staple (avg €76.8), 14 printings"
+    },
+    {
+      "name": "All Hallow's Eve",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €369.46), 1 printings"
+    },
+    {
+      "name": "Ancient Copper Dragon",
+      "category": "auto-added",
+      "notes": "Staple (avg €72.77), 5 printings"
+    },
+    {
+      "name": "Kudzu",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €120.9), 5 printings"
+    },
+    {
+      "name": "Earthquake",
+      "category": "auto-added",
+      "notes": "Staple (avg €90.51), 19 printings"
+    },
+    {
+      "name": "Drop of Honey",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €360.84), 1 printings"
+    },
+    {
+      "name": "Lion's Eye Diamond",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €358.28), 1 printings"
+    },
+    {
+      "name": "Purelace",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €119.28), 8 printings"
+    },
+    {
+      "name": "Volcanic Eruption",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €116.19), 7 printings"
+    },
+    {
+      "name": "Sephiroth, Fabled SOLDIER // Sephiroth, One-Winged Angel",
+      "category": "auto-added",
+      "notes": "8 printings, avg €43.24"
+    },
+    {
+      "name": "Animate Wall",
+      "category": "auto-added",
+      "notes": "Staple (avg €85.14), 10 printings"
+    },
+    {
+      "name": "Veteran Bodyguard",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €112.48), 6 printings"
+    },
+    {
+      "name": "Eureka",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €332.26), 1 printings"
+    },
+    {
+      "name": "Fungusaur",
+      "category": "auto-added",
+      "notes": "Staple (avg €82.61), 10 printings"
+    },
+    {
+      "name": "Psionic Blast",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €109.4), 5 printings"
+    },
+    {
+      "name": "Chaoslace",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €108.95), 8 printings"
+    },
+    {
+      "name": "Transmute Artifact",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €317.76), 1 printings"
+    },
+    {
+      "name": "City of Traitors",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €311.35), 1 printings"
+    },
+    {
+      "name": "Lightning Bolt",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (41 printings), avg €43.38"
+    },
+    {
+      "name": "Black Vise",
+      "category": "auto-added",
+      "notes": "Staple (avg €55.77), 9 printings"
+    },
+    {
+      "name": "Mana Flare",
+      "category": "auto-added",
+      "notes": "Staple (avg €92.67), 10 printings"
+    },
+    {
+      "name": "Grim Monolith",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €268.6), 1 printings"
+    },
+    {
+      "name": "Personal Incarnation",
+      "category": "auto-added",
+      "notes": "Staple (avg €85.69), 8 printings"
+    },
+    {
+      "name": "Serra's Sanctum",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €252.56), 1 printings"
+    },
+    {
+      "name": "Icy Manipulator",
+      "category": "auto-added",
+      "notes": "Staple (avg €83.52), 14 printings"
+    },
+    {
+      "name": "Ulamog, the Infinite Gyre",
+      "category": "auto-added",
+      "notes": "7 printings, avg €35.56"
+    },
+    {
+      "name": "Smoke",
+      "category": "auto-added",
+      "notes": "Staple (avg €81.79), 8 printings"
+    },
+    {
+      "name": "Wrenn and Six",
+      "category": "auto-added",
+      "notes": "6 printings, avg €40.84"
+    },
+    {
+      "name": "The Hive",
+      "category": "auto-added",
+      "notes": "Staple (avg €61.15), 12 printings"
+    },
+    {
+      "name": "Sacrifice",
+      "category": "auto-added",
+      "notes": "Staple (avg €81.36), 7 printings"
+    },
+    {
+      "name": "Old Man of the Sea",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €241.96), 1 printings"
+    },
+    {
+      "name": "Living Artifact",
+      "category": "auto-added",
+      "notes": "Staple (avg €80.5), 9 printings"
+    },
+    {
+      "name": "Survival of the Fittest",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €240.76), 1 printings"
+    },
+    {
+      "name": "Copper Tablet",
+      "category": "auto-added",
+      "notes": "Staple (avg €77.67), 3 printings"
+    },
+    {
+      "name": "Ali from Cairo",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €225.55), 1 printings"
+    },
+    {
+      "name": "Ice Storm",
+      "category": "auto-added",
+      "notes": "Staple (avg €74.39), 4 printings"
+    },
+    {
+      "name": "Sunglasses of Urza",
+      "category": "auto-added",
+      "notes": "Staple (avg €74.37), 7 printings"
+    },
+    {
+      "name": "Dark Ritual",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (34 printings), avg €27.85"
+    },
+    {
+      "name": "Northern Paladin",
+      "category": "auto-added",
+      "notes": "Staple (avg €74.14), 8 printings"
+    },
+    {
+      "name": "Consecrated Sphinx",
+      "category": "auto-added",
+      "notes": "8 printings, avg €27.33"
+    },
+    {
+      "name": "Warp Artifact",
+      "category": "auto-added",
+      "notes": "Staple (avg €72.12), 9 printings"
+    },
+    {
+      "name": "Verduran Enchantress",
+      "category": "auto-added",
+      "notes": "Staple (avg €71.76), 14 printings"
+    },
+    {
+      "name": "Gaea's Liege",
+      "category": "auto-added",
+      "notes": "Staple (avg €71.34), 8 printings"
+    },
+    {
+      "name": "The Ozolith",
+      "category": "auto-added",
+      "notes": "6 printings, avg €35.57"
+    },
+    {
+      "name": "Mirror Universe",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €207.71), 1 printings"
+    },
+    {
+      "name": "Crucible of Worlds",
+      "category": "auto-added",
+      "notes": "9 printings, avg €22.85"
+    },
+    {
+      "name": "Ebony Horse",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €102.1), 6 printings"
+    },
+    {
+      "name": "Shadowspear",
+      "category": "auto-added",
+      "notes": "5 printings, avg €40.35"
+    },
+    {
+      "name": "Dingus Egg",
+      "category": "auto-added",
+      "notes": "Staple (avg €50.03), 12 printings"
+    },
+    {
+      "name": "Island of Wak-Wak",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €198.52), 1 printings"
+    },
+    {
+      "name": "Terror",
+      "category": "auto-added",
+      "notes": "Staple (avg €65.14), 20 printings"
+    },
+    {
+      "name": "Living Plane",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €192.29), 1 printings"
+    },
+    {
+      "name": "Wasteland",
+      "category": "auto-added",
+      "notes": "8 printings, avg €23.86"
+    },
+    {
+      "name": "Phyrexian Tower",
+      "category": "auto-added",
+      "notes": "7 printings, avg €27.11"
+    },
+    {
+      "name": "Terror of the Peaks",
+      "category": "auto-added",
+      "notes": "6 printings, avg €31.45"
+    },
+    {
+      "name": "Phyrexian Dreadnought",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €184.07), 1 printings"
+    },
+    {
+      "name": "Sauron, the Dark Lord",
+      "category": "auto-added",
+      "notes": "Staple (avg €90.97), 3 printings"
+    },
+    {
+      "name": "Damnation",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €18.18"
+    },
+    {
+      "name": "Intuition",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €180.43), 1 printings"
+    },
+    {
+      "name": "Simulacrum Synthesizer",
+      "category": "auto-added",
+      "notes": "4 printings, avg €44.84"
+    },
+    {
+      "name": "Living Wall",
+      "category": "auto-added",
+      "notes": "Staple (avg €59.02), 6 printings"
+    },
+    {
+      "name": "Aladdin's Lamp",
+      "category": "auto-added",
+      "notes": "Staple (avg €87.93), 6 printings"
+    },
+    {
+      "name": "Lance",
+      "category": "auto-added",
+      "notes": "Staple (avg €58.26), 6 printings"
+    },
+    {
+      "name": "Serendib Efreet",
+      "category": "auto-added",
+      "notes": "Staple (avg €86.81), 6 printings"
+    },
+    {
+      "name": "Mishra's Factory",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (19 printings), avg €28.65"
+    },
+    {
+      "name": "Field of the Dead",
+      "category": "auto-added",
+      "notes": "5 printings, avg €34.37"
+    },
+    {
+      "name": "Ancient Silver Dragon",
+      "category": "auto-added",
+      "notes": "4 printings, avg €42.7"
+    },
+    {
+      "name": "Bruvac the Grandiloquent",
+      "category": "auto-added",
+      "notes": "5 printings, avg €33.94"
+    },
+    {
+      "name": "Zodiac Dragon",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €168.87), 1 printings"
+    },
+    {
+      "name": "Nettling Imp",
+      "category": "auto-added",
+      "notes": "Staple (avg €55.94), 6 printings"
+    },
+    {
+      "name": "Ulamog, the Ceaseless Hunger",
+      "category": "auto-added",
+      "notes": "4 printings, avg €41.86"
+    },
+    {
+      "name": "Drain Life",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €41.23"
+    },
+    {
+      "name": "Sliver Queen",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €163.5), 1 printings"
+    },
+    {
+      "name": "Animar, Soul of Elements",
+      "category": "auto-added",
+      "notes": "5 printings, avg €32.56"
+    },
+    {
+      "name": "Emrakul, the Promised End",
+      "category": "auto-added",
+      "notes": "6 printings, avg €26.84"
+    },
+    {
+      "name": "Three Tree City",
+      "category": "auto-added",
+      "notes": "6 printings, avg €26.79"
+    },
+    {
+      "name": "Quantum Riddler",
+      "category": "auto-added",
+      "notes": "Staple (avg €53.35), 3 printings"
+    },
+    {
+      "name": "Grim Tutor",
+      "category": "auto-added",
+      "notes": "7 printings, avg €22.72"
+    },
+    {
+      "name": "Jade Monolith",
+      "category": "auto-added",
+      "notes": "Staple (avg €52.47), 9 printings"
+    },
+    {
+      "name": "Web",
+      "category": "auto-added",
+      "notes": "Staple (avg €52.29), 9 printings"
+    },
+    {
+      "name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €19.25"
+    },
+    {
+      "name": "Simulacrum",
+      "category": "auto-added",
+      "notes": "Staple (avg €51.32), 8 printings"
+    },
+    {
+      "name": "Magical Hack",
+      "category": "auto-added",
+      "notes": "Staple (avg €51.16), 8 printings"
+    },
+    {
+      "name": "Gwendlyn Di Corci",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €152.69), 1 printings"
+    },
+    {
+      "name": "Lumra, Bellow of the Woods",
+      "category": "auto-added",
+      "notes": "4 printings, avg €37.66"
+    },
+    {
+      "name": "Eye for an Eye",
+      "category": "auto-added",
+      "notes": "Staple (avg €74.62), 7 printings"
+    },
+    {
+      "name": "Animate Artifact",
+      "category": "auto-added",
+      "notes": "8 printings, avg €48.95"
+    },
+    {
+      "name": "Ocelot Pride",
+      "category": "auto-added",
+      "notes": "3 printings, avg €48.86"
+    },
+    {
+      "name": "Blessing",
+      "category": "auto-added",
+      "notes": "9 printings, avg €48.64"
+    },
+    {
+      "name": "Prismatic Vista",
+      "category": "auto-added",
+      "notes": "4 printings, avg €36.33"
+    },
+    {
+      "name": "Wanderlust",
+      "category": "auto-added",
+      "notes": "9 printings, avg €48.44"
+    },
+    {
+      "name": "Angus Mackenzie",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €144.64), 1 printings"
+    },
+    {
+      "name": "Earthbind",
+      "category": "auto-added",
+      "notes": "6 printings, avg €48.04"
+    },
+    {
+      "name": "Gilded Drake",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €143.82), 1 printings"
+    },
+    {
+      "name": "Riding the Dilu Horse",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €143.18), 1 printings"
+    },
+    {
+      "name": "Sinkhole",
+      "category": "auto-added",
+      "notes": "4 printings, avg €46.92"
+    },
+    {
+      "name": "Ifh-Bíff Efreet",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €140.24), 1 printings"
+    },
+    {
+      "name": "Serendib Djinn",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €139.24), 1 printings"
+    },
+    {
+      "name": "Aspect of Wolf",
+      "category": "auto-added",
+      "notes": "Staple (avg €68.67), 8 printings"
+    },
+    {
+      "name": "Allosaurus Shepherd",
+      "category": "auto-added",
+      "notes": "4 printings, avg €34.32"
+    },
+    {
+      "name": "Blue Elemental Blast",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €45.46"
+    },
+    {
+      "name": "Elephant Graveyard",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €134.73), 1 printings"
+    },
+    {
+      "name": "Grizzly Bears",
+      "category": "auto-added",
+      "notes": "Staple (avg €66.99), 17 printings"
+    },
+    {
+      "name": "Deathlace",
+      "category": "auto-added",
+      "notes": "Staple (avg €66.72), 7 printings"
+    },
+    {
+      "name": "Coat of Arms",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €11.99"
+    },
+    {
+      "name": "Flying Carpet",
+      "category": "auto-added",
+      "notes": "Staple (avg €65.17), 10 printings"
+    },
+    {
+      "name": "Ancient Brass Dragon",
+      "category": "auto-added",
+      "notes": "4 printings, avg €32.5"
+    },
+    {
+      "name": "Elvish Champion",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €43.02"
+    },
+    {
+      "name": "Clone",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (15 printings), avg €42.95"
+    },
+    {
+      "name": "Solitude",
+      "category": "auto-added",
+      "notes": "4 printings, avg €32.1"
+    },
+    {
+      "name": "Power Artifact",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €127.46), 1 printings"
+    },
+    {
+      "name": "Vaultborn Tyrant",
+      "category": "auto-added",
+      "notes": "3 printings, avg €42.4"
+    },
+    {
+      "name": "Righteousness",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (15 printings), avg €41.95"
+    },
+    {
+      "name": "Manabarbs",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €41.84"
+    },
+    {
+      "name": "Instill Energy",
+      "category": "auto-added",
+      "notes": "9 printings, avg €41.83"
+    },
+    {
+      "name": "Clockwork Beast",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €41.8"
+    },
+    {
+      "name": "Ravages of War",
+      "category": "auto-added",
+      "notes": "Staple (avg €62.16), 2 printings"
+    },
+    {
+      "name": "Sea Gate Restoration // Sea Gate, Reborn",
+      "category": "auto-added",
+      "notes": "4 printings, avg €30.89"
+    },
+    {
+      "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "category": "auto-added",
+      "notes": "6 printings, avg €20.58"
+    },
+    {
+      "name": "Shatterstorm",
+      "category": "auto-added",
+      "notes": "Staple (avg €61.39), 7 printings"
+    },
+    {
+      "name": "Tsunami",
+      "category": "auto-added",
+      "notes": "9 printings, avg €40.87"
+    },
+    {
+      "name": "Tamiyo, Inquisitive Student // Tamiyo, Seasoned Scholar",
+      "category": "auto-added",
+      "notes": "4 printings, avg €30.62"
+    },
+    {
+      "name": "Sliver Legion",
+      "category": "auto-added",
+      "notes": "4 printings, avg €30.33"
+    },
+    {
+      "name": "Soul Net",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (11 printings), avg €40.27"
+    },
+    {
+      "name": "Uthden Troll",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (11 printings), avg €40.2"
+    },
+    {
+      "name": "Island",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (640 printings), avg €5.48"
+    },
+    {
+      "name": "Wall of Ice",
+      "category": "auto-added",
+      "notes": "8 printings, avg €39.82"
+    },
+    {
+      "name": "Living Lands",
+      "category": "auto-added",
+      "notes": "Staple (avg €59.5), 9 printings"
+    },
+    {
+      "name": "Akroma's Memorial",
+      "category": "auto-added",
+      "notes": "6 printings, avg €19.81"
+    },
+    {
+      "name": "Brass Man",
+      "category": "auto-added",
+      "notes": "Staple (avg €59.32), 6 printings"
+    },
+    {
+      "name": "Vivi Ornitier",
+      "category": "auto-added",
+      "notes": "3 printings, avg €39.34"
+    },
+    {
+      "name": "Thicket Basilisk",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €39.21"
+    },
+    {
+      "name": "Sylvan Tutor",
+      "category": "auto-added",
+      "notes": "3 printings, avg €39.15"
+    },
+    {
+      "name": "Burgeoning",
+      "category": "auto-added",
+      "notes": "5 printings, avg €23.48"
+    },
+    {
+      "name": "Hazezon Tamar",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €116.38), 1 printings"
+    },
+    {
+      "name": "Ojer Axonil, Deepest Might // Temple of Power",
+      "category": "auto-added",
+      "notes": "4 printings, avg €28.91"
+    },
+    {
+      "name": "Blue Ward",
+      "category": "auto-added",
+      "notes": "8 printings, avg €38.23"
+    },
+    {
+      "name": "Halvar, God of Battle // Sword of the Realms",
+      "category": "auto-added",
+      "notes": "6 printings, avg €18.84"
+    },
+    {
+      "name": "Urza's Incubator",
+      "category": "auto-added",
+      "notes": "7 printings, avg €16.13"
+    },
+    {
+      "name": "Amulet of Vigor",
+      "category": "auto-added",
+      "notes": "3 printings, avg €37.37"
+    },
+    {
+      "name": "Blightsteel Colossus",
+      "category": "auto-added",
+      "notes": "4 printings, avg €27.98"
+    },
+    {
+      "name": "Natural Order",
+      "category": "auto-added",
+      "notes": "6 printings, avg €18.32"
+    },
+    {
+      "name": "Ugin, the Spirit Dragon",
+      "category": "auto-added",
+      "notes": "6 printings, avg €18.26"
+    },
+    {
+      "name": "Yawgmoth's Will",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €109.53), 1 printings"
+    },
+    {
+      "name": "Tawnos's Coffin",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €108.76), 1 printings"
+    },
+    {
+      "name": "Mana Confluence",
+      "category": "auto-added",
+      "notes": "4 printings, avg €27.07"
+    },
+    {
+      "name": "Stoneforge Mystic",
+      "category": "auto-added",
+      "notes": "5 printings, avg €21.59"
+    },
+    {
+      "name": "Conservator",
+      "category": "auto-added",
+      "notes": "8 printings, avg €35.95"
+    },
+    {
+      "name": "Wan Shi Tong, Librarian",
+      "category": "auto-added",
+      "notes": "Staple (avg €53.81), 2 printings"
+    },
+    {
+      "name": "Badgermole Cub",
+      "category": "auto-added",
+      "notes": "Staple (avg €53.73), 2 printings"
+    },
+    {
+      "name": "Scapeshift",
+      "category": "auto-added",
+      "notes": "3 printings, avg €35.78"
+    },
+    {
+      "name": "Mikaeus, the Unhallowed",
+      "category": "auto-added",
+      "notes": "6 printings, avg €17.83"
+    },
+    {
+      "name": "Chromatic Orrery",
+      "category": "auto-added",
+      "notes": "4 printings, avg €26.74"
+    },
+    {
+      "name": "Archangel of Thune",
+      "category": "auto-added",
+      "notes": "3 printings, avg €35.65"
+    },
+    {
+      "name": "Thunder Spirit",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €106.69), 1 printings"
+    },
+    {
+      "name": "Jace, the Mind Sculptor",
+      "category": "auto-added",
+      "notes": "6 printings, avg €17.7"
+    },
+    {
+      "name": "Atraxa, Praetors' Voice",
+      "category": "auto-added",
+      "notes": "4 printings, avg €26.45"
+    },
+    {
+      "name": "Water Elemental",
+      "category": "auto-added",
+      "notes": "9 printings, avg €35.13"
+    },
+    {
+      "name": "Helm of Chatzuk",
+      "category": "auto-added",
+      "notes": "Staple (avg €52.39), 8 printings"
+    },
+    {
+      "name": "King Suleiman",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €104.24), 1 printings"
+    },
+    {
+      "name": "Pestilence",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €34.74"
+    },
+    {
+      "name": "Tom Bombadil",
+      "category": "auto-added",
+      "notes": "Staple (avg €52), 4 printings"
+    },
+    {
+      "name": "Ouroboroid",
+      "category": "auto-added",
+      "notes": "3 printings, avg €34.6"
+    },
+    {
+      "name": "Rasputin Dreamweaver",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €102.22), 1 printings"
+    },
+    {
+      "name": "Cursed Land",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €33.88"
+    },
+    {
+      "name": "Commander's Plate",
+      "category": "auto-added",
+      "notes": "3 printings, avg €33.82"
+    },
+    {
+      "name": "Nissa, Resurgent Animist",
+      "category": "auto-added",
+      "notes": "4 printings, avg €25.34"
+    },
+    {
+      "name": "Obsianus Golem",
+      "category": "auto-added",
+      "notes": "9 printings, avg €33.76"
+    },
+    {
+      "name": "Field of Dreams",
+      "category": "auto-added",
+      "notes": "Premium staple (avg €100.1), 1 printings"
+    },
+    {
+      "name": "Wall of Water",
+      "category": "auto-added",
+      "notes": "8 printings, avg €33.28"
+    },
+    {
+      "name": "Scroll Rack",
+      "category": "auto-added",
+      "notes": "4 printings, avg €24.83"
+    },
+    {
+      "name": "Displacer Kitten",
+      "category": "auto-added",
+      "notes": "5 printings, avg €19.85"
+    },
+    {
+      "name": "Morphic Pool",
+      "category": "auto-added",
+      "notes": "5 printings, avg €19.79"
+    },
+    {
+      "name": "Luxury Suite",
+      "category": "auto-added",
+      "notes": "5 printings, avg €19.69"
+    },
+    {
+      "name": "Hellfire",
+      "category": "auto-added",
+      "notes": "Staple (avg €97.87), 1 printings"
+    },
+    {
+      "name": "Singing Tree",
+      "category": "auto-added",
+      "notes": "Staple (avg €97.39), 1 printings"
+    },
+    {
+      "name": "Jade Statue",
+      "category": "auto-added",
+      "notes": "4 printings, avg €32.45"
+    },
+    {
+      "name": "Divine Intervention",
+      "category": "auto-added",
+      "notes": "Staple (avg €96.96), 1 printings"
+    },
+    {
+      "name": "Bloodthirsty Conqueror",
+      "category": "auto-added",
+      "notes": "3 printings, avg €32.28"
+    },
+    {
+      "name": "Earthcraft",
+      "category": "auto-added",
+      "notes": "Staple (avg €96.51), 1 printings"
+    },
+    {
+      "name": "Last March of the Ents",
+      "category": "auto-added",
+      "notes": "3 printings, avg €31.96"
+    },
+    {
+      "name": "Erhnam Djinn",
+      "category": "auto-added",
+      "notes": "7 printings, avg €47.77"
+    },
+    {
+      "name": "Ironroot Treefolk",
+      "category": "auto-added",
+      "notes": "9 printings, avg €47.62"
+    },
+    {
+      "name": "Black Ward",
+      "category": "auto-added",
+      "notes": "8 printings, avg €47.55"
+    },
+    {
+      "name": "Frozen Shade",
+      "category": "auto-added",
+      "notes": "9 printings, avg €47.48"
+    },
+    {
+      "name": "Cloud, Midgar Mercenary",
+      "category": "auto-added",
+      "notes": "3 printings, avg €31.62"
+    },
+    {
+      "name": "Hidetsugu, Devouring Chaos",
+      "category": "auto-added",
+      "notes": "7 printings, avg €46.99"
+    },
+    {
+      "name": "Agatha's Soul Cauldron",
+      "category": "auto-added",
+      "notes": "3 printings, avg €31.23"
+    },
+    {
+      "name": "Wall of Stone",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €31.18"
+    },
+    {
+      "name": "Land Equilibrium",
+      "category": "auto-added",
+      "notes": "Staple (avg €93.4), 1 printings"
+    },
+    {
+      "name": "Reverse Damage",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €46.38"
+    },
+    {
+      "name": "Su-Chi",
+      "category": "auto-added",
+      "notes": "Staple (avg €92.54), 1 printings"
+    },
+    {
+      "name": "Agadeem's Awakening // Agadeem, the Undercrypt",
+      "category": "auto-added",
+      "notes": "4 printings, avg €23.02"
+    },
+    {
+      "name": "Ley Druid",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €30.62"
+    },
+    {
+      "name": "Replenish",
+      "category": "auto-added",
+      "notes": "Staple (avg €91.6), 1 printings"
+    },
+    {
+      "name": "Serra Ascendant",
+      "category": "auto-added",
+      "notes": "4 printings, avg €22.81"
+    },
+    {
+      "name": "Maha, Its Feathers Night",
+      "category": "auto-added",
+      "notes": "3 printings, avg €30.4"
+    },
+    {
+      "name": "Spire Garden",
+      "category": "auto-added",
+      "notes": "6 printings, avg €15.15"
+    },
+    {
+      "name": "Argivian Archaeologist",
+      "category": "auto-added",
+      "notes": "Staple (avg €90.04), 1 printings"
+    },
+    {
+      "name": "Palantír of Orthanc",
+      "category": "auto-added",
+      "notes": "3 printings, avg €29.98"
+    },
+    {
+      "name": "White Ward",
+      "category": "auto-added",
+      "notes": "8 printings, avg €44.93"
+    },
+    {
+      "name": "Shatter",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (22 printings), avg €29.87"
+    },
+    {
+      "name": "Liliana, the Last Hope",
+      "category": "auto-added",
+      "notes": "7 printings, avg €29.67"
+    },
+    {
+      "name": "Powder Keg",
+      "category": "auto-added",
+      "notes": "2 printings, avg €44.34"
+    },
+    {
+      "name": "Desert Twister",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €43.96"
+    },
+    {
+      "name": "Goblin Sharpshooter",
+      "category": "auto-added",
+      "notes": "4 printings, avg €21.98"
+    },
+    {
+      "name": "Time Warp",
+      "category": "auto-added",
+      "notes": "6 printings, avg €14.64"
+    },
+    {
+      "name": "Phantom Monster",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €29.25"
+    },
+    {
+      "name": "The First Sliver",
+      "category": "auto-added",
+      "notes": "3 printings, avg €29.25"
+    },
+    {
+      "name": "Mirri's Guile",
+      "category": "auto-added",
+      "notes": "3 printings, avg €29.18"
+    },
+    {
+      "name": "Void Winnower",
+      "category": "auto-added",
+      "notes": "5 printings, avg €21.81"
+    },
+    {
+      "name": "Tainted Pact",
+      "category": "auto-added",
+      "notes": "3 printings, avg €29.07"
+    },
+    {
+      "name": "Eye of Ugin",
+      "category": "auto-added",
+      "notes": "2 printings, avg €43.57"
+    },
+    {
+      "name": "Battle Angels of Tyr",
+      "category": "auto-added",
+      "notes": "4 printings, avg €21.56"
+    },
+    {
+      "name": "Kaito, Bane of Nightmares",
+      "category": "auto-added",
+      "notes": "4 printings, avg €21.54"
+    },
+    {
+      "name": "Mesa Pegasus",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €42.74"
+    },
+    {
+      "name": "Castle",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (11 printings), avg €28.49"
+    },
+    {
+      "name": "Fire Elemental",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (17 printings), avg €28.48"
+    },
+    {
+      "name": "Opposition Agent",
+      "category": "auto-added",
+      "notes": "3 printings, avg €28.48"
+    },
+    {
+      "name": "Witch-king of Angmar",
+      "category": "auto-added",
+      "notes": "5 printings, avg €21.36"
+    },
+    {
+      "name": "Sword of Truth and Justice",
+      "category": "auto-added",
+      "notes": "4 printings, avg €21.35"
+    },
+    {
+      "name": "Rishadan Port",
+      "category": "auto-added",
+      "notes": "3 printings, avg €28.45"
+    },
+    {
+      "name": "Chalice of the Void",
+      "category": "auto-added",
+      "notes": "5 printings, avg €16.97"
+    },
+    {
+      "name": "Akroma's Will",
+      "category": "auto-added",
+      "notes": "5 printings, avg €16.91"
+    },
+    {
+      "name": "In the Eye of Chaos",
+      "category": "auto-added",
+      "notes": "Staple (avg €84.46), 1 printings"
+    },
+    {
+      "name": "Toph, Earthbending Master",
+      "category": "auto-added",
+      "notes": "2 printings, avg €41.7"
+    },
+    {
+      "name": "The Fourteenth Doctor",
+      "category": "auto-added",
+      "notes": "Staple (avg €83.17), 1 printings"
+    },
+    {
+      "name": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "category": "auto-added",
+      "notes": "8 printings, avg €13.84"
+    },
+    {
+      "name": "Esika, God of the Tree // The Prismatic Bridge",
+      "category": "auto-added",
+      "notes": "6 printings, avg €13.79"
+    },
+    {
+      "name": "Toxrill, the Corrosive",
+      "category": "auto-added",
+      "notes": "5 printings, avg €16.48"
+    },
+    {
+      "name": "Earth Elemental",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €27.41"
+    },
+    {
+      "name": "Defense of the Heart",
+      "category": "auto-added",
+      "notes": "5 printings, avg €16.43"
+    },
+    {
+      "name": "Aura Shards",
+      "category": "auto-added",
+      "notes": "5 printings, avg €16.4"
+    },
+    {
+      "name": "Ojer Taq, Deepest Foundation // Temple of Civilization",
+      "category": "auto-added",
+      "notes": "4 printings, avg €20.41"
+    },
+    {
+      "name": "Control Magic",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €27.08"
+    },
+    {
+      "name": "Dong Zhou, the Tyrant",
+      "category": "auto-added",
+      "notes": "Staple (avg €80.67), 1 printings"
+    },
+    {
+      "name": "Dwarven Warriors",
+      "category": "auto-added",
+      "notes": "9 printings, avg €40.29"
+    },
+    {
+      "name": "Thassa, Deep-Dwelling",
+      "category": "auto-added",
+      "notes": "4 printings, avg €20.12"
+    },
+    {
+      "name": "Darksteel Forge",
+      "category": "auto-added",
+      "notes": "4 printings, avg €20.01"
+    },
+    {
+      "name": "Sakashima's Student",
+      "category": "auto-added",
+      "notes": "3 printings, avg €26.63"
+    },
+    {
+      "name": "Overlord of the Balemurk",
+      "category": "auto-added",
+      "notes": "3 printings, avg €26.62"
+    },
+    {
+      "name": "Scavenging Ghoul",
+      "category": "auto-added",
+      "notes": "8 printings, avg €26.61"
+    },
+    {
+      "name": "Elspeth, Storm Slayer",
+      "category": "auto-added",
+      "notes": "3 printings, avg €26.6"
+    },
+    {
+      "name": "Siren's Call",
+      "category": "auto-added",
+      "notes": "8 printings, avg €26.56"
+    },
+    {
+      "name": "Portal to Phyrexia",
+      "category": "auto-added",
+      "notes": "3 printings, avg €26.36"
+    },
+    {
+      "name": "Howl from Beyond",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €39.52"
+    },
+    {
+      "name": "Twinflame Tyrant",
+      "category": "auto-added",
+      "notes": "3 printings, avg €26.32"
+    },
+    {
+      "name": "Balefire Dragon",
+      "category": "auto-added",
+      "notes": "6 printings, avg €13.09"
+    },
+    {
+      "name": "Gloom",
+      "category": "auto-added",
+      "notes": "8 printings, avg €19.39"
+    },
+    {
+      "name": "Null Rod",
+      "category": "auto-added",
+      "notes": "Staple (avg €77.41), 1 printings"
+    },
+    {
+      "name": "Crystal Rod",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €25.68"
+    },
+    {
+      "name": "Aggravated Assault",
+      "category": "auto-added",
+      "notes": "6 printings, avg €12.76"
+    },
+    {
+      "name": "Metalworker",
+      "category": "auto-added",
+      "notes": "Staple (avg €76.35), 1 printings"
+    },
+    {
+      "name": "Guardian Angel",
+      "category": "auto-added",
+      "notes": "6 printings, avg €38"
+    },
+    {
+      "name": "Sea of Clouds",
+      "category": "auto-added",
+      "notes": "5 printings, avg €15.2"
+    },
+    {
+      "name": "Disenchant",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (34 printings), avg €18.94"
+    },
+    {
+      "name": "Dictate of Erebos",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18.91"
+    },
+    {
+      "name": "Bloodchief Ascension",
+      "category": "auto-added",
+      "notes": "5 printings, avg €15.04"
+    },
+    {
+      "name": "Tezzeret, Cruel Captain",
+      "category": "auto-added",
+      "notes": "3 printings, avg €25.06"
+    },
+    {
+      "name": "Ydwen Efreet",
+      "category": "auto-added",
+      "notes": "Staple (avg €74.99), 1 printings"
+    },
+    {
+      "name": "Swamp",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (671 printings), avg €3.57"
+    },
+    {
+      "name": "Ancient Gold Dragon",
+      "category": "auto-added",
+      "notes": "3 printings, avg €24.98"
+    },
+    {
+      "name": "Edgar Markov",
+      "category": "auto-added",
+      "notes": "3 printings, avg €24.95"
+    },
+    {
+      "name": "Zagoth Triome",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18.68"
+    },
+    {
+      "name": "Benalish Hero",
+      "category": "auto-added",
+      "notes": "9 printings, avg €37.26"
+    },
+    {
+      "name": "Air Elemental",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (30 printings), avg €24.79"
+    },
+    {
+      "name": "Utvara Hellkite",
+      "category": "auto-added",
+      "notes": "5 printings, avg €14.65"
+    },
+    {
+      "name": "Tezzeret the Seeker",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18.23"
+    },
+    {
+      "name": "Resurrection",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €24.28"
+    },
+    {
+      "name": "Buster Sword",
+      "category": "auto-added",
+      "notes": "2 printings, avg €36.34"
+    },
+    {
+      "name": "Mountain",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (672 printings), avg €4.03"
+    },
+    {
+      "name": "Forest",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (688 printings), avg €3.62"
+    },
+    {
+      "name": "Nyxbloom Ancient",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18.1"
+    },
+    {
+      "name": "Ugin, Eye of the Storms // Ugin, Eye of the Storms",
+      "category": "auto-added",
+      "notes": "2 printings, avg €36.06"
+    },
+    {
+      "name": "Shallow Grave",
+      "category": "auto-added",
+      "notes": "Staple (avg €72.06), 1 printings"
+    },
+    {
+      "name": "Diabolic Intent",
+      "category": "auto-added",
+      "notes": "7 printings, avg €24.01"
+    },
+    {
+      "name": "Ring of Ma'rûf",
+      "category": "auto-added",
+      "notes": "Staple (avg €72.02), 1 printings"
+    },
+    {
+      "name": "Atraxa, Grand Unifier",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18"
+    },
+    {
+      "name": "Tunnel",
+      "category": "auto-added",
+      "notes": "8 printings, avg €35.95"
+    },
+    {
+      "name": "Goblin Lackey",
+      "category": "auto-added",
+      "notes": "4 printings, avg €17.94"
+    },
+    {
+      "name": "Argothian Enchantress",
+      "category": "auto-added",
+      "notes": "2 printings, avg €35.74"
+    },
+    {
+      "name": "Undercity Sewers",
+      "category": "auto-added",
+      "notes": "3 printings, avg €23.75"
+    },
+    {
+      "name": "Mother of Runes",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €11.86"
+    },
+    {
+      "name": "Plains",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (659 printings), avg €3.55"
+    },
+    {
+      "name": "Unwinding Clock",
+      "category": "auto-added",
+      "notes": "5 printings, avg €14.19"
+    },
+    {
+      "name": "Wooden Sphere",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €23.55"
+    },
+    {
+      "name": "Paralyze",
+      "category": "auto-added",
+      "notes": "9 printings, avg €23.49"
+    },
+    {
+      "name": "Khabál Ghoul",
+      "category": "auto-added",
+      "notes": "Staple (avg €70.22), 1 printings"
+    },
+    {
+      "name": "Gray Ogre",
+      "category": "auto-added",
+      "notes": "8 printings, avg €34.89"
+    },
+    {
+      "name": "Evil Presence",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €23.22"
+    },
+    {
+      "name": "Bloodletter of Aclazotz",
+      "category": "auto-added",
+      "notes": "3 printings, avg €23.2"
+    },
+    {
+      "name": "Wall of Brambles",
+      "category": "auto-added",
+      "notes": "9 printings, avg €34.75"
+    },
+    {
+      "name": "Mycosynth Golem",
+      "category": "auto-added",
+      "notes": "3 printings, avg €23.07"
+    },
+    {
+      "name": "Wild Growth",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (21 printings), avg €23.07"
+    },
+    {
+      "name": "The Wandering Emperor",
+      "category": "auto-added",
+      "notes": "5 printings, avg €34.44"
+    },
+    {
+      "name": "Sengir Vampire",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (26 printings), avg €22.89"
+    },
+    {
+      "name": "Indatha Triome",
+      "category": "auto-added",
+      "notes": "4 printings, avg €17.11"
+    },
+    {
+      "name": "Sword of Wealth and Power",
+      "category": "auto-added",
+      "notes": "3 printings, avg €22.81"
+    },
+    {
+      "name": "Minamo, School at Water's Edge",
+      "category": "auto-added",
+      "notes": "2 printings, avg €34.19"
+    },
+    {
+      "name": "Linvala, Keeper of Silence",
+      "category": "auto-added",
+      "notes": "4 printings, avg €17.09"
+    },
+    {
+      "name": "Tetsuo Umezawa",
+      "category": "auto-added",
+      "notes": "Staple (avg €67.61), 1 printings"
+    },
+    {
+      "name": "Parallax Wave",
+      "category": "auto-added",
+      "notes": "2 printings, avg €33.75"
+    },
+    {
+      "name": "Lake of the Dead",
+      "category": "auto-added",
+      "notes": "Staple (avg €67.32), 1 printings"
+    },
+    {
+      "name": "Lady Sun",
+      "category": "auto-added",
+      "notes": "Staple (avg €67.25), 1 printings"
+    },
+    {
+      "name": "Time Spiral",
+      "category": "auto-added",
+      "notes": "Staple (avg €66.73), 1 printings"
+    },
+    {
+      "name": "The Ur-Dragon",
+      "category": "auto-added",
+      "notes": "2 printings, avg €33.3"
+    },
+    {
+      "name": "Mons's Goblin Raiders",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €33.24"
+    },
+    {
+      "name": "Sigarda's Aid",
+      "category": "auto-added",
+      "notes": "5 printings, avg €13.22"
+    },
+    {
+      "name": "Bountiful Promenade",
+      "category": "auto-added",
+      "notes": "5 printings, avg €13.18"
+    },
+    {
+      "name": "Lifetap",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €21.8"
+    },
+    {
+      "name": "Firebreathing",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (16 printings), avg €32.67"
+    },
+    {
+      "name": "White Knight",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €21.72"
+    },
+    {
+      "name": "Goldspan Dragon",
+      "category": "auto-added",
+      "notes": "8 printings, avg €16.19"
+    },
+    {
+      "name": "Myrel, Shield of Argive",
+      "category": "auto-added",
+      "notes": "4 printings, avg €16.18"
+    },
+    {
+      "name": "Zhulodok, Void Gorger",
+      "category": "auto-added",
+      "notes": "2 printings, avg €32.31"
+    },
+    {
+      "name": "Savai Triome",
+      "category": "auto-added",
+      "notes": "4 printings, avg €16.14"
+    },
+    {
+      "name": "Shanodin Dryads",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (11 printings), avg €31.91"
+    },
+    {
+      "name": "Sheoldred // The True Scriptures",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.95"
+    },
+    {
+      "name": "Ranger-Captain of Eos",
+      "category": "auto-added",
+      "notes": "3 printings, avg €21.25"
+    },
+    {
+      "name": "Sea Serpent",
+      "category": "auto-added",
+      "notes": "9 printings, avg €31.67"
+    },
+    {
+      "name": "Kaalia of the Vast",
+      "category": "auto-added",
+      "notes": "9 printings, avg €15.7"
+    },
+    {
+      "name": "No Mercy",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.67"
+    },
+    {
+      "name": "Ugin, Eye of the Storms",
+      "category": "auto-added",
+      "notes": "2 printings, avg €31.27"
+    },
+    {
+      "name": "Sword of Hearth and Home",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.54"
+    },
+    {
+      "name": "Mesmeric Orb",
+      "category": "auto-added",
+      "notes": "5 printings, avg €12.43"
+    },
+    {
+      "name": "Goblin Welder",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.53"
+    },
+    {
+      "name": "Thrasios, Triton Hero",
+      "category": "auto-added",
+      "notes": "3 printings, avg €20.67"
+    },
+    {
+      "name": "Reflecting Pool",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (11 printings), avg €12.4"
+    },
+    {
+      "name": "Sakashima of a Thousand Faces // Sakashima of a Thousand Faces",
+      "category": "auto-added",
+      "notes": "2 printings, avg €30.94"
+    },
+    {
+      "name": "Birds of Paradise // Birds of Paradise",
+      "category": "auto-added",
+      "notes": "2 printings, avg €30.84"
+    },
+    {
+      "name": "Etali, Primal Conqueror // Etali, Primal Sickness",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.39"
+    },
+    {
+      "name": "Dolmen Gate",
+      "category": "auto-added",
+      "notes": "3 printings, avg €20.5"
+    },
+    {
+      "name": "Summon: Bahamut",
+      "category": "auto-added",
+      "notes": "2 printings, avg €30.59"
+    },
+    {
+      "name": "Ancient Bronze Dragon",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.27"
+    },
+    {
+      "name": "Molten Duplication",
+      "category": "auto-added",
+      "notes": "3 printings, avg €20.26"
+    },
+    {
+      "name": "Nicol Bolas, the Ravager // Nicol Bolas, the Arisen",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.11"
+    },
+    {
+      "name": "Volrath's Stronghold",
+      "category": "auto-added",
+      "notes": "Staple (avg €60.44), 1 printings"
+    },
+    {
+      "name": "Sire of Seven Deaths",
+      "category": "auto-added",
+      "notes": "2 printings, avg €30.2"
+    },
+    {
+      "name": "Vault of Champions",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.1"
+    },
+    {
+      "name": "Wall of Air",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €20.03"
+    },
+    {
+      "name": "Braid of Fire",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.85"
+    },
+    {
+      "name": "Pyramids",
+      "category": "auto-added",
+      "notes": "Staple (avg €59.26), 1 printings"
+    },
+    {
+      "name": "War Mammoth",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €29.61"
+    },
+    {
+      "name": "Bone Miser",
+      "category": "auto-added",
+      "notes": "3 printings, avg €19.71"
+    },
+    {
+      "name": "Zhang Fei, Fierce Warrior",
+      "category": "auto-added",
+      "notes": "Staple (avg €58.97), 1 printings"
+    },
+    {
+      "name": "Sword of the Ages",
+      "category": "auto-added",
+      "notes": "Staple (avg €58.78), 1 printings"
+    },
+    {
+      "name": "Kinnan, Bonder Prodigy",
+      "category": "auto-added",
+      "notes": "5 printings, avg €14.63"
+    },
+    {
+      "name": "Stone Giant",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €29.26"
+    },
+    {
+      "name": "Mount Doom",
+      "category": "auto-added",
+      "notes": "4 printings, avg €29.21"
+    },
+    {
+      "name": "Icetill Explorer",
+      "category": "auto-added",
+      "notes": "3 printings, avg €19.45"
+    },
+    {
+      "name": "Silence",
+      "category": "auto-added",
+      "notes": "9 printings, avg €14.51"
+    },
+    {
+      "name": "Inkshield",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.5"
+    },
+    {
+      "name": "Piracy",
+      "category": "auto-added",
+      "notes": "2 printings, avg €28.98"
+    },
+    {
+      "name": "Death Ward",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €28.95"
+    },
+    {
+      "name": "Spellseeker",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.44"
+    },
+    {
+      "name": "Power Leak",
+      "category": "auto-added",
+      "notes": "8 printings, avg €28.84"
+    },
+    {
+      "name": "Acid Rain",
+      "category": "auto-added",
+      "notes": "Staple (avg €57.54), 1 printings"
+    },
+    {
+      "name": "Tinybones, Trinket Thief",
+      "category": "auto-added",
+      "notes": "2 printings, avg €28.77"
+    },
+    {
+      "name": "Blood Moon",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €14.36"
+    },
+    {
+      "name": "Jetmir's Garden",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.28"
+    },
+    {
+      "name": "Thoughtseize",
+      "category": "auto-added",
+      "notes": "8 printings, avg €14.22"
+    },
+    {
+      "name": "City of Shadows",
+      "category": "auto-added",
+      "notes": "Staple (avg €56.72), 1 printings"
+    },
+    {
+      "name": "Traveling Chocobo",
+      "category": "auto-added",
+      "notes": "2 printings, avg €28.31"
+    },
+    {
+      "name": "Abhorrent Oculus",
+      "category": "auto-added",
+      "notes": "3 printings, avg €18.85"
+    },
+    {
+      "name": "Propaganda // Propaganda",
+      "category": "auto-added",
+      "notes": "2 printings, avg €28.05"
+    },
+    {
+      "name": "Raise the Palisade",
+      "category": "auto-added",
+      "notes": "3 printings, avg €18.7"
+    },
+    {
+      "name": "Kobold Overlord",
+      "category": "auto-added",
+      "notes": "Staple (avg €56.04), 1 printings"
+    },
+    {
+      "name": "Ketria Triome",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13.99"
+    },
+    {
+      "name": "Show and Tell",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18.62"
+    },
+    {
+      "name": "Throne of Eldraine",
+      "category": "auto-added",
+      "notes": "2 printings, avg €27.76"
+    },
+    {
+      "name": "Bog Wraith",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (20 printings), avg €18.49"
+    },
+    {
+      "name": "Red Ward",
+      "category": "auto-added",
+      "notes": "8 printings, avg €27.7"
+    },
+    {
+      "name": "Lu Bu, Master-at-Arms",
+      "category": "auto-added",
+      "notes": "3 printings, avg €27.54"
+    },
+    {
+      "name": "Circle of Protection: Red",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (17 printings), avg €18.32"
+    },
+    {
+      "name": "Drannith Magistrate",
+      "category": "auto-added",
+      "notes": "5 printings, avg €13.67"
+    },
+    {
+      "name": "Moonshaker Cavalry",
+      "category": "auto-added",
+      "notes": "4 printings, avg €18.18"
+    },
+    {
+      "name": "Riverpyre Verge",
+      "category": "auto-added",
+      "notes": "3 printings, avg €18.12"
+    },
+    {
+      "name": "Cursed Scroll",
+      "category": "auto-added",
+      "notes": "Staple (avg €54.24), 1 printings"
+    },
+    {
+      "name": "Stream of Life",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €18.02"
+    },
+    {
+      "name": "Goblin Wizard",
+      "category": "auto-added",
+      "notes": "Staple (avg €54.02), 1 printings"
+    },
+    {
+      "name": "Tiller Engine",
+      "category": "auto-added",
+      "notes": "2 printings, avg €26.99"
+    },
+    {
+      "name": "Klauth, Unrivaled Ancient",
+      "category": "auto-added",
+      "notes": "2 printings, avg €26.94"
+    },
+    {
+      "name": "Raffine's Tower",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13.46"
+    },
+    {
+      "name": "Delighted Halfling",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.83"
+    },
+    {
+      "name": "Trinisphere",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.8"
+    },
+    {
+      "name": "Katara, Waterbending Master",
+      "category": "auto-added",
+      "notes": "2 printings, avg €26.63"
+    },
+    {
+      "name": "Arwen, Mortal Queen",
+      "category": "auto-added",
+      "notes": "4 printings, avg €17.75"
+    },
+    {
+      "name": "Circle of Protection: White",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €26.49"
+    },
+    {
+      "name": "Meticulous Archive",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.65"
+    },
+    {
+      "name": "Beseech the Mirror",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.64"
+    },
+    {
+      "name": "Circle of Protection: Blue",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €26.32"
+    },
+    {
+      "name": "Plague Rats",
+      "category": "auto-added",
+      "notes": "9 printings, avg €26.26"
+    },
+    {
+      "name": "The Legend of Roku // Avatar Roku",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13.13"
+    },
+    {
+      "name": "Spectator Seating",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13.05"
+    },
+    {
+      "name": "Terra, Magical Adept // Esper Terra",
+      "category": "auto-added",
+      "notes": "6 printings, avg €13.03"
+    },
+    {
+      "name": "Emeria, the Sky Ruin",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.37"
+    },
+    {
+      "name": "Deranged Hermit",
+      "category": "auto-added",
+      "notes": "Staple (avg €52.05), 1 printings"
+    },
+    {
+      "name": "Greensleeves, Maro-Sorcerer",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.22"
+    },
+    {
+      "name": "Caverns of Despair",
+      "category": "auto-added",
+      "notes": "Staple (avg €51.51), 1 printings"
+    },
+    {
+      "name": "Murktide Regent",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.84"
+    },
+    {
+      "name": "Adun Oakenshield",
+      "category": "auto-added",
+      "notes": "Staple (avg €51.28), 1 printings"
+    },
+    {
+      "name": "Ivory Cup",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €25.64"
+    },
+    {
+      "name": "Tranquility",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (15 printings), avg €25.62"
+    },
+    {
+      "name": "Rograkh, Son of Rohgahh",
+      "category": "auto-added",
+      "notes": "4 printings, avg €25.59"
+    },
+    {
+      "name": "Raugrin Triome",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.79"
+    },
+    {
+      "name": "Camouflage",
+      "category": "auto-added",
+      "notes": "3 printings, avg €25.56"
+    },
+    {
+      "name": "Mycosynth Lattice",
+      "category": "auto-added",
+      "notes": "3 printings, avg €16.98"
+    },
+    {
+      "name": "Horn of Greed",
+      "category": "auto-added",
+      "notes": "3 printings, avg €16.89"
+    },
+    {
+      "name": "Ugin's Labyrinth",
+      "category": "auto-added",
+      "notes": "3 printings, avg €16.81"
+    },
+    {
+      "name": "Danny Pink",
+      "category": "auto-added",
+      "notes": "2 printings, avg €25.21"
+    },
+    {
+      "name": "Lightning, Army of One",
+      "category": "auto-added",
+      "notes": "4 printings, avg €16.76"
+    },
+    {
+      "name": "Burrowing",
+      "category": "auto-added",
+      "notes": "9 printings, avg €25.11"
+    },
+    {
+      "name": "Training Center",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.5"
+    },
+    {
+      "name": "Urabrask // The Great Work",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.49"
+    },
+    {
+      "name": "Academy Rector",
+      "category": "auto-added",
+      "notes": "1 printing, avg €49.86"
+    },
+    {
+      "name": "Hunting Velociraptor",
+      "category": "auto-added",
+      "notes": "1 printing, avg €49.6"
+    },
+    {
+      "name": "Hammer of Nazahn",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.39"
+    },
+    {
+      "name": "Ral, Crackling Wit",
+      "category": "auto-added",
+      "notes": "3 printings, avg €16.52"
+    },
+    {
+      "name": "Tergrid, God of Fright // Tergrid's Lantern",
+      "category": "auto-added",
+      "notes": "6 printings, avg €12.36"
+    },
+    {
+      "name": "Inventors' Fair",
+      "category": "auto-added",
+      "notes": "5 printings, avg €12.3"
+    },
+    {
+      "name": "Kokusho, the Evening Star",
+      "category": "auto-added",
+      "notes": "3 printings, avg €16.38"
+    },
+    {
+      "name": "Yavimaya Hollow",
+      "category": "auto-added",
+      "notes": "1 printing, avg €49.11"
+    },
+    {
+      "name": "Willow Satyr",
+      "category": "auto-added",
+      "notes": "1 printing, avg €48.89"
+    },
+    {
+      "name": "Nuka-Cola Vending Machine",
+      "category": "auto-added",
+      "notes": "2 printings, avg €24.42"
+    },
+    {
+      "name": "Valakut Awakening // Valakut Stoneforge",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.16"
+    },
+    {
+      "name": "Gravity Sphere",
+      "category": "auto-added",
+      "notes": "1 printing, avg €48.5"
+    },
+    {
+      "name": "Rod of Ruin",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (17 printings), avg €16.14"
+    },
+    {
+      "name": "Squandered Resources",
+      "category": "auto-added",
+      "notes": "1 printing, avg €48.25"
+    },
+    {
+      "name": "Yuan Shao, the Indecisive",
+      "category": "auto-added",
+      "notes": "1 printing, avg €48.23"
+    },
+    {
+      "name": "Uncivil Unrest",
+      "category": "auto-added",
+      "notes": "3 printings, avg €16.05"
+    },
+    {
+      "name": "Painter's Servant",
+      "category": "auto-added",
+      "notes": "2 printings, avg €24.04"
+    },
+    {
+      "name": "Psychic Venom",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €23.91"
+    },
+    {
+      "name": "Mana Matrix",
+      "category": "auto-added",
+      "notes": "1 printing, avg €47.43"
+    },
+    {
+      "name": "Voice of Victory",
+      "category": "auto-added",
+      "notes": "3 printings, avg €15.61"
+    },
+    {
+      "name": "All Will Be One",
+      "category": "auto-added",
+      "notes": "2 printings, avg €23.38"
+    },
+    {
+      "name": "Grim Hireling",
+      "category": "auto-added",
+      "notes": "3 printings, avg €15.54"
+    },
+    {
+      "name": "Grand Abolisher",
+      "category": "auto-added",
+      "notes": "9 printings, avg €11.65"
+    },
+    {
+      "name": "Pearled Unicorn",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €23.3"
+    },
+    {
+      "name": "Ghalta, Stampede Tyrant",
+      "category": "auto-added",
+      "notes": "3 printings, avg €15.53"
+    },
+    {
+      "name": "Green Ward",
+      "category": "auto-added",
+      "notes": "8 printings, avg €23.08"
+    },
+    {
+      "name": "Mana Echoes",
+      "category": "auto-added",
+      "notes": "2 printings, avg €23.06"
+    },
+    {
+      "name": "Deceit",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.94"
+    },
+    {
+      "name": "Ulamog, the Ceaseless Hunger // Ulamog, the Ceaseless Hunger",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.93"
+    },
+    {
+      "name": "Fear",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (16 printings), avg €22.9"
+    },
+    {
+      "name": "Blightsteel Colossus // Blightsteel Colossus",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.89"
+    },
+    {
+      "name": "Triumph of the Hordes",
+      "category": "auto-added",
+      "notes": "3 printings, avg €15.21"
+    },
+    {
+      "name": "Disharmony",
+      "category": "auto-added",
+      "notes": "1 printing, avg €45.38"
+    },
+    {
+      "name": "Polyraptor",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.98"
+    },
+    {
+      "name": "Vigor",
+      "category": "auto-added",
+      "notes": "5 printings, avg €11.22"
+    },
+    {
+      "name": "Bitterbloom Bearer",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.41"
+    },
+    {
+      "name": "Sliver Overlord",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.34"
+    },
+    {
+      "name": "Jin Sakai, Ghost of Tsushima",
+      "category": "auto-added",
+      "notes": "1 printing, avg €44.47"
+    },
+    {
+      "name": "Charismatic Conqueror",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.19"
+    },
+    {
+      "name": "Drudge Skeletons",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (20 printings), avg €22.18"
+    },
+    {
+      "name": "Avatar Roku, Firebender",
+      "category": "auto-added",
+      "notes": "2 printings, avg €22.02"
+    },
+    {
+      "name": "Greymond, Avacyn's Stalwart",
+      "category": "auto-added",
+      "notes": "1 printing, avg €44.01"
+    },
+    {
+      "name": "Thundering Falls",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.6"
+    },
+    {
+      "name": "Warren Soultrader",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.58"
+    },
+    {
+      "name": "Cavern-Hoard Dragon",
+      "category": "auto-added",
+      "notes": "2 printings, avg €21.81"
+    },
+    {
+      "name": "Seize the Spotlight",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.48"
+    },
+    {
+      "name": "Exalted Sunborn",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.38"
+    },
+    {
+      "name": "Xiahou Dun, the One-Eyed",
+      "category": "auto-added",
+      "notes": "1 printing, avg €43.12"
+    },
+    {
+      "name": "Norin the Wary // Norin the Wary",
+      "category": "auto-added",
+      "notes": "2 printings, avg €21.5"
+    },
+    {
+      "name": "Library of Leng",
+      "category": "auto-added",
+      "notes": "9 printings, avg €21.49"
+    },
+    {
+      "name": "Sword of Light and Shadow",
+      "category": "auto-added",
+      "notes": "6 printings, avg €10.74"
+    },
+    {
+      "name": "Faerie Mastermind",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.26"
+    },
+    {
+      "name": "Seize the Day",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.26"
+    },
+    {
+      "name": "Yoshimaru, Ever Faithful",
+      "category": "auto-added",
+      "notes": "3 printings, avg €21.39"
+    },
+    {
+      "name": "Planar Gate",
+      "category": "auto-added",
+      "notes": "1 printing, avg €42.72"
+    },
+    {
+      "name": "Stifle",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.24"
+    },
+    {
+      "name": "Liliana, Dreadhorde General",
+      "category": "auto-added",
+      "notes": "6 printings, avg €21.3"
+    },
+    {
+      "name": "Unholy Strength",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (20 printings), avg €21.29"
+    },
+    {
+      "name": "Spell Blast",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €21.28"
+    },
+    {
+      "name": "Liliana of the Dark Realms",
+      "category": "auto-added",
+      "notes": "5 printings, avg €14.15"
+    },
+    {
+      "name": "The Walls of Ba Sing Se",
+      "category": "auto-added",
+      "notes": "2 printings, avg €21.22"
+    },
+    {
+      "name": "It That Betrays",
+      "category": "auto-added",
+      "notes": "4 printings, avg €14.14"
+    },
+    {
+      "name": "Orcish Artillery",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €21.21"
+    },
+    {
+      "name": "Underground Mortuary",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.11"
+    },
+    {
+      "name": "The Gaffer",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.1"
+    },
+    {
+      "name": "Phyrexian Devourer",
+      "category": "auto-added",
+      "notes": "1 printing, avg €41.94"
+    },
+    {
+      "name": "Gate to Phyrexia",
+      "category": "auto-added",
+      "notes": "1 printing, avg €41.91"
+    },
+    {
+      "name": "Clive, Ifrit's Dominant // Ifrit, Warden of Inferno",
+      "category": "auto-added",
+      "notes": "8 printings, avg €10.46"
+    },
+    {
+      "name": "Gwen Stacy // Ghost-Spider",
+      "category": "auto-added",
+      "notes": "6 printings, avg €10.46"
+    },
+    {
+      "name": "Creature Bond",
+      "category": "auto-added",
+      "notes": "8 printings, avg €20.85"
+    },
+    {
+      "name": "Jet Medallion",
+      "category": "auto-added",
+      "notes": "7 printings, avg €10.36"
+    },
+    {
+      "name": "Goblin Balloon Brigade",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €20.59"
+    },
+    {
+      "name": "The Fifteenth Doctor",
+      "category": "auto-added",
+      "notes": "1 printing, avg €40.91"
+    },
+    {
+      "name": "Cruel Tutor",
+      "category": "auto-added",
+      "notes": "3 printings, avg €20.38"
+    },
+    {
+      "name": "Valgavoth, Terror Eater",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.57"
+    },
+    {
+      "name": "Hammerheim",
+      "category": "auto-added",
+      "notes": "2 printings, avg €20.34"
+    },
+    {
+      "name": "Calix, Guided by Fate",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.55"
+    },
+    {
+      "name": "Imperial Recruiter",
+      "category": "auto-added",
+      "notes": "5 printings, avg €20.29"
+    },
+    {
+      "name": "Gaea's Avenger",
+      "category": "auto-added",
+      "notes": "1 printing, avg €40.48"
+    },
+    {
+      "name": "Bitterthorn, Nissa's Animus",
+      "category": "auto-added",
+      "notes": "2 printings, avg €20.21"
+    },
+    {
+      "name": "Aminatou, the Fateshifter",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13.47"
+    },
+    {
+      "name": "Giant Growth",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (39 printings), avg €13.44"
+    },
+    {
+      "name": "Awaken the Woods",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.42"
+    },
+    {
+      "name": "Shadowy Backstreet",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.41"
+    },
+    {
+      "name": "Rohgahh of Kher Keep",
+      "category": "auto-added",
+      "notes": "1 printing, avg €40.03"
+    },
+    {
+      "name": "The Cabbage Merchant",
+      "category": "auto-added",
+      "notes": "2 printings, avg €20.01"
+    },
+    {
+      "name": "Wistfulness",
+      "category": "auto-added",
+      "notes": "2 printings, avg €20"
+    },
+    {
+      "name": "Monument to Endurance",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.28"
+    },
+    {
+      "name": "Harvester of Misery",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.15"
+    },
+    {
+      "name": "Ashcoat of the Shadow Swarm",
+      "category": "auto-added",
+      "notes": "1 printing, avg €39.35"
+    },
+    {
+      "name": "Doubling Cube",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.09"
+    },
+    {
+      "name": "Mossborn Hydra",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.09"
+    },
+    {
+      "name": "Lady Zhurong, Warrior Queen",
+      "category": "auto-added",
+      "notes": "1 printing, avg €39.23"
+    },
+    {
+      "name": "Capture of Jingzhou",
+      "category": "auto-added",
+      "notes": "2 printings, avg €39.11"
+    },
+    {
+      "name": "Doubling Cube // Doubling Cube",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19.47"
+    },
+    {
+      "name": "Astral Dragon",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19.41"
+    },
+    {
+      "name": "Shizo, Death's Storehouse",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19.38"
+    },
+    {
+      "name": "Moonshadow",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19.37"
+    },
+    {
+      "name": "Winds of Change",
+      "category": "auto-added",
+      "notes": "9 printings, avg €9.63"
+    },
+    {
+      "name": "Wild-Magic Sorcerer",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.84"
+    },
+    {
+      "name": "Archfiend of Despair",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19.25"
+    },
+    {
+      "name": "Rin and Seri, Inseparable",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19.2"
+    },
+    {
+      "name": "Wolf Pack",
+      "category": "auto-added",
+      "notes": "1 printing, avg €38.2"
+    },
+    {
+      "name": "Hedge Maze",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.67"
+    },
+    {
+      "name": "Silver Drake",
+      "category": "auto-added",
+      "notes": "2 printings, avg €38.01"
+    },
+    {
+      "name": "Gisela, the Broken Blade // Brisela, Voice of Nightmares",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19"
+    },
+    {
+      "name": "Wolverine Riders",
+      "category": "auto-added",
+      "notes": "2 printings, avg €19"
+    },
+    {
+      "name": "Rionya, Fire Dancer",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.64"
+    },
+    {
+      "name": "Nesting Dovehawk",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.91"
+    },
+    {
+      "name": "Stone Rain",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (25 printings), avg €12.55"
+    },
+    {
+      "name": "Urza's Workshop",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.77"
+    },
+    {
+      "name": "Evendo, Waking Haven",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.51"
+    },
+    {
+      "name": "Lara Croft, Tomb Raider",
+      "category": "auto-added",
+      "notes": "1 printing, avg €37.4"
+    },
+    {
+      "name": "Ezio Auditore da Firenze",
+      "category": "auto-added",
+      "notes": "3 printings, avg €18.63"
+    },
+    {
+      "name": "Passionate Archaeologist",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.63"
+    },
+    {
+      "name": "Ravenous Tyrannosaurus",
+      "category": "auto-added",
+      "notes": "1 printing, avg €37.22"
+    },
+    {
+      "name": "Righteous Fury",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.61"
+    },
+    {
+      "name": "Grand Arbiter Augustin IV",
+      "category": "auto-added",
+      "notes": "7 printings, avg €9.3"
+    },
+    {
+      "name": "Spara's Headquarters",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.39"
+    },
+    {
+      "name": "Humility",
+      "category": "auto-added",
+      "notes": "1 printing, avg €37.08"
+    },
+    {
+      "name": "Holy Strength",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (16 printings), avg €18.52"
+    },
+    {
+      "name": "Beza, the Bounding Spring",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.33"
+    },
+    {
+      "name": "Storm World",
+      "category": "auto-added",
+      "notes": "1 printing, avg €36.89"
+    },
+    {
+      "name": "Formidable Speaker",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.38"
+    },
+    {
+      "name": "Persistent Constrictor",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.38"
+    },
+    {
+      "name": "Scorched Ruins",
+      "category": "auto-added",
+      "notes": "1 printing, avg €36.75"
+    },
+    {
+      "name": "Eladamri, Lord of Leaves",
+      "category": "auto-added",
+      "notes": "1 printing, avg €36.73"
+    },
+    {
+      "name": "Jump",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (10 printings), avg €18.26"
+    },
+    {
+      "name": "Iroas, God of Victory",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.17"
+    },
+    {
+      "name": "Knowledge Vault",
+      "category": "auto-added",
+      "notes": "1 printing, avg €36.45"
+    },
+    {
+      "name": "Incarnation Technique",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.12"
+    },
+    {
+      "name": "Zuko, Firebending Master",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.17"
+    },
+    {
+      "name": "Zhang He, Wei General",
+      "category": "auto-added",
+      "notes": "1 printing, avg €36.31"
+    },
+    {
+      "name": "Sliver Gravemother",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18.11"
+    },
+    {
+      "name": "Zhou Yu, Chief Commander",
+      "category": "auto-added",
+      "notes": "1 printing, avg €36.19"
+    },
+    {
+      "name": "Okaun, Eye of Chaos // Okaun, Eye of Chaos",
+      "category": "auto-added",
+      "notes": "2 printings, avg €18"
+    },
+    {
+      "name": "Realms Uncharted",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.99"
+    },
+    {
+      "name": "Urborg",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.95"
+    },
+    {
+      "name": "Samite Healer",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (15 printings), avg €17.91"
+    },
+    {
+      "name": "Darksteel Monolith",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.9"
+    },
+    {
+      "name": "Constant Mists",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.89"
+    },
+    {
+      "name": "Nicol Bolas",
+      "category": "auto-added",
+      "notes": "6 printings, avg €17.87"
+    },
+    {
+      "name": "Temporal Manipulation",
+      "category": "auto-added",
+      "notes": "6 printings, avg €11.91"
+    },
+    {
+      "name": "Regrowth",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €17.83"
+    },
+    {
+      "name": "Regeneration",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (17 printings), avg €17.82"
+    },
+    {
+      "name": "Juggernaut",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (21 printings), avg €17.81"
+    },
+    {
+      "name": "Keldon Warlord",
+      "category": "auto-added",
+      "notes": "9 printings, avg €11.87"
+    },
+    {
+      "name": "Overlord of the Hauntwoods",
+      "category": "auto-added",
+      "notes": "3 printings, avg €11.82"
+    },
+    {
+      "name": "Gloomlake Verge",
+      "category": "auto-added",
+      "notes": "3 printings, avg €11.81"
+    },
+    {
+      "name": "Hexing Squelcher",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.68"
+    },
+    {
+      "name": "Scythecat Cub",
+      "category": "auto-added",
+      "notes": "1 printing, avg €35.18"
+    },
+    {
+      "name": "Fireball",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (28 printings), avg €11.72"
+    },
+    {
+      "name": "Delayed Blast Fireball",
+      "category": "auto-added",
+      "notes": "3 printings, avg €11.7"
+    },
+    {
+      "name": "Hurkyl's Recall",
+      "category": "auto-added",
+      "notes": "9 printings, avg €11.67"
+    },
+    {
+      "name": "Gamble",
+      "category": "auto-added",
+      "notes": "9 printings, avg €11.65"
+    },
+    {
+      "name": "The Ghoul, Gunslinger",
+      "category": "auto-added",
+      "notes": "1 printing, avg €34.95"
+    },
+    {
+      "name": "Oath of Druids",
+      "category": "auto-added",
+      "notes": "3 printings, avg €17.47"
+    },
+    {
+      "name": "Welcome to . . . // Jurassic Park",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.46"
+    },
+    {
+      "name": "Phlage, Titan of Fire's Fury",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.38"
+    },
+    {
+      "name": "Kratos, God of War",
+      "category": "auto-added",
+      "notes": "1 printing, avg €34.54"
+    },
+    {
+      "name": "Spawning Kraken",
+      "category": "auto-added",
+      "notes": "2 printings, avg €17.24"
+    },
+    {
+      "name": "Final Fortune",
+      "category": "auto-added",
+      "notes": "5 printings, avg €11.48"
+    },
+    {
+      "name": "Persistent Petitioners",
+      "category": "auto-added",
+      "notes": "5 printings, avg €17.08"
+    },
+    {
+      "name": "Aluren",
+      "category": "auto-added",
+      "notes": "1 printing, avg €34.06"
+    },
+    {
+      "name": "Wall of Wood",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (11 printings), avg €17.01"
+    },
+    {
+      "name": "Circle of Protection: Green",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €17"
+    },
+    {
+      "name": "Alela, Cunning Conqueror",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.95"
+    },
+    {
+      "name": "Timber Protector",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.9"
+    },
+    {
+      "name": "Expropriate",
+      "category": "auto-added",
+      "notes": "3 printings, avg €11.26"
+    },
+    {
+      "name": "Krark's Thumb // Krark's Thumb",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.88"
+    },
+    {
+      "name": "Hei Bai, Forest Guardian",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.87"
+    },
+    {
+      "name": "Inkmoth Nexus",
+      "category": "auto-added",
+      "notes": "5 printings, avg €11.22"
+    },
+    {
+      "name": "Undergrowth Stadium",
+      "category": "auto-added",
+      "notes": "5 printings, avg €11.21"
+    },
+    {
+      "name": "Chronicle of Victory",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.81"
+    },
+    {
+      "name": "Spitting Dilophosaurus",
+      "category": "auto-added",
+      "notes": "1 printing, avg €33.62"
+    },
+    {
+      "name": "Holy Armor",
+      "category": "auto-added",
+      "notes": "8 printings, avg €16.74"
+    },
+    {
+      "name": "Pixie Queen",
+      "category": "auto-added",
+      "notes": "1 printing, avg €33.43"
+    },
+    {
+      "name": "Telekinesis",
+      "category": "auto-added",
+      "notes": "1 printing, avg €33.21"
+    },
+    {
+      "name": "Uthros, Titanic Godcore",
+      "category": "auto-added",
+      "notes": "3 printings, avg €11.07"
+    },
+    {
+      "name": "Ensnaring Bridge",
+      "category": "auto-added",
+      "notes": "7 printings, avg €11.06"
+    },
+    {
+      "name": "Oboro, Palace in the Clouds",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.54"
+    },
+    {
+      "name": "Scathe Zombies",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (16 printings), avg €16.46"
+    },
+    {
+      "name": "Appa, Steadfast Guardian",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.45"
+    },
+    {
+      "name": "Fomori Vault",
+      "category": "auto-added",
+      "notes": "4 printings, avg €16.44"
+    },
+    {
+      "name": "Arcane Signet",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (54 printings), avg €4.69"
+    },
+    {
+      "name": "Witch's Clinic",
+      "category": "auto-added",
+      "notes": "3 printings, avg €10.93"
+    },
+    {
+      "name": "Summon: Knights of Round",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.35"
+    },
+    {
+      "name": "Tsabo's Web",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16.32"
+    },
+    {
+      "name": "Preacher",
+      "category": "auto-added",
+      "notes": "1 printing, avg €32.6"
+    },
+    {
+      "name": "Ramses Overdark",
+      "category": "auto-added",
+      "notes": "1 printing, avg €32.38"
+    },
+    {
+      "name": "Master of the Hunt",
+      "category": "auto-added",
+      "notes": "1 printing, avg €32.34"
+    },
+    {
+      "name": "Underworld Dreams",
+      "category": "auto-added",
+      "notes": "8 printings, avg €16.14"
+    },
+    {
+      "name": "Wall of Fire",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (17 printings), avg €16.13"
+    },
+    {
+      "name": "Descent into Avernus",
+      "category": "auto-added",
+      "notes": "4 printings, avg €10.72"
+    },
+    {
+      "name": "Avatar Kyoshi, Earthbender",
+      "category": "auto-added",
+      "notes": "2 printings, avg €16"
+    },
+    {
+      "name": "The Immortal Sun",
+      "category": "auto-added",
+      "notes": "3 printings, avg €10.64"
+    },
+    {
+      "name": "Miles Morales // Ultimate Spider-Man",
+      "category": "auto-added",
+      "notes": "8 printings, avg €7.95"
+    },
+    {
+      "name": "Subtlety",
+      "category": "auto-added",
+      "notes": "4 printings, avg €10.58"
+    },
+    {
+      "name": "Brazen Borrower // Petty Theft",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €7.93"
+    },
+    {
+      "name": "Lady Evangela",
+      "category": "auto-added",
+      "notes": "1 printing, avg €31.71"
+    },
+    {
+      "name": "Orcish Oriflamme",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €15.77"
+    },
+    {
+      "name": "Pang Tong, \"Young Phoenix\"",
+      "category": "auto-added",
+      "notes": "1 printing, avg €31.47"
+    },
+    {
+      "name": "Zhuge Jin, Wu Strategist",
+      "category": "auto-added",
+      "notes": "1 printing, avg €31.17"
+    },
+    {
+      "name": "Ancient Greenwarden",
+      "category": "auto-added",
+      "notes": "5 printings, avg €10.29"
+    },
+    {
+      "name": "Fiery Emancipation",
+      "category": "auto-added",
+      "notes": "4 printings, avg €10.29"
+    },
+    {
+      "name": "Norn's Choirmaster",
+      "category": "auto-added",
+      "notes": "2 printings, avg €15.38"
+    },
+    {
+      "name": "Aang, Airbending Master",
+      "category": "auto-added",
+      "notes": "2 printings, avg €15.36"
+    },
+    {
+      "name": "Storm of Saruman",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.32"
+    },
+    {
+      "name": "Al-abara's Carpet",
+      "category": "auto-added",
+      "notes": "1 printing, avg €30.63"
+    },
+    {
+      "name": "Tezzeret, Master of the Bridge",
+      "category": "auto-added",
+      "notes": "2 printings, avg €15.27"
+    },
+    {
+      "name": "Liliana Vess // Liliana Vess",
+      "category": "auto-added",
+      "notes": "2 printings, avg €15.2"
+    },
+    {
+      "name": "Kardur, Doomscourge // Kardur, Doomscourge",
+      "category": "auto-added",
+      "notes": "2 printings, avg €15.18"
+    },
+    {
+      "name": "Unsummon",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (24 printings), avg €10.11"
+    },
+    {
+      "name": "Yuna, Hope of Spira",
+      "category": "auto-added",
+      "notes": "3 printings, avg €15.15"
+    },
+    {
+      "name": "Endurance",
+      "category": "auto-added",
+      "notes": "5 printings, avg €10.1"
+    },
+    {
+      "name": "Atomize",
+      "category": "auto-added",
+      "notes": "2 printings, avg €15.13"
+    },
+    {
+      "name": "Dwarven Demolition Team",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.13"
+    },
+    {
+      "name": "Raise Dead",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (20 printings), avg €15.1"
+    },
+    {
+      "name": "Tibalt's Trickery",
+      "category": "auto-added",
+      "notes": "5 printings, avg €10.06"
+    },
+    {
+      "name": "Fog",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (21 printings), avg €15.04"
+    },
+    {
+      "name": "Mijae Djinn",
+      "category": "auto-added",
+      "notes": "4 printings, avg €15.03"
+    },
+    {
+      "name": "Darkness",
+      "category": "auto-added",
+      "notes": "4 printings, avg €10"
+    },
+    {
+      "name": "Hatred",
+      "category": "auto-added",
+      "notes": "1 printing, avg €29.98"
+    },
+    {
+      "name": "Wand of Orcus",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.99"
+    },
+    {
+      "name": "Twinning Staff",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.93"
+    },
+    {
+      "name": "Dismember",
+      "category": "auto-added",
+      "notes": "8 printings, avg €9.92"
+    },
+    {
+      "name": "Prosper, Tome-Bound",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.87"
+    },
+    {
+      "name": "Crypt Ghast",
+      "category": "auto-added",
+      "notes": "5 printings, avg €9.9"
+    },
+    {
+      "name": "Thousand-Year Elixir",
+      "category": "auto-added",
+      "notes": "6 printings, avg €9.89"
+    },
+    {
+      "name": "Malleable Impostor",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.82"
+    },
+    {
+      "name": "Storm, Force of Nature",
+      "category": "auto-added",
+      "notes": "1 printing, avg €29.62"
+    },
+    {
+      "name": "Burning of Xinye",
+      "category": "auto-added",
+      "notes": "1 printing, avg €29.55"
+    },
+    {
+      "name": "Borrowing the East Wind",
+      "category": "auto-added",
+      "notes": "1 printing, avg €29.51"
+    },
+    {
+      "name": "Flayer of Loyalties",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.75"
+    },
+    {
+      "name": "Illustrious Wanderglyph",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.75"
+    },
+    {
+      "name": "Weakness",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €14.74"
+    },
+    {
+      "name": "Treachery",
+      "category": "auto-added",
+      "notes": "1 printing, avg €29.42"
+    },
+    {
+      "name": "Halfdane",
+      "category": "auto-added",
+      "notes": "1 printing, avg €29.24"
+    },
+    {
+      "name": "Flight",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (14 printings), avg €14.58"
+    },
+    {
+      "name": "Hill Giant",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (16 printings), avg €14.56"
+    },
+    {
+      "name": "The Black Gate",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.54"
+    },
+    {
+      "name": "Craw Wurm",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (13 printings), avg €14.48"
+    },
+    {
+      "name": "Devastation",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.48"
+    },
+    {
+      "name": "Dystopia",
+      "category": "auto-added",
+      "notes": "1 printing, avg €28.84"
+    },
+    {
+      "name": "Steam Vents // Steam Vents",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.42"
+    },
+    {
+      "name": "Livonya Silone",
+      "category": "auto-added",
+      "notes": "1 printing, avg €28.79"
+    },
+    {
+      "name": "Starfield of Nyx",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.13"
+    },
+    {
+      "name": "Wilhelt, the Rotcleaver",
+      "category": "auto-added",
+      "notes": "3 printings, avg €14.13"
+    },
+    {
+      "name": "Snuff Out",
+      "category": "auto-added",
+      "notes": "7 printings, avg €9.42"
+    },
+    {
+      "name": "Urza's Tower",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (20 printings), avg €5.63"
+    },
+    {
+      "name": "Jin-Gitaxias // The Great Synthesis",
+      "category": "auto-added",
+      "notes": "6 printings, avg €14.05"
+    },
+    {
+      "name": "Dragonborn Champion",
+      "category": "auto-added",
+      "notes": "2 printings, avg €14.02"
+    },
+    {
+      "name": "Sun Ce, Young Conquerer",
+      "category": "auto-added",
+      "notes": "1 printing, avg €27.88"
+    },
+    {
+      "name": "Filigree Vector",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.9"
+    },
+    {
+      "name": "Ozai, the Phoenix King",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.86"
+    },
+    {
+      "name": "Currency Converter",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.84"
+    },
+    {
+      "name": "Iron Man, Titan of Innovation",
+      "category": "auto-added",
+      "notes": "1 printing, avg €27.49"
+    },
+    {
+      "name": "Captain America, First Avenger",
+      "category": "auto-added",
+      "notes": "1 printing, avg €27.47"
+    },
+    {
+      "name": "Pest Control",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.72"
+    },
+    {
+      "name": "Tombstone Stairwell",
+      "category": "auto-added",
+      "notes": "1 printing, avg €27.38"
+    },
+    {
+      "name": "Blood Crypt // Blood Crypt",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.65"
+    },
+    {
+      "name": "Determined Iteration",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.56"
+    },
+    {
+      "name": "The Celestial Toymaker",
+      "category": "auto-added",
+      "notes": "1 printing, avg €27.12"
+    },
+    {
+      "name": "Chivalric Alliance",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.52"
+    },
+    {
+      "name": "Shinka, the Bloodsoaked Keep",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.48"
+    },
+    {
+      "name": "Triskelion",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (12 printings), avg €13.47"
+    },
+    {
+      "name": "Relic of Sauron",
+      "category": "auto-added",
+      "notes": "3 printings, avg €13.43"
+    },
+    {
+      "name": "Xun Yu, Wei Advisor",
+      "category": "auto-added",
+      "notes": "1 printing, avg €26.76"
+    },
+    {
+      "name": "Arena of Glory",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.34"
+    },
+    {
+      "name": "Consecrate Land",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13.26"
+    },
+    {
+      "name": "Guardian Augmenter",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.25"
+    },
+    {
+      "name": "Elves of Deep Shadow",
+      "category": "auto-added",
+      "notes": "7 printings, avg €8.83"
+    },
+    {
+      "name": "Aesi, Tyrant of Gyre Strait // Aesi, Tyrant of Gyre Strait",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.08"
+    },
+    {
+      "name": "The Aetherspark",
+      "category": "auto-added",
+      "notes": "2 printings, avg €13.04"
+    },
+    {
+      "name": "Chimil, the Inner Sun",
+      "category": "auto-added",
+      "notes": "4 printings, avg €13"
+    },
+    {
+      "name": "Reverberation",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.9"
+    },
+    {
+      "name": "Guan Yu's 1,000-Li March",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.75"
+    },
+    {
+      "name": "Llanowar Elves",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (35 printings), avg €8.55"
+    },
+    {
+      "name": "Artist's Talent",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.82"
+    },
+    {
+      "name": "Attrition",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.82"
+    },
+    {
+      "name": "Spinal Villain",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.63"
+    },
+    {
+      "name": "Hallowed Fountain // Hallowed Fountain",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.81"
+    },
+    {
+      "name": "Sauron, the Lidless Eye",
+      "category": "auto-added",
+      "notes": "2 printings, avg €25.59"
+    },
+    {
+      "name": "Huang Zhong, Shu General",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.55"
+    },
+    {
+      "name": "Masticore",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.4"
+    },
+    {
+      "name": "Helm of Obedience",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.35"
+    },
+    {
+      "name": "Bothersome Quasit",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.66"
+    },
+    {
+      "name": "Ragnar",
+      "category": "auto-added",
+      "notes": "1 printing, avg €25.17"
+    },
+    {
+      "name": "Codsworth, Handy Helper",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.57"
+    },
+    {
+      "name": "Kor Haven",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.5"
+    },
+    {
+      "name": "Sword of Body and Mind",
+      "category": "auto-added",
+      "notes": "3 printings, avg €12.45"
+    },
+    {
+      "name": "Aesi, Tyrant of Gyre Strait",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.41"
+    },
+    {
+      "name": "Unbound Flourishing",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.41"
+    },
+    {
+      "name": "Slicer, Hired Muscle // Slicer, High-Speed Antagonist",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.39"
+    },
+    {
+      "name": "Zuo Ci, the Mocking Sage",
+      "category": "auto-added",
+      "notes": "1 printing, avg €24.72"
+    },
+    {
+      "name": "Palinchron",
+      "category": "auto-added",
+      "notes": "1 printing, avg €24.65"
+    },
+    {
+      "name": "Death Baron // Death Baron",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.32"
+    },
+    {
+      "name": "Dragonlord Dromoka",
+      "category": "auto-added",
+      "notes": "7 printings, avg €8.21"
+    },
+    {
+      "name": "Army of Allah",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.29"
+    },
+    {
+      "name": "Command Tower",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (73 printings), avg €3.06"
+    },
+    {
+      "name": "Opalescence",
+      "category": "auto-added",
+      "notes": "1 printing, avg €24.44"
+    },
+    {
+      "name": "Multiversal Passage",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.2"
+    },
+    {
+      "name": "Najeela, the Blade-Blossom",
+      "category": "auto-added",
+      "notes": "6 printings, avg €12.17"
+    },
+    {
+      "name": "Rukh Egg",
+      "category": "auto-added",
+      "notes": "4 printings, avg €12.14"
+    },
+    {
+      "name": "Tangle Wire",
+      "category": "auto-added",
+      "notes": "1 printing, avg €24.28"
+    },
+    {
+      "name": "Overgrown Tomb // Overgrown Tomb",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.13"
+    },
+    {
+      "name": "Ring of Immortals",
+      "category": "auto-added",
+      "notes": "1 printing, avg €24.11"
+    },
+    {
+      "name": "Echo of Eons",
+      "category": "auto-added",
+      "notes": "2 printings, avg €12.05"
+    },
+    {
+      "name": "Healing Salve",
+      "category": "auto-added",
+      "notes": "Heavily reprinted (18 printings), avg €12.05"
+    },
+    {
+      "name": "Aragorn and Arwen, Wed",
+      "category": "auto-added",
+      "notes": "2 printings, avg €24.04"
+    },
+    {
+      "name": "Mind Over Matter",
+      "category": "auto-added",
+      "notes": "1 printing, avg €23.96"
+    },
+    {
+      "name": "Jacques le Vert",
+      "category": "auto-added",
+      "notes": "1 printing, avg €23.9"
+    },
+    {
+      "name": "Karn, Legacy Reforged",
+      "category": "auto-added",
+      "notes": "3 printings, avg €11.95"
+    }
   ]
 }
