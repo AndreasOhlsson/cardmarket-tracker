@@ -4,7 +4,7 @@ import { mkdirSync, existsSync, unlinkSync } from "node:fs";
 import { dirname } from "node:path";
 import { getConfig } from "./config.js";
 import { initializeDatabase } from "./db/schema.js";
-import { upsertWatchlistEntry, getCardsByName } from "./db/queries.js";
+import { upsertWatchlistEntry, getCardsByName, getLatestPrice, get30DayAvgPrice } from "./db/queries.js";
 import {
   downloadMtgjsonGzToDisk,
   streamJsonDataEntries,
@@ -181,20 +181,35 @@ async function main() {
     unlinkSync(config.allPricesCachePath);
 
     // Step 6: Populate watchlist table from JSON
+    // Only add printings with latest price >= €10 (skip cheap reprints/promos)
     const watchlist = loadWatchlist(config.watchlistPath);
     let watchlistMatches = 0;
+    let watchlistSkipped = 0;
 
     const insertWatchlist = db.transaction(() => {
       for (const card of watchlist) {
         const dbCards = getCardsByName(db, card.name);
         for (const dbCard of dbCards) {
+          const latest = getLatestPrice(db, dbCard.uuid);
+          const price = latest?.cm_trend ?? null;
+          const avg = get30DayAvgPrice(db, dbCard.uuid);
+          // Skip if we have price data and both current and avg are below floor
+          if (price !== null && price < config.priceFloorEur && (avg === null || avg < config.priceFloorEur)) {
+            watchlistSkipped++;
+            continue;
+          }
+          // Skip if no price data at all (digital-only sets)
+          if (price === null && avg === null) {
+            watchlistSkipped++;
+            continue;
+          }
           upsertWatchlistEntry(db, dbCard.uuid, card.notes);
           watchlistMatches++;
         }
       }
     });
     insertWatchlist();
-    console.log(`Watchlist: ${watchlistMatches} UUIDs from ${watchlist.length} card names`);
+    console.log(`Watchlist: ${watchlistMatches} UUIDs from ${watchlist.length} card names (skipped ${watchlistSkipped} under €${config.priceFloorEur})`);
 
     console.log("Seed complete!");
   } finally {
