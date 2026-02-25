@@ -1,9 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/hooks/use-api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
+import CardHoverPreview from "@/components/card-hover-preview";
+import { cn } from "@/lib/utils";
+
+function scryfallSmallUrl(scryfallId: string): string {
+  return `https://cards.scryfall.io/small/front/${scryfallId[0]}/${scryfallId[1]}/${scryfallId}.jpg`;
+}
 
 interface PipelineStats {
   totalCards: number;
@@ -11,12 +16,6 @@ interface PipelineStats {
   totalDeals: number;
   watchlistSize: number;
   latestPriceDate: string | null;
-}
-
-interface DealStatRow {
-  deal_type: string;
-  date: string;
-  count: number;
 }
 
 interface DealRow {
@@ -33,15 +32,60 @@ interface DealRow {
   scryfall_id: string | null;
 }
 
+interface WatchlistRow {
+  uuid: string;
+  name: string;
+  set_code: string | null;
+  scryfall_id: string | null;
+  latest_price: number | null;
+  pct_change: number | null;
+}
+
+function MoverRow({ card, rank }: { card: WatchlistRow; rank: number }) {
+  return (
+    <Link
+      to={`/card/${card.uuid}`}
+      className="flex items-center justify-between py-2 border-b border-border/30 last:border-0 hover:bg-muted/20 -mx-2 px-2 rounded transition-colors"
+    >
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-muted-foreground w-5">{rank}.</span>
+        {card.scryfall_id && (
+          <CardHoverPreview scryfallId={card.scryfall_id}>
+            <img
+              src={scryfallSmallUrl(card.scryfall_id)}
+              alt=""
+              className="w-10 h-auto rounded-sm"
+              loading="lazy"
+            />
+          </CardHoverPreview>
+        )}
+        <span className="text-sm font-medium">{card.name}</span>
+        {card.set_code && (
+          <span className="text-xs text-muted-foreground">{card.set_code}</span>
+        )}
+      </div>
+      <div className="font-mono text-sm flex items-center gap-3">
+        {card.latest_price != null && (
+          <span className="text-muted-foreground">€{card.latest_price.toFixed(2)}</span>
+        )}
+        {card.pct_change != null && (
+          <span className={cn(
+            "min-w-16 text-right",
+            card.pct_change < 0 ? "text-deal-trend-drop" : "text-positive",
+          )}>
+            {card.pct_change > 0 ? "+" : ""}
+            {(card.pct_change * 100).toFixed(1)}%
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
 export default function StatsPage() {
   const { data: stats, isPending: statsPending } = useQuery({
     queryKey: ["pipeline-stats"],
     queryFn: () => apiFetch<PipelineStats>("/stats/pipeline"),
-  });
-
-  const { data: dealStats } = useQuery({
-    queryKey: ["deal-stats"],
-    queryFn: () => apiFetch<DealStatRow[]>("/deals/stats"),
   });
 
   const { data: topDrops } = useQuery({
@@ -49,21 +93,15 @@ export default function StatsPage() {
     queryFn: () => apiFetch<DealRow[]>("/deals?sort=pct_change&sortDir=asc&limit=10"),
   });
 
-  const chartData = dealStats
-    ? Object.values(
-        dealStats.reduce(
-          (acc, row) => {
-            if (!acc[row.date]) acc[row.date] = { date: row.date, trend_drop: 0, new_low: 0, watchlist_alert: 0 };
-            const entry = acc[row.date]!;
-            if (row.deal_type === "trend_drop") entry.trend_drop = row.count;
-            if (row.deal_type === "new_low") entry.new_low = row.count;
-            if (row.deal_type === "watchlist_alert") entry.watchlist_alert = row.count;
-            return acc;
-          },
-          {} as Record<string, { date: string; trend_drop: number; new_low: number; watchlist_alert: number }>,
-        ),
-      ).sort((a, b) => a.date.localeCompare(b.date))
-    : [];
+  const { data: losers } = useQuery({
+    queryKey: ["watchlist-losers"],
+    queryFn: () => apiFetch<WatchlistRow[]>("/watchlist?sort=pct_change&sortDir=asc&limit=10"),
+  });
+
+  const { data: gainers } = useQuery({
+    queryKey: ["watchlist-gainers"],
+    queryFn: () => apiFetch<WatchlistRow[]>("/watchlist?sort=pct_change&sortDir=desc&limit=10"),
+  });
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -92,9 +130,9 @@ export default function StatsPage() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Total Deals</p>
+                <p className="text-xs text-muted-foreground">Watchlist Size</p>
                 <p className="font-mono text-2xl text-foreground">
-                  {stats?.totalDeals.toLocaleString()}
+                  {stats?.watchlistSize.toLocaleString()}
                 </p>
               </CardContent>
             </Card>
@@ -110,38 +148,47 @@ export default function StatsPage() {
         )}
       </div>
 
-      {chartData.length > 0 && (
-        <Card className="mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card>
           <CardHeader>
-            <CardTitle className="font-display text-lg">Deals by Day</CardTitle>
+            <CardTitle className="font-display text-lg">Watchlist Losers</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.30 0.03 80 / 0.3)" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: "oklch(0.65 0.02 80)", fontSize: 11 }}
-                  tickFormatter={(v: string) => v.slice(5)}
-                />
-                <YAxis tick={{ fill: "oklch(0.65 0.02 80)", fontSize: 11 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "oklch(0.18 0.02 250)",
-                    border: "1px solid oklch(0.30 0.03 80)",
-                    borderRadius: "0.5rem",
-                    color: "oklch(0.93 0.01 80)",
-                    fontSize: "12px",
-                  }}
-                />
-                <Bar dataKey="trend_drop" fill="oklch(0.58 0.22 25)" name="Trend Drop" />
-                <Bar dataKey="new_low" fill="oklch(0.62 0.18 250)" name="New Low" />
-                <Bar dataKey="watchlist_alert" fill="oklch(0.75 0.15 75)" name="Watchlist" />
-              </BarChart>
-            </ResponsiveContainer>
+            {losers ? (
+              <div className="space-y-1">
+                {losers.filter(c => c.pct_change != null && c.pct_change < 0).map((card, i) => (
+                  <MoverRow key={card.uuid} card={card} rank={i + 1} />
+                ))}
+                {losers.filter(c => c.pct_change != null && c.pct_change < 0).length === 0 && (
+                  <p className="text-sm text-muted-foreground py-4 text-center">No losers right now</p>
+                )}
+              </div>
+            ) : (
+              <Skeleton className="h-48" />
+            )}
           </CardContent>
         </Card>
-      )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-display text-lg">Watchlist Gainers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {gainers ? (
+              <div className="space-y-1">
+                {gainers.filter(c => c.pct_change != null && c.pct_change > 0).map((card, i) => (
+                  <MoverRow key={card.uuid} card={card} rank={i + 1} />
+                ))}
+                {gainers.filter(c => c.pct_change != null && c.pct_change > 0).length === 0 && (
+                  <p className="text-sm text-muted-foreground py-4 text-center">No gainers right now</p>
+                )}
+              </div>
+            ) : (
+              <Skeleton className="h-48" />
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {topDrops && topDrops.length > 0 && (
         <Card>
@@ -151,18 +198,26 @@ export default function StatsPage() {
           <CardContent>
             <div className="space-y-2">
               {topDrops.map((deal, i) => (
-                <div
+                <Link
                   key={deal.id}
-                  className="flex items-center justify-between py-2 border-b border-border/30 last:border-0"
+                  to={`/card/${deal.uuid}`}
+                  className="flex items-center justify-between py-2 border-b border-border/30 last:border-0 hover:bg-muted/20 -mx-2 px-2 rounded transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground w-5">{i + 1}.</span>
-                    <Link
-                      to={`/card/${deal.uuid}`}
-                      className="text-sm font-medium hover:text-primary transition-colors"
-                    >
+                    {deal.scryfall_id && (
+                      <CardHoverPreview scryfallId={deal.scryfall_id}>
+                        <img
+                          src={scryfallSmallUrl(deal.scryfall_id)}
+                          alt=""
+                          className="w-10 h-auto rounded-sm"
+                          loading="lazy"
+                        />
+                      </CardHoverPreview>
+                    )}
+                    <span className="text-sm font-medium">
                       {deal.name}
-                    </Link>
+                    </span>
                     {deal.set_code && (
                       <span className="text-xs text-muted-foreground">{deal.set_code}</span>
                     )}
@@ -175,7 +230,7 @@ export default function StatsPage() {
                       €{deal.current_price.toFixed(2)}
                     </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </CardContent>
