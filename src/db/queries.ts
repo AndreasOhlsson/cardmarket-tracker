@@ -391,13 +391,10 @@ export function searchCards(db: Database.Database, query: string, limit: number 
   return db
     .prepare(
       `SELECT c.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id,
-              lp.cm_trend as latest_price
+              (SELECT p.cm_trend FROM prices p
+               WHERE p.uuid = c.uuid AND p.cm_trend IS NOT NULL
+               ORDER BY p.date DESC LIMIT 1) as latest_price
        FROM cards c
-       LEFT JOIN (
-         SELECT uuid, cm_trend,
-                ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY date DESC) as rn
-         FROM prices WHERE cm_trend IS NOT NULL
-       ) lp ON c.uuid = lp.uuid AND lp.rn = 1
        WHERE c.name LIKE @query AND c.commander_legal = 1
        ORDER BY c.name ASC
        LIMIT @limit`,
@@ -418,29 +415,26 @@ export function getCardPrintings(db: Database.Database, name: string): CardRow[]
 }
 
 export function getPipelineStats(db: Database.Database): PipelineStatsRow {
-  const totalCards = (
-    db.prepare("SELECT COUNT(*) as count FROM cards WHERE commander_legal = 1").get() as {
-      count: number;
-    }
-  ).count;
-  const totalPrices = (
-    db.prepare("SELECT COUNT(*) as count FROM prices").get() as { count: number }
-  ).count;
-  const totalDeals = (
-    db.prepare("SELECT COUNT(*) as count FROM deals").get() as { count: number }
-  ).count;
-  const watchlistSize = (
-    db.prepare("SELECT COUNT(*) as count FROM watchlist").get() as { count: number }
-  ).count;
-  const latestRow = db
-    .prepare("SELECT MAX(date) as latest_date FROM prices")
-    .get() as { latest_date: string | null } | undefined;
+  const row = db
+    .prepare(
+      `SELECT
+         (SELECT COUNT(*) FROM cards WHERE commander_legal = 1) as totalCards,
+         (SELECT COUNT(*) FROM deals) as totalDeals,
+         (SELECT COUNT(*) FROM watchlist) as watchlistSize,
+         (SELECT MAX(date) FROM prices) as latestPriceDate`,
+    )
+    .get() as { totalCards: number; totalDeals: number; watchlistSize: number; latestPriceDate: string | null };
+
+  // prices COUNT is the expensive one (6.7M rows) — use max(id) as a fast proxy
+  const priceCountRow = db
+    .prepare("SELECT MAX(id) as totalPrices FROM prices")
+    .get() as { totalPrices: number | null };
 
   return {
-    totalCards,
-    totalPrices,
-    totalDeals,
-    watchlistSize,
-    latestPriceDate: latestRow?.latest_date ?? null,
+    totalCards: row.totalCards,
+    totalPrices: priceCountRow.totalPrices ?? 0,
+    totalDeals: row.totalDeals,
+    watchlistSize: row.watchlistSize,
+    latestPriceDate: row.latestPriceDate,
   };
 }

@@ -45,6 +45,7 @@ export function initializeDatabase(db: Database.Database): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_prices_uuid_date ON prices(uuid, date);
+    CREATE INDEX IF NOT EXISTS idx_prices_date ON prices(date);
     CREATE INDEX IF NOT EXISTS idx_deals_date ON deals(date);
     CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name);
     CREATE INDEX IF NOT EXISTS idx_cards_commander ON cards(commander_legal);
