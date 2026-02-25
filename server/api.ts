@@ -6,8 +6,10 @@ import { initializeDatabase } from "../src/db/schema.js";
 import {
   getCardByUuid,
   getDealsFiltered,
+  getDealsFilteredCount,
   getDealStats,
   getWatchlistWithCards,
+  getWatchlistCount,
   searchCards,
   getPriceHistory,
   getCardDeals,
@@ -27,12 +29,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = process.env.DB_PATH ?? path.join(__dirname, "..", "data", "tracker.db");
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
 
-const db = new Database(DB_PATH, { readonly: true });
-db.pragma("journal_mode = WAL");
-initializeDatabase(db);
-
+// Write handle first — creates the DB file and schema if missing
 const writeDb = new Database(DB_PATH);
 writeDb.pragma("journal_mode = WAL");
+initializeDatabase(writeDb);
+
+const db = new Database(DB_PATH, { readonly: true });
+db.pragma("journal_mode = WAL");
 
 const app = express();
 app.use(express.json());
@@ -49,7 +52,9 @@ app.get("/api/deals", (req, res) => {
     limit: req.query.limit ? Number(req.query.limit) : 50,
     offset: req.query.offset ? Number(req.query.offset) : 0,
   };
-  res.json(getDealsFiltered(db, filter));
+  const items = getDealsFiltered(db, filter);
+  const total = getDealsFilteredCount(db, filter);
+  res.json({ items, total });
 });
 
 app.get("/api/deals/stats", (_req, res) => {
@@ -65,11 +70,12 @@ app.get("/api/watchlist", (req, res) => {
     offset: req.query.offset ? Number(req.query.offset) : 0,
   };
   const rows = getWatchlistWithCards(db, filter);
+  const total = getWatchlistCount(db, filter);
   const enriched = rows.map((row) => ({
     ...row,
     signal: computeDealSignal(row.latest_price, row.avg_30d, row.historical_low),
   }));
-  res.json(enriched);
+  res.json({ items: enriched, total });
 });
 
 app.get("/api/cards/search", (req, res) => {
@@ -137,6 +143,7 @@ app.get("/{*path}", (_req, res) => {
   res.sendFile(path.join(webDist, "index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`Dashboard API running at http://localhost:${PORT}`);
+const HOST = process.env.HOST ?? "0.0.0.0";
+app.listen(PORT, HOST, () => {
+  console.log(`Dashboard API running at http://${HOST}:${PORT}`);
 });

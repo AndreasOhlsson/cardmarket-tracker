@@ -1,9 +1,7 @@
 "use client"
 
 import * as React from "react"
-import CheckIcon from "lucide-react/dist/esm/icons/check"
-import ChevronDownIcon from "lucide-react/dist/esm/icons/chevron-down"
-import ChevronUpIcon from "lucide-react/dist/esm/icons/chevron-up"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import { Select as SelectPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"

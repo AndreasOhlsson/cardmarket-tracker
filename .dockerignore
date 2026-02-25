@@ -1,0 +1,13 @@
+node_modules/
+web/node_modules/
+dist/
+web/dist/
+data/
+.env
+.git/
+.claude/
+tests/
+docs/
+*.db
+*.db-shm
+*.db-wal
