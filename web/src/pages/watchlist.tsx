@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useState, useDeferredValue } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useDeferredValue, useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
 import CardHoverPreview from "@/components/card-hover-preview";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,15 @@ interface WatchlistRow {
 }
 
 type SortKey = "name" | "latest_price" | "avg_30d" | "avg_90d" | "pct_change";
+const VALID_SORTS: SortKey[] = ["name", "latest_price", "avg_30d", "avg_90d", "pct_change"];
+
+function parseSortKey(value: string | null): SortKey {
+  return VALID_SORTS.includes(value as SortKey) ? (value as SortKey) : "name";
+}
+
+function parseSortDir(value: string | null): "asc" | "desc" {
+  return value === "desc" ? "desc" : "asc";
+}
 
 function scryfallImageUrl(scryfallId: string | null): string | null {
   if (!scryfallId) return null;
@@ -62,21 +71,61 @@ function SortableHead({
 
 export default function WatchlistPage() {
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const deferredSearch = useDeferredValue(search);
-  const [page, setPage] = useState(0);
-  const [sort, setSort] = useState<SortKey>("name");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [searchParams, setSearchParams] = useSearchParams();
   const pageSize = 50;
+
+  // Read state from URL
+  const sort = parseSortKey(searchParams.get("sort"));
+  const sortDir = parseSortDir(searchParams.get("dir"));
+  const page = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10) || 0);
+  const urlSearch = searchParams.get("q") ?? "";
+
+  // Local search state for debounce — initialise from URL
+  const [search, setSearch] = useState(urlSearch);
+  const deferredSearch = useDeferredValue(search);
+
+  // Sync deferred search back to URL
+  useEffect(() => {
+    const current = searchParams.get("q") ?? "";
+    if (deferredSearch !== current) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (deferredSearch) {
+          next.set("q", deferredSearch);
+        } else {
+          next.delete("q");
+        }
+        next.delete("page");
+        return next;
+      }, { replace: true });
+    }
+  }, [deferredSearch, searchParams, setSearchParams]);
+
+  const updateParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        for (const [k, v] of Object.entries(updates)) {
+          if (v == null || v === "" || (k === "sort" && v === "name") || (k === "dir" && v === "asc") || (k === "page" && v === "0")) {
+            next.delete(k);
+          } else {
+            next.set(k, v);
+          }
+        }
+        return next;
+      }, { replace: true });
+    },
+    [setSearchParams],
+  );
 
   function handleSort(key: SortKey) {
     if (sort === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      const newDir = sortDir === "asc" ? "desc" : "asc";
+      updateParams({ dir: newDir, page: "0" });
     } else {
-      setSort(key);
-      setSortDir(key === "name" ? "asc" : "desc");
+      const newDir = key === "name" ? "asc" : "desc";
+      updateParams({ sort: key, dir: newDir, page: "0" });
     }
-    setPage(0);
   }
 
   const { data: cards, isPending, isFetching } = useQuery({
@@ -100,10 +149,7 @@ export default function WatchlistPage() {
         <Input
           placeholder="Search cards..."
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(0);
-          }}
+          onChange={(e) => setSearch(e.target.value)}
           className="w-64"
         />
       </div>
@@ -211,7 +257,7 @@ export default function WatchlistPage() {
       {cards && cards.length > 0 && (
         <div className="flex justify-center gap-4 mt-4">
           <button
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            onClick={() => updateParams({ page: String(Math.max(0, page - 1)) })}
             disabled={page === 0}
             className="text-sm text-primary disabled:text-muted-foreground"
           >
@@ -219,7 +265,7 @@ export default function WatchlistPage() {
           </button>
           <span className="text-sm text-muted-foreground">Page {page + 1}</span>
           <button
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => updateParams({ page: String(page + 1) })}
             disabled={cards.length < pageSize}
             className="text-sm text-primary disabled:text-muted-foreground"
           >

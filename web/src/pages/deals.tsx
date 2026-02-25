@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState, useDeferredValue } from "react";
+import { useState, useDeferredValue, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
 import DealCard from "@/components/deal-card";
 import { Input } from "@/components/ui/input";
@@ -20,24 +21,68 @@ interface DealRow {
   scryfall_id: string | null;
 }
 
+const VALID_SORTS = ["date", "pct_change", "current_price"];
+const VALID_TYPES = ["all", "trend_drop", "new_low", "watchlist_alert"];
+
 export default function DealsPage() {
-  const [dealType, setDealType] = useState<string>("all");
-  const [minPrice, setMinPrice] = useState<string>("");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Read state from URL
+  const dealType = VALID_TYPES.includes(searchParams.get("type") ?? "all")
+    ? (searchParams.get("type") ?? "all")
+    : "all";
+  const sort = VALID_SORTS.includes(searchParams.get("sort") ?? "date")
+    ? (searchParams.get("sort") ?? "date")
+    : "date";
+  const urlMinPrice = searchParams.get("minPrice") ?? "";
+
+  // Local minPrice state for debounce — initialise from URL
+  const [minPrice, setMinPrice] = useState(urlMinPrice);
   const deferredMinPrice = useDeferredValue(minPrice);
-  const [sort, setSort] = useState<string>("date");
+
+  // Sync deferred minPrice back to URL
+  useEffect(() => {
+    const current = searchParams.get("minPrice") ?? "";
+    if (deferredMinPrice !== current) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (deferredMinPrice) {
+          next.set("minPrice", deferredMinPrice);
+        } else {
+          next.delete("minPrice");
+        }
+        return next;
+      }, { replace: true });
+    }
+  }, [deferredMinPrice, searchParams, setSearchParams]);
+
+  function updateParam(key: string, value: string) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const isDefault =
+        (key === "type" && value === "all") ||
+        (key === "sort" && value === "date");
+      if (isDefault) {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+      return next;
+    }, { replace: true });
+  }
 
   const sortDir = sort === "date" ? "desc" : "asc";
 
-  const params = new URLSearchParams();
-  if (dealType !== "all") params.set("type", dealType);
-  if (deferredMinPrice) params.set("minPrice", deferredMinPrice);
-  params.set("sort", sort);
-  params.set("sortDir", sortDir);
-  params.set("limit", "100");
+  const apiParams = new URLSearchParams();
+  if (dealType !== "all") apiParams.set("type", dealType);
+  if (deferredMinPrice) apiParams.set("minPrice", deferredMinPrice);
+  apiParams.set("sort", sort);
+  apiParams.set("sortDir", sortDir);
+  apiParams.set("limit", "100");
 
   const { data: deals, isPending } = useQuery({
     queryKey: ["deals", dealType, deferredMinPrice, sort, sortDir],
-    queryFn: () => apiFetch<DealRow[]>(`/deals?${params.toString()}`),
+    queryFn: () => apiFetch<DealRow[]>(`/deals?${apiParams.toString()}`),
   });
 
   return (
@@ -45,7 +90,7 @@ export default function DealsPage() {
       <h1 className="font-display text-3xl text-primary mb-6">Today's Deals</h1>
 
       <div className="flex gap-3 mb-6 flex-wrap">
-        <Select value={dealType} onValueChange={setDealType}>
+        <Select value={dealType} onValueChange={(v) => updateParam("type", v)}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Deal type" />
           </SelectTrigger>
@@ -65,7 +110,7 @@ export default function DealsPage() {
           className="w-36"
         />
 
-        <Select value={sort} onValueChange={setSort}>
+        <Select value={sort} onValueChange={(v) => updateParam("sort", v)}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
