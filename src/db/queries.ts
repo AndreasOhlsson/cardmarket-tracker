@@ -69,6 +69,62 @@ export interface DealWithCardRow extends DealRow {
   name: string;
   set_code: string | null;
   mcm_id: number | null;
+  scryfall_id: string | null;
+}
+
+// --- Dashboard query types ---
+
+export interface DealsFilter {
+  dealType?: string;
+  date?: string;
+  minPrice?: number;
+  sort?: "pct_change" | "current_price" | "date";
+  sortDir?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
+export interface DealStatRow {
+  deal_type: string;
+  date: string;
+  count: number;
+}
+
+export interface WatchlistFilter {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface WatchlistCardRow {
+  uuid: string;
+  name: string;
+  set_code: string | null;
+  set_name: string | null;
+  scryfall_id: string | null;
+  mcm_id: number | null;
+  notes: string | null;
+  latest_price: number | null;
+  avg_30d: number | null;
+  pct_change: number | null;
+}
+
+export interface CardSearchRow {
+  uuid: string;
+  name: string;
+  set_code: string | null;
+  set_name: string | null;
+  scryfall_id: string | null;
+  mcm_id: number | null;
+  latest_price: number | null;
+}
+
+export interface PipelineStatsRow {
+  totalCards: number;
+  totalPrices: number;
+  totalDeals: number;
+  watchlistSize: number;
+  latestPriceDate: string | null;
 }
 
 // --- Cards ---
@@ -212,7 +268,7 @@ export function upsertDeal(db: Database.Database, deal: DealInput): void {
 export function getUnnotifiedDeals(db: Database.Database): DealWithCardRow[] {
   return db
     .prepare(
-      `SELECT d.*, c.name, c.set_code, c.mcm_id
+      `SELECT d.*, c.name, c.set_code, c.mcm_id, c.scryfall_id
        FROM deals d JOIN cards c ON d.uuid = c.uuid
        WHERE d.notified = 0
        ORDER BY d.pct_change ASC`,
@@ -224,4 +280,157 @@ export function markDealsNotified(db: Database.Database, dealIds: number[]): voi
   if (dealIds.length === 0) return;
   const placeholders = dealIds.map(() => "?").join(",");
   db.prepare(`UPDATE deals SET notified = 1 WHERE id IN (${placeholders})`).run(...dealIds);
+}
+
+// --- Dashboard queries ---
+
+export function getDealsFiltered(db: Database.Database, filter: DealsFilter): DealWithCardRow[] {
+  const conditions: string[] = [];
+  const params: Record<string, unknown> = {};
+
+  if (filter.dealType) {
+    conditions.push("d.deal_type = @dealType");
+    params.dealType = filter.dealType;
+  }
+  if (filter.date) {
+    conditions.push("d.date = @date");
+    params.date = filter.date;
+  }
+  if (filter.minPrice) {
+    conditions.push("d.current_price >= @minPrice");
+    params.minPrice = filter.minPrice;
+  }
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const allowedSorts = ["pct_change", "current_price", "date"];
+  const safeSort = allowedSorts.includes(filter.sort ?? "") ? filter.sort : "date";
+  const safeDir = filter.sortDir === "asc" ? "ASC" : "DESC";
+  const limit = filter.limit ?? 50;
+  const offset = filter.offset ?? 0;
+
+  return db
+    .prepare(
+      `SELECT d.*, c.name, c.set_code, c.mcm_id, c.scryfall_id
+       FROM deals d
+       JOIN cards c ON d.uuid = c.uuid
+       ${where}
+       ORDER BY d.${safeSort} ${safeDir}
+       LIMIT @limit OFFSET @offset`,
+    )
+    .all({ ...params, limit, offset }) as DealWithCardRow[];
+}
+
+export function getDealStats(db: Database.Database): DealStatRow[] {
+  return db
+    .prepare(
+      `SELECT deal_type, date, COUNT(*) as count
+       FROM deals
+       GROUP BY deal_type, date
+       ORDER BY date DESC`,
+    )
+    .all() as DealStatRow[];
+}
+
+export function getWatchlistWithCards(
+  db: Database.Database,
+  filter: WatchlistFilter,
+): WatchlistCardRow[] {
+  const conditions: string[] = [];
+  const params: Record<string, unknown> = {};
+
+  if (filter.search) {
+    conditions.push("c.name LIKE @search");
+    params.search = `%${filter.search}%`;
+  }
+
+  const where = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
+  const limit = filter.limit ?? 50;
+  const offset = filter.offset ?? 0;
+
+  return db
+    .prepare(
+      `SELECT
+         w.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id, w.notes,
+         lp.cm_trend as latest_price,
+         avg_p.avg_30d,
+         CASE WHEN avg_p.avg_30d > 0 AND lp.cm_trend IS NOT NULL
+           THEN (lp.cm_trend - avg_p.avg_30d) / avg_p.avg_30d
+           ELSE NULL
+         END as pct_change
+       FROM watchlist w
+       JOIN cards c ON w.uuid = c.uuid
+       LEFT JOIN (
+         SELECT uuid, cm_trend,
+                ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY date DESC) as rn
+         FROM prices WHERE cm_trend IS NOT NULL
+       ) lp ON w.uuid = lp.uuid AND lp.rn = 1
+       LEFT JOIN (
+         SELECT uuid, AVG(cm_trend) as avg_30d
+         FROM prices
+         WHERE cm_trend IS NOT NULL AND date >= date('now', '-30 days')
+         GROUP BY uuid
+       ) avg_p ON w.uuid = avg_p.uuid
+       WHERE 1=1 ${where}
+       ORDER BY c.name ASC
+       LIMIT @limit OFFSET @offset`,
+    )
+    .all({ ...params, limit, offset }) as WatchlistCardRow[];
+}
+
+export function searchCards(db: Database.Database, query: string, limit: number = 20): CardSearchRow[] {
+  return db
+    .prepare(
+      `SELECT c.uuid, c.name, c.set_code, c.set_name, c.scryfall_id, c.mcm_id,
+              lp.cm_trend as latest_price
+       FROM cards c
+       LEFT JOIN (
+         SELECT uuid, cm_trend,
+                ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY date DESC) as rn
+         FROM prices WHERE cm_trend IS NOT NULL
+       ) lp ON c.uuid = lp.uuid AND lp.rn = 1
+       WHERE c.name LIKE @query AND c.commander_legal = 1
+       ORDER BY c.name ASC
+       LIMIT @limit`,
+    )
+    .all({ query: `%${query}%`, limit }) as CardSearchRow[];
+}
+
+export function getCardDeals(db: Database.Database, uuid: string): DealRow[] {
+  return db
+    .prepare(`SELECT * FROM deals WHERE uuid = @uuid ORDER BY date DESC`)
+    .all({ uuid }) as DealRow[];
+}
+
+export function getCardPrintings(db: Database.Database, name: string): CardRow[] {
+  return db
+    .prepare(`SELECT * FROM cards WHERE name = @name AND commander_legal = 1 ORDER BY set_code ASC`)
+    .all({ name }) as CardRow[];
+}
+
+export function getPipelineStats(db: Database.Database): PipelineStatsRow {
+  const totalCards = (
+    db.prepare("SELECT COUNT(*) as count FROM cards WHERE commander_legal = 1").get() as {
+      count: number;
+    }
+  ).count;
+  const totalPrices = (
+    db.prepare("SELECT COUNT(*) as count FROM prices").get() as { count: number }
+  ).count;
+  const totalDeals = (
+    db.prepare("SELECT COUNT(*) as count FROM deals").get() as { count: number }
+  ).count;
+  const watchlistSize = (
+    db.prepare("SELECT COUNT(*) as count FROM watchlist").get() as { count: number }
+  ).count;
+  const latestRow = db
+    .prepare("SELECT MAX(date) as latest_date FROM prices")
+    .get() as { latest_date: string | null } | undefined;
+
+  return {
+    totalCards,
+    totalPrices,
+    totalDeals,
+    watchlistSize,
+    latestPriceDate: latestRow?.latest_date ?? null,
+  };
 }
