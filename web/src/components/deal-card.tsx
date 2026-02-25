@@ -49,67 +49,68 @@ export default function DealCard(props: DealCardProps) {
   const imageUrl = scryfallImageUrl(props.scryfallId);
 
   return (
-    <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-colors">
-      <CardContent className="p-0 flex">
-        {imageUrl && (
-          <Link to={`/card/${props.uuid}`} className="shrink-0">
-            <img
-              src={imageUrl}
-              alt={props.name}
-              className="w-24 h-auto object-cover"
-              loading="lazy"
-            />
-          </Link>
-        )}
-
-        <div className="flex-1 p-4 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className={cn("text-xs", config.className)}>
-                {config.label}
-              </Badge>
-              {props.setCode && (
-                <span className="text-xs text-muted-foreground">{props.setCode}</span>
-              )}
+    <Link to={`/card/${props.uuid}`} className="block">
+      <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-colors cursor-pointer">
+        <CardContent className="p-0 flex">
+          {imageUrl && (
+            <div className="shrink-0">
+              <img
+                src={imageUrl}
+                alt={props.name}
+                className="w-24 h-auto object-cover"
+                loading="lazy"
+              />
             </div>
-            <Link to={`/card/${props.uuid}`}>
-              <h3 className="font-display text-sm font-semibold text-foreground hover:text-primary transition-colors">
+          )}
+
+          <div className="flex-1 p-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant="outline" className={cn("text-xs", config.className)}>
+                  {config.label}
+                </Badge>
+                {props.setCode && (
+                  <span className="text-xs text-muted-foreground">{props.setCode}</span>
+                )}
+              </div>
+              <h3 className="font-display text-sm font-semibold text-foreground">
                 {props.name}
               </h3>
-            </Link>
-          </div>
+            </div>
 
-          <div className="flex items-end justify-between mt-2">
-            <div>
-              <span className="font-mono text-lg font-semibold text-foreground">
-                €{props.currentPrice.toFixed(2)}
-              </span>
-              <span className="text-xs text-muted-foreground ml-2">
-                ← €{props.referencePrice.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={cn(
-                  "font-mono text-sm font-medium",
-                  props.pctChange < 0 ? "text-deal-trend-drop" : "text-positive",
-                )}
-              >
-                {props.pctChange > 0 ? "+" : ""}
-                {pctStr}%
-              </span>
-              <a
-                href={cardmarketUrl(props.name, props.mcmId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline"
-              >
-                Buy →
-              </a>
+            <div className="flex items-end justify-between mt-2">
+              <div>
+                <span className="font-mono text-lg font-semibold text-foreground">
+                  €{props.currentPrice.toFixed(2)}
+                </span>
+                <span className="text-xs text-muted-foreground ml-2">
+                  ← €{props.referencePrice.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "font-mono text-sm font-medium",
+                    props.pctChange < 0 ? "text-deal-trend-drop" : "text-positive",
+                  )}
+                >
+                  {props.pctChange > 0 ? "+" : ""}
+                  {pctStr}%
+                </span>
+                <a
+                  href={cardmarketUrl(props.name, props.mcmId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Buy →
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

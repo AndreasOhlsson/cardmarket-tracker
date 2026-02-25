@@ -92,11 +92,13 @@ export interface DealStatRow {
 
 export interface WatchlistFilter {
   search?: string;
-  sort?: "name" | "latest_price" | "avg_30d" | "pct_change";
+  sort?: "name" | "latest_price" | "avg_30d" | "avg_90d" | "pct_change";
   sortDir?: "asc" | "desc";
   limit?: number;
   offset?: number;
 }
+
+export type DealSignal = "near_low" | "below_avg" | null;
 
 export interface WatchlistCardRow {
   uuid: string;
@@ -107,7 +109,10 @@ export interface WatchlistCardRow {
   mcm_id: number | null;
   notes: string | null;
   latest_price: number | null;
+  foil_price: number | null;
+  historical_low: number | null;
   avg_30d: number | null;
+  avg_90d: number | null;
   pct_change: number | null;
 }
 
@@ -216,6 +221,17 @@ export function get30DayAvgPrice(db: Database.Database, uuid: string): number | 
   return row?.avg_price ?? null;
 }
 
+export function get90DayAvgPrice(db: Database.Database, uuid: string): number | null {
+  const row = db
+    .prepare(
+      `SELECT AVG(cm_trend) as avg_price FROM prices
+       WHERE uuid = ? AND cm_trend IS NOT NULL
+       AND date >= date('now', '-90 days')`,
+    )
+    .get(uuid) as { avg_price: number | null } | undefined;
+  return row?.avg_price ?? null;
+}
+
 export function getHistoricalLowPrice(db: Database.Database, uuid: string): number | null {
   const row = db
     .prepare(
@@ -242,6 +258,34 @@ export function upsertWatchlistEntry(db: Database.Database, uuid: string, notes?
     ON CONFLICT(uuid) DO UPDATE SET notes = excluded.notes
   `,
   ).run(uuid, today, notes ?? null);
+}
+
+export function isOnWatchlist(db: Database.Database, uuid: string): boolean {
+  return db.prepare("SELECT 1 FROM watchlist WHERE uuid = ?").get(uuid) !== undefined;
+}
+
+export function removeWatchlistEntry(db: Database.Database, uuid: string): void {
+  db.prepare("DELETE FROM watchlist WHERE uuid = ?").run(uuid);
+}
+
+export function computeDealSignal(
+  currentPrice: number | null,
+  avg30d: number | null,
+  historicalLow: number | null,
+): DealSignal {
+  if (currentPrice == null) return null;
+
+  if (historicalLow != null && historicalLow > 0) {
+    const distFromLow = (currentPrice - historicalLow) / historicalLow;
+    if (distFromLow <= 0.10) return "near_low";
+  }
+
+  if (avg30d != null && avg30d > 0) {
+    const distFromAvg = (currentPrice - avg30d) / avg30d;
+    if (distFromAvg <= -0.05) return "below_avg";
+  }
+
+  return null;
 }
 
 // --- Deals ---
@@ -349,7 +393,7 @@ export function getWatchlistWithCards(
   const limit = filter.limit ?? 50;
   const offset = filter.offset ?? 0;
 
-  const allowedSorts = ["name", "latest_price", "avg_30d", "pct_change"];
+  const allowedSorts = ["name", "latest_price", "avg_30d", "avg_90d", "pct_change"];
   const sort = allowedSorts.includes(filter.sort ?? "") ? filter.sort! : "name";
   const dir = filter.sortDir === "desc" ? "DESC" : "ASC";
   const nullsLast = dir === "ASC" ? "999999" : "-999999";
@@ -372,9 +416,17 @@ export function getWatchlistWithCards(
            (SELECT p.cm_trend FROM prices p
             WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
             ORDER BY p.date DESC LIMIT 1) as latest_price,
+           (SELECT p.cm_foil_trend FROM prices p
+            WHERE p.uuid = page.uuid
+            ORDER BY p.date DESC LIMIT 1) as foil_price,
+           (SELECT MIN(p.cm_trend) FROM prices p
+            WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL) as historical_low,
            (SELECT AVG(p.cm_trend) FROM prices p
             WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
             AND p.date >= date('now', '-30 days')) as avg_30d,
+           (SELECT AVG(p.cm_trend) FROM prices p
+            WHERE p.uuid = page.uuid AND p.cm_trend IS NOT NULL
+            AND p.date >= date('now', '-90 days')) as avg_90d,
            CASE
              WHEN (SELECT AVG(p2.cm_trend) FROM prices p2
                    WHERE p2.uuid = page.uuid AND p2.cm_trend IS NOT NULL
@@ -405,9 +457,17 @@ export function getWatchlistWithCards(
          (SELECT p.cm_trend FROM prices p
           WHERE p.uuid = w.uuid AND p.cm_trend IS NOT NULL
           ORDER BY p.date DESC LIMIT 1) as latest_price,
+         (SELECT p.cm_foil_trend FROM prices p
+          WHERE p.uuid = w.uuid
+          ORDER BY p.date DESC LIMIT 1) as foil_price,
+         (SELECT MIN(p.cm_trend) FROM prices p
+          WHERE p.uuid = w.uuid AND p.cm_trend IS NOT NULL) as historical_low,
          (SELECT AVG(p.cm_trend) FROM prices p
           WHERE p.uuid = w.uuid AND p.cm_trend IS NOT NULL
           AND p.date >= date('now', '-30 days')) as avg_30d,
+         (SELECT AVG(p.cm_trend) FROM prices p
+          WHERE p.uuid = w.uuid AND p.cm_trend IS NOT NULL
+          AND p.date >= date('now', '-90 days')) as avg_90d,
          CASE
            WHEN (SELECT AVG(p2.cm_trend) FROM prices p2
                  WHERE p2.uuid = w.uuid AND p2.cm_trend IS NOT NULL

@@ -12,6 +12,9 @@ import {
   getHistoricalLowPrice,
   getWatchlistUuids,
   upsertWatchlistEntry,
+  isOnWatchlist,
+  removeWatchlistEntry,
+  computeDealSignal,
   upsertDeal,
   getUnnotifiedDeals,
   markDealsNotified,
@@ -209,6 +212,64 @@ describe("database queries", () => {
 
       const uuids = getWatchlistUuids(db);
       expect(uuids).toEqual(["abc-123"]);
+    });
+  });
+
+  describe("isOnWatchlist", () => {
+    it("returns true when card is on watchlist", () => {
+      upsertCard(db, { uuid: "abc-123", name: "Test", commanderLegal: true });
+      upsertWatchlistEntry(db, "abc-123");
+      expect(isOnWatchlist(db, "abc-123")).toBe(true);
+    });
+
+    it("returns false when card is not on watchlist", () => {
+      expect(isOnWatchlist(db, "nonexistent")).toBe(false);
+    });
+  });
+
+  describe("removeWatchlistEntry", () => {
+    it("removes an existing entry", () => {
+      upsertCard(db, { uuid: "abc-123", name: "Test", commanderLegal: true });
+      upsertWatchlistEntry(db, "abc-123");
+      expect(isOnWatchlist(db, "abc-123")).toBe(true);
+
+      removeWatchlistEntry(db, "abc-123");
+      expect(isOnWatchlist(db, "abc-123")).toBe(false);
+    });
+
+    it("does not throw on non-existent entry", () => {
+      expect(() => removeWatchlistEntry(db, "nonexistent")).not.toThrow();
+    });
+  });
+
+  describe("computeDealSignal", () => {
+    it("returns near_low when price is within 10% of historical low", () => {
+      expect(computeDealSignal(11, 15, 10)).toBe("near_low");
+    });
+
+    it("returns near_low when price equals historical low", () => {
+      expect(computeDealSignal(10, 15, 10)).toBe("near_low");
+    });
+
+    it("returns below_avg when price is 5%+ below 30d avg", () => {
+      expect(computeDealSignal(9, 10, 5)).toBe("below_avg");
+    });
+
+    it("returns near_low when both conditions are met (priority)", () => {
+      // Price is at historical low AND below avg
+      expect(computeDealSignal(10, 15, 10)).toBe("near_low");
+    });
+
+    it("returns null when neither condition is met", () => {
+      expect(computeDealSignal(15, 14, 10)).toBeNull();
+    });
+
+    it("returns null for null current price", () => {
+      expect(computeDealSignal(null, 10, 5)).toBeNull();
+    });
+
+    it("returns null for null avg and historical low", () => {
+      expect(computeDealSignal(10, null, null)).toBeNull();
     });
   });
 

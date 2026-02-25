@@ -14,7 +14,13 @@ import {
   getCardPrintings,
   getPipelineStats,
   get30DayAvgPrice,
+  get90DayAvgPrice,
   getHistoricalLowPrice,
+  getLatestPrice,
+  isOnWatchlist,
+  upsertWatchlistEntry,
+  removeWatchlistEntry,
+  computeDealSignal,
 } from "../src/db/queries.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,7 +31,11 @@ const db = new Database(DB_PATH, { readonly: true });
 db.pragma("journal_mode = WAL");
 initializeDatabase(db);
 
+const writeDb = new Database(DB_PATH);
+writeDb.pragma("journal_mode = WAL");
+
 const app = express();
+app.use(express.json());
 
 // --- API Routes ---
 
@@ -49,12 +59,17 @@ app.get("/api/deals/stats", (_req, res) => {
 app.get("/api/watchlist", (req, res) => {
   const filter = {
     search: req.query.search as string | undefined,
-    sort: req.query.sort as "name" | "latest_price" | "avg_30d" | "pct_change" | undefined,
+    sort: req.query.sort as "name" | "latest_price" | "avg_30d" | "avg_90d" | "pct_change" | undefined,
     sortDir: req.query.sortDir as "asc" | "desc" | undefined,
     limit: req.query.limit ? Number(req.query.limit) : 50,
     offset: req.query.offset ? Number(req.query.offset) : 0,
   };
-  res.json(getWatchlistWithCards(db, filter));
+  const rows = getWatchlistWithCards(db, filter);
+  const enriched = rows.map((row) => ({
+    ...row,
+    signal: computeDealSignal(row.latest_price, row.avg_30d, row.historical_low),
+  }));
+  res.json(enriched);
 });
 
 app.get("/api/cards/search", (req, res) => {
@@ -73,9 +88,15 @@ app.get("/api/cards/:uuid", (req, res) => {
     return;
   }
   const avg30d = get30DayAvgPrice(db, req.params.uuid);
+  const avg90d = get90DayAvgPrice(db, req.params.uuid);
   const historicalLow = getHistoricalLowPrice(db, req.params.uuid);
+  const latestPriceRow = getLatestPrice(db, req.params.uuid);
+  const latestPrice = latestPriceRow?.cm_trend ?? null;
+  const foilPrice = latestPriceRow?.cm_foil_trend ?? null;
+  const signal = computeDealSignal(latestPrice, avg30d, historicalLow);
+  const watched = isOnWatchlist(db, req.params.uuid);
   const printings = getCardPrintings(db, card.name);
-  res.json({ ...card, avg30d, historicalLow, printings });
+  res.json({ ...card, avg30d, avg90d, historicalLow, latestPrice, foilPrice, signal, isWatched: watched, printings });
 });
 
 app.get("/api/cards/:uuid/prices", (req, res) => {
@@ -89,6 +110,24 @@ app.get("/api/cards/:uuid/deals", (req, res) => {
 
 app.get("/api/stats/pipeline", (_req, res) => {
   res.json(getPipelineStats(db));
+});
+
+app.post("/api/watchlist/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const card = getCardByUuid(db, uuid);
+  if (!card) {
+    res.status(404).json({ error: "Card not found" });
+    return;
+  }
+  const notes = req.body?.notes ?? null;
+  upsertWatchlistEntry(writeDb, uuid, notes);
+  res.json({ ok: true });
+});
+
+app.delete("/api/watchlist/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  removeWatchlistEntry(writeDb, uuid);
+  res.json({ ok: true });
 });
 
 // --- Static file serving (production) ---

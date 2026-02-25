@@ -1,10 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { apiFetch } from "@/hooks/use-api";
 import PriceChart from "@/components/price-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,12 @@ interface CardData {
   scryfall_id: string | null;
   mcm_id: number | null;
   avg30d: number | null;
+  avg90d: number | null;
   historicalLow: number | null;
+  latestPrice: number | null;
+  foilPrice: number | null;
+  signal: "near_low" | "below_avg" | null;
+  isWatched: boolean;
   printings: { uuid: string; set_code: string | null; set_name: string | null; scryfall_id: string | null }[];
 }
 
@@ -50,9 +56,15 @@ function cardmarketUrl(name: string, mcmId: number | null): string {
   return `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(name)}`;
 }
 
+const SIGNAL_CONFIG = {
+  near_low: { label: "Near Historical Low", className: "text-deal-new-low bg-deal-new-low/10 border-deal-new-low/30" },
+  below_avg: { label: "Below 30d Avg", className: "text-deal-trend-drop bg-deal-trend-drop/10 border-deal-trend-drop/30" },
+} as const;
+
 export default function CardDetailPage() {
   const { uuid } = useParams<{ uuid: string }>();
   const [days, setDays] = useState("90");
+  const queryClient = useQueryClient();
 
   const { data: card, isPending: cardPending } = useQuery({
     queryKey: ["card", uuid],
@@ -70,6 +82,19 @@ export default function CardDetailPage() {
     queryKey: ["card-deals", uuid],
     queryFn: () => apiFetch<DealRow[]>(`/cards/${uuid}/deals`),
     enabled: !!uuid,
+  });
+
+  const watchlistMutation = useMutation({
+    mutationFn: () => {
+      if (card?.isWatched) {
+        return apiFetch(`/watchlist/${uuid}`, { method: "DELETE" });
+      }
+      return apiFetch(`/watchlist/${uuid}`, { method: "POST" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["card", uuid] });
+      queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+    },
   });
 
   if (cardPending) {
@@ -103,12 +128,51 @@ export default function CardDetailPage() {
         )}
 
         <div className="flex-1">
-          <h1 className="font-display text-3xl text-primary mb-1">{card.name}</h1>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="font-display text-3xl text-primary">{card.name}</h1>
+            <Button
+              variant={card.isWatched ? "default" : "outline"}
+              size="sm"
+              onClick={() => watchlistMutation.mutate()}
+              disabled={watchlistMutation.isPending}
+            >
+              {card.isWatched ? "Watching" : "Watch"}
+            </Button>
+          </div>
           <p className="text-muted-foreground mb-4">
             {card.set_name ? `${card.set_name} (${card.set_code})` : card.set_code}
+            <a
+              href={cardmarketUrl(card.name, card.mcm_id)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline text-sm ml-3"
+            >
+              View on Cardmarket →
+            </a>
           </p>
 
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-4 gap-4 mb-4">
+            <Card className="border-primary/30">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground">Current Price</p>
+                <p className="font-mono text-2xl font-semibold">
+                  {card.latestPrice != null ? `€${card.latestPrice.toFixed(2)}` : "—"}
+                </p>
+                {card.foilPrice != null && (
+                  <p className="font-mono text-sm text-muted-foreground mt-1">
+                    Foil €{card.foilPrice.toFixed(2)}
+                  </p>
+                )}
+                {card.signal && (
+                  <Badge
+                    variant="outline"
+                    className={cn("mt-2 text-xs", SIGNAL_CONFIG[card.signal].className)}
+                  >
+                    {SIGNAL_CONFIG[card.signal].label}
+                  </Badge>
+                )}
+              </CardContent>
+            </Card>
             <Card>
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground">30d Average</p>
@@ -119,23 +183,18 @@ export default function CardDetailPage() {
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Historical Low</p>
+                <p className="text-xs text-muted-foreground">90d Average</p>
                 <p className="font-mono text-lg">
-                  {card.historicalLow != null ? `€${card.historicalLow.toFixed(2)}` : "—"}
+                  {card.avg90d != null ? `€${card.avg90d.toFixed(2)}` : "—"}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground">Cardmarket</p>
-                <a
-                  href={cardmarketUrl(card.name, card.mcm_id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline text-sm"
-                >
-                  View on CM →
-                </a>
+                <p className="text-xs text-muted-foreground">Historical Low</p>
+                <p className="font-mono text-lg">
+                  {card.historicalLow != null ? `€${card.historicalLow.toFixed(2)}` : "—"}
+                </p>
               </CardContent>
             </Card>
           </div>
