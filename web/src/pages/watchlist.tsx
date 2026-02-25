@@ -2,6 +2,7 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useDeferredValue } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
+import CardHoverPreview from "@/components/card-hover-preview";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -141,14 +142,16 @@ export default function WatchlistPage() {
                 onClick={() => navigate(`/card/${card.uuid}`)}
               >
                 <TableCell className="py-2">
-                  {card.scryfall_id && (
-                    <img
-                      src={scryfallImageUrl(card.scryfall_id) ?? ""}
-                      alt=""
-                      className="w-14 h-auto rounded-sm"
-                      loading="lazy"
-                    />
-                  )}
+                  {card.scryfall_id ? (
+                    <CardHoverPreview scryfallId={card.scryfall_id}>
+                      <img
+                        src={scryfallImageUrl(card.scryfall_id) ?? ""}
+                        alt=""
+                        className="w-14 h-auto rounded-sm"
+                        loading="lazy"
+                      />
+                    </CardHoverPreview>
+                  ) : null}
                 </TableCell>
                 <TableCell className="py-2 truncate font-medium">
                   {card.name}

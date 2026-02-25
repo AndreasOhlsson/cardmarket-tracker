@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import CardHoverPreview from "@/components/card-hover-preview";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
@@ -52,15 +53,15 @@ export default function DealCard(props: DealCardProps) {
     <Link to={`/card/${props.uuid}`} className="block">
       <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-colors cursor-pointer">
         <CardContent className="p-0 flex">
-          {imageUrl && (
-            <div className="shrink-0">
+          {imageUrl && props.scryfallId && (
+            <CardHoverPreview scryfallId={props.scryfallId}>
               <img
                 src={imageUrl}
                 alt={props.name}
                 className="w-24 h-auto object-cover"
                 loading="lazy"
               />
-            </div>
+            </CardHoverPreview>
           )}
 
           <div className="flex-1 p-4 flex flex-col justify-between">
