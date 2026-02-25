@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useDeferredValue } from "react";
 import { Link } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
@@ -73,7 +73,7 @@ export default function WatchlistPage() {
     setPage(0);
   }
 
-  const { data: cards, isPending } = useQuery({
+  const { data: cards, isPending, isFetching } = useQuery({
     queryKey: ["watchlist", deferredSearch, page, sort, sortDir],
     queryFn: () => {
       const params = new URLSearchParams();
@@ -84,6 +84,7 @@ export default function WatchlistPage() {
       params.set("offset", String(page * pageSize));
       return apiFetch<WatchlistRow[]>(`/watchlist?${params.toString()}`);
     },
+    placeholderData: keepPreviousData,
   });
 
   return (
@@ -101,16 +102,21 @@ export default function WatchlistPage() {
         />
       </div>
 
-      <div className="rounded-lg border border-border overflow-hidden">
-        <Table>
+      <div className="rounded-lg border border-border overflow-hidden relative">
+        {isFetching && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/30 overflow-hidden z-10">
+            <div className="h-full w-1/3 bg-primary animate-[slide_1s_ease-in-out_infinite]" />
+          </div>
+        )}
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow className="bg-muted/30">
-              <TableHead className="w-10"></TableHead>
-              <SortableHead label="Name" sortKey="name" activeSort={sort} activeDir={sortDir} onSort={handleSort} />
-              <TableHead>Set</TableHead>
-              <SortableHead label="Price" sortKey="latest_price" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortableHead label="30d Avg" sortKey="avg_30d" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortableHead label="Change" sortKey="pct_change" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right" />
+              <TableHead className="w-12"></TableHead>
+              <SortableHead label="Name" sortKey="name" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="w-[40%]" />
+              <TableHead className="w-16">Set</TableHead>
+              <SortableHead label="Price" sortKey="latest_price" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right w-28" />
+              <SortableHead label="30d Avg" sortKey="avg_30d" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right w-28" />
+              <SortableHead label="Change" sortKey="pct_change" activeSort={sort} activeDir={sortDir} onSort={handleSort} className="text-right w-24" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -123,18 +129,18 @@ export default function WatchlistPage() {
                 </TableRow>
               ))}
             {cards?.map((card) => (
-              <TableRow key={card.uuid} className="hover:bg-muted/20">
-                <TableCell>
+              <TableRow key={card.uuid} className="hover:bg-muted/20 h-14">
+                <TableCell className="py-2">
                   {card.scryfall_id && (
                     <img
                       src={scryfallImageUrl(card.scryfall_id) ?? ""}
                       alt=""
-                      className="w-8 h-auto rounded-sm"
+                      className="w-10 h-auto rounded-sm"
                       loading="lazy"
                     />
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="py-2 truncate">
                   <Link
                     to={`/card/${card.uuid}`}
                     className="font-medium hover:text-primary transition-colors"
@@ -142,14 +148,14 @@ export default function WatchlistPage() {
                     {card.name}
                   </Link>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{card.set_code}</TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="py-2 text-muted-foreground">{card.set_code}</TableCell>
+                <TableCell className="py-2 text-right font-mono">
                   {card.latest_price != null ? `€${card.latest_price.toFixed(2)}` : "—"}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="py-2 text-right font-mono text-muted-foreground">
                   {card.avg_30d != null ? `€${card.avg_30d.toFixed(2)}` : "—"}
                 </TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="py-2 text-right font-mono">
                   {card.pct_change != null ? (
                     <span
                       className={cn(

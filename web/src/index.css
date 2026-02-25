@@ -102,3 +102,8 @@
         @apply bg-background text-foreground font-sans antialiased;
     }
 }
+
+@keyframes slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+}
