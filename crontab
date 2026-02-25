@@ -1,0 +1,2 @@
+# Run price pipeline daily at 06:00 UTC
+0 6 * * * . /app/.env.cron; cd /app && node dist/index.js >> /data/pipeline.log 2>&1

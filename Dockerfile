@@ -39,6 +39,10 @@ COPY --from=build /app/web/dist ./web/dist
 COPY server ./server
 COPY src ./src
 
+# Cron schedule + start script
+COPY crontab ./crontab
+COPY start.sh ./start.sh
+
 # Data directory for SQLite (mounted as Fly volume)
 RUN mkdir -p /data
 
@@ -48,4 +52,4 @@ ENV PORT=3001
 
 EXPOSE 3001
 
-CMD ["npx", "tsx", "server/api.ts"]
+CMD ["./start.sh"]
