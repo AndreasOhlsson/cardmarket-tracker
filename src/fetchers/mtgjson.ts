@@ -135,28 +135,21 @@ export async function downloadMtgjsonGzToDisk(url: string, outputPath: string): 
  * Stream-parse entries from a JSON file's "data" key without loading the
  * entire file into memory. Uses stream-json for constant memory usage.
  *
- * NOTE: stream-json is CJS. Dynamic imports with ESM interop — named exports
- * are available directly. If this fails on your Node version, fall back to
- * `createRequire(import.meta.url)` from `node:module`.
+ * NOTE: stream-json is CJS. We use createRequire to avoid ESM subpath
+ * resolution issues (Node requires .js extensions for dynamic imports of
+ * CJS subpaths like "stream-json/filters/Pick").
  */
 export async function* streamJsonDataEntries(
   filePath: string,
 ): AsyncGenerator<{ key: string; value: unknown }> {
-  // stream-json is CJS with no subpath type declarations.
-  // Dynamic imports + interop: named exports may live on the module or on .default.
-  const parserMod = await import("stream-json");
-  // @ts-expect-error — stream-json subpath has no type declarations
-  const pickMod: Record<string, unknown> = await import("stream-json/filters/Pick");
-  // @ts-expect-error — stream-json subpath has no type declarations
-  const streamObjectMod: Record<string, unknown> = await import("stream-json/streamers/StreamObject"); // prettier-ignore
+  const { createRequire } = await import("node:module");
+  const require = createRequire(import.meta.url);
 
   type PipeFn = (...args: unknown[]) => NodeJS.ReadWriteStream;
 
-  const parserFn =
-    parserMod.parser ?? (parserMod as unknown as { default: { parser: PipeFn } }).default.parser;
-  const pickFn = (pickMod.pick ?? (pickMod.default as { pick: PipeFn }).pick) as PipeFn;
-  const streamObjectFn = (streamObjectMod.streamObject ??
-    (streamObjectMod.default as { streamObject: PipeFn }).streamObject) as PipeFn;
+  const { parser: parserFn } = require("stream-json") as { parser: PipeFn };
+  const { pick: pickFn } = require("stream-json/filters/Pick") as { pick: PipeFn };
+  const { streamObject: streamObjectFn } = require("stream-json/streamers/StreamObject") as { streamObject: PipeFn };
 
   const stream = createReadStream(filePath)
     .pipe(parserFn())
