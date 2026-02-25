@@ -78,6 +78,7 @@ export interface DealsFilter {
   dealType?: string;
   date?: string;
   minPrice?: number;
+  search?: string;
   sort?: "pct_change" | "current_price" | "date";
   sortDir?: "asc" | "desc";
   limit?: number;
@@ -330,7 +331,7 @@ export function markDealsNotified(db: Database.Database, dealIds: number[]): voi
 
 // --- Dashboard queries ---
 
-export function getDealsFiltered(db: Database.Database, filter: DealsFilter): DealWithCardRow[] {
+function buildDealsWhere(filter: DealsFilter): { where: string; params: Record<string, unknown> } {
   const conditions: string[] = [];
   const params: Record<string, unknown> = {};
 
@@ -346,8 +347,17 @@ export function getDealsFiltered(db: Database.Database, filter: DealsFilter): De
     conditions.push("d.current_price >= @minPrice");
     params.minPrice = filter.minPrice;
   }
+  if (filter.search) {
+    conditions.push("c.name LIKE @search");
+    params.search = `%${filter.search}%`;
+  }
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  return { where, params };
+}
+
+export function getDealsFiltered(db: Database.Database, filter: DealsFilter): DealWithCardRow[] {
+  const { where, params } = buildDealsWhere(filter);
   const allowedSorts = ["pct_change", "current_price", "date"];
   const safeSort = allowedSorts.includes(filter.sort ?? "") ? filter.sort : "date";
   const safeDir = filter.sortDir === "asc" ? "ASC" : "DESC";
@@ -364,6 +374,14 @@ export function getDealsFiltered(db: Database.Database, filter: DealsFilter): De
        LIMIT @limit OFFSET @offset`,
     )
     .all({ ...params, limit, offset }) as DealWithCardRow[];
+}
+
+export function getDealsFilteredCount(db: Database.Database, filter: DealsFilter): number {
+  const { where, params } = buildDealsWhere(filter);
+
+  return (db.prepare(
+    `SELECT COUNT(*) as count FROM deals d JOIN cards c ON d.uuid = c.uuid ${where}`,
+  ).get(params) as { count: number }).count;
 }
 
 export function getDealStats(db: Database.Database): DealStatRow[] {
@@ -490,6 +508,22 @@ export function getWatchlistWithCards(
        LIMIT @limit OFFSET @offset`,
     )
     .all({ ...params, limit, offset }) as WatchlistCardRow[];
+}
+
+export function getWatchlistCount(db: Database.Database, filter: WatchlistFilter): number {
+  const conditions: string[] = [];
+  const params: Record<string, unknown> = {};
+
+  if (filter.search) {
+    conditions.push("c.name LIKE @search");
+    params.search = `%${filter.search}%`;
+  }
+
+  const where = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
+
+  return (db.prepare(
+    `SELECT COUNT(*) as count FROM watchlist w JOIN cards c ON w.uuid = c.uuid WHERE 1=1 ${where}`,
+  ).get(params) as { count: number }).count;
 }
 
 export function searchCards(db: Database.Database, query: string, limit: number = 20): CardSearchRow[] {

@@ -2,6 +2,7 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useDeferredValue, useCallback, useEffect, useTransition } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
+import { useDebounce } from "@/hooks/use-debounce";
 import CardHoverPreview from "@/components/card-hover-preview";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -89,9 +90,10 @@ export default function WatchlistPage() {
   const page = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10) || 0);
   const urlSearch = searchParams.get("q") ?? "";
 
-  // Local search state for debounce — initialise from URL
+  // Local state → debounce (delay network) → defer (deprioritise render)
   const [search, setSearch] = useState(urlSearch);
-  const deferredSearch = useDeferredValue(search);
+  const debouncedSearch = useDebounce(search, 300);
+  const deferredSearch = useDeferredValue(debouncedSearch);
 
   // Sync deferred search back to URL
   useEffect(() => {
@@ -139,7 +141,7 @@ export default function WatchlistPage() {
     }
   }
 
-  const { data: cards, isPending, isFetching } = useQuery({
+  const { data, isPending, isFetching } = useQuery({
     queryKey: ["watchlist", deferredSearch, page, sort, sortDir],
     queryFn: () => {
       const params = new URLSearchParams();
@@ -148,13 +150,16 @@ export default function WatchlistPage() {
       params.set("sortDir", sortDir);
       params.set("limit", String(pageSize));
       params.set("offset", String(page * pageSize));
-      return apiFetch<WatchlistRow[]>(`/watchlist?${params.toString()}`);
+      return apiFetch<{ items: WatchlistRow[]; total: number }>(`/watchlist?${params.toString()}`);
     },
     placeholderData: keepPreviousData,
   });
+  const cards = data?.items;
+  const total = data?.total;
 
   return (
     <div className="p-4 md:p-6">
+      <title>Watchlist — Cardmarket Tracker</title>
       <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
         <h1 className="font-display text-2xl md:text-3xl text-primary">Watchlist</h1>
         <Input
@@ -165,7 +170,13 @@ export default function WatchlistPage() {
         />
       </div>
 
-      <div className={cn("rounded-lg border border-border overflow-x-auto relative transition-opacity duration-150", isSortPending && "opacity-50")}>
+      {cards && total != null && (
+        <p className="text-sm text-muted-foreground mb-4">
+          Showing {cards.length} of {total} card{total !== 1 ? "s" : ""}
+        </p>
+      )}
+
+      <div className={cn("rounded-lg border border-border overflow-x-auto relative transition-opacity duration-150", (isSortPending || (isFetching && !isPending)) && "opacity-50")}>
         {isFetching && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/30 overflow-hidden z-10">
             <div className="h-full w-1/3 bg-primary animate-[slide_1s_ease-in-out_infinite]" />
@@ -258,7 +269,7 @@ export default function WatchlistPage() {
         </Table>
       </div>
 
-      {cards && cards.length > 0 && (
+      {cards && total != null && total > pageSize && (
         <div className="flex justify-center gap-4 mt-4">
           <button
             onClick={() => updateParams({ page: String(Math.max(0, page - 1)) })}
@@ -267,10 +278,10 @@ export default function WatchlistPage() {
           >
             ← Previous
           </button>
-          <span className="text-sm text-muted-foreground">Page {page + 1}</span>
+          <span className="text-sm text-muted-foreground">Page {page + 1} of {Math.ceil(total / pageSize)}</span>
           <button
             onClick={() => updateParams({ page: String(page + 1) })}
-            disabled={cards.length < pageSize}
+            disabled={(page + 1) * pageSize >= total}
             className="text-sm text-primary disabled:text-muted-foreground"
           >
             Next →

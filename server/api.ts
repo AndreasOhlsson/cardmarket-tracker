@@ -47,6 +47,7 @@ app.get("/api/deals", (req, res) => {
     dealType: req.query.type as string | undefined,
     date: req.query.date as string | undefined,
     minPrice: req.query.minPrice ? Number(req.query.minPrice) : undefined,
+    search: req.query.search as string | undefined,
     sort: req.query.sort as "pct_change" | "current_price" | "date" | undefined,
     sortDir: req.query.sortDir as "asc" | "desc" | undefined,
     limit: req.query.limit ? Number(req.query.limit) : 50,

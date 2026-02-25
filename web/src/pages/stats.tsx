@@ -91,6 +91,7 @@ export default function StatsPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <title>Stats — Cardmarket Tracker</title>
       <h1 className="font-display text-2xl md:text-3xl text-primary mb-6">Stats</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

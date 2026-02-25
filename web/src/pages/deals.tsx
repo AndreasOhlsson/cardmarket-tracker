@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useDeferredValue, useEffect, useTransition } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "@/hooks/use-api";
+import { useDebounce } from "@/hooks/use-debounce";
 import DealCard from "@/components/deal-card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -41,10 +42,15 @@ export default function DealsPage() {
     ? (searchParams.get("sort") ?? "date")
     : "date";
   const urlMinPrice = searchParams.get("minPrice") ?? "";
+  const urlSearch = searchParams.get("q") ?? "";
 
-  // Local minPrice state for debounce — initialise from URL
+  // Local state → debounce (delay network) → defer (deprioritise render)
   const [minPrice, setMinPrice] = useState(urlMinPrice);
-  const deferredMinPrice = useDeferredValue(minPrice);
+  const debouncedMinPrice = useDebounce(minPrice, 300);
+  const deferredMinPrice = useDeferredValue(debouncedMinPrice);
+  const [search, setSearch] = useState(urlSearch);
+  const debouncedSearch = useDebounce(search, 300);
+  const deferredSearch = useDeferredValue(debouncedSearch);
 
   // Sync deferred minPrice back to URL
   useEffect(() => {
@@ -61,6 +67,22 @@ export default function DealsPage() {
       }, { replace: true });
     }
   }, [deferredMinPrice, searchParams, setSearchParams]);
+
+  // Sync deferred search back to URL
+  useEffect(() => {
+    const current = searchParams.get("q") ?? "";
+    if (deferredSearch !== current) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (deferredSearch) {
+          next.set("q", deferredSearch);
+        } else {
+          next.delete("q");
+        }
+        return next;
+      }, { replace: true });
+    }
+  }, [deferredSearch, searchParams, setSearchParams]);
 
   function updateParam(key: string, value: string) {
     startFilterTransition(() => {
@@ -84,20 +106,32 @@ export default function DealsPage() {
   const apiParams = new URLSearchParams();
   if (dealType !== "all") apiParams.set("type", dealType);
   if (deferredMinPrice) apiParams.set("minPrice", deferredMinPrice);
+  if (deferredSearch.length >= 2) apiParams.set("search", deferredSearch);
   apiParams.set("sort", sort);
   apiParams.set("sortDir", sortDir);
   apiParams.set("limit", "100");
 
-  const { data: deals, isPending } = useQuery({
-    queryKey: ["deals", dealType, deferredMinPrice, sort, sortDir],
-    queryFn: () => apiFetch<DealRow[]>(`/deals?${apiParams.toString()}`),
+  const { data, isPending, isFetching } = useQuery({
+    queryKey: ["deals", dealType, deferredMinPrice, deferredSearch, sort, sortDir],
+    queryFn: () => apiFetch<{ items: DealRow[]; total: number }>(`/deals?${apiParams.toString()}`),
+    placeholderData: keepPreviousData,
   });
+  const deals = data?.items;
+  const total = data?.total;
 
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto">
+      <title>Deals — Cardmarket Tracker</title>
       <h1 className="font-display text-2xl md:text-3xl text-primary mb-6 animate-fade-in">Today's Deals</h1>
 
       <div className="flex gap-3 mb-6 flex-wrap animate-fade-in" style={{ animationDelay: "0.05s" }}>
+        <Input
+          placeholder="Search cards..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full sm:w-52"
+        />
+
         <Select value={dealType} onValueChange={(v) => updateParam("type", v)}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Deal type" />
@@ -130,13 +164,13 @@ export default function DealsPage() {
         </Select>
       </div>
 
-      {deals && (
+      {deals && total != null && (
         <p className="text-sm text-muted-foreground mb-4">
-          {deals.length} deal{deals.length !== 1 ? "s" : ""} found
+          Showing {deals.length} of {total} deal{total !== 1 ? "s" : ""}
         </p>
       )}
 
-      <div className={cn("space-y-3 transition-opacity duration-150", isFilterPending && "opacity-50")}>
+      <div className={cn("space-y-3 transition-opacity duration-150", (isFilterPending || (isFetching && !isPending)) && "opacity-50")}>
         {isPending && DEAL_SKELETONS}
         {deals?.map((deal, i) => (
           <DealCard

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import { useState, useTransition } from "react";
+import { useState, useOptimistic, useTransition } from "react";
 import { apiFetch } from "@/hooks/use-api";
 import PriceChart from "@/components/price-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,8 +85,11 @@ export default function CardDetailPage() {
     enabled: !!uuid,
   });
 
+  const [optimisticWatched, setOptimisticWatched] = useOptimistic(card?.isWatched ?? false);
+
   const watchlistMutation = useMutation({
     mutationFn: () => {
+      setOptimisticWatched(!optimisticWatched);
       if (card?.isWatched) {
         return apiFetch(`/watchlist/${uuid}`, { method: "DELETE" });
       }
@@ -117,6 +120,7 @@ export default function CardDetailPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto">
+      <title>{card.name} — Cardmarket Tracker</title>
       <div className="flex flex-col sm:flex-row gap-6 md:gap-8 mb-8">
         {imageUrl && (
           <div className="shrink-0 flex justify-center sm:block animate-fade-in-up">
@@ -132,12 +136,12 @@ export default function CardDetailPage() {
           <div className="flex items-center gap-3 mb-1 flex-wrap">
             <h1 className="font-display text-2xl md:text-3xl text-primary">{card.name}</h1>
             <Button
-              variant={card.isWatched ? "default" : "outline"}
+              variant={optimisticWatched ? "default" : "outline"}
               size="sm"
               onClick={() => watchlistMutation.mutate()}
               disabled={watchlistMutation.isPending}
             >
-              {card.isWatched ? "Watching" : "Watch"}
+              {optimisticWatched ? "Watching" : "Watch"}
             </Button>
           </div>
           <p className="text-muted-foreground mb-4">
