@@ -17,8 +17,8 @@ export default function CardHoverPreview({ scryfallId, children }: CardHoverPrev
   const handleMouseEnter = useCallback(() => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const previewWidth = 224; // w-56
-    const previewHeight = 312; // approximate card aspect ratio
+    const previewWidth = 288; // w-72
+    const previewHeight = 402; // approximate card aspect ratio
     const gap = 12;
 
     const spaceRight = window.innerWidth - rect.right;
@@ -49,7 +49,7 @@ export default function CardHoverPreview({ scryfallId, children }: CardHoverPrev
           <img
             src={scryfallNormalUrl(scryfallId)}
             alt=""
-            className="w-56 rounded-lg shadow-2xl shadow-black/50 ring-1 ring-border/50 animate-card-hover-in"
+            className="w-72 rounded-lg shadow-2xl shadow-black/50 ring-1 ring-border/50 animate-card-hover-in"
           />
         </div>,
         document.body,
