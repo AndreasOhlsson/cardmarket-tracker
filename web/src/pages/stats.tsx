@@ -79,15 +79,17 @@ export default function StatsPage() {
     queryFn: () => apiFetch<PipelineStats>("/stats/pipeline"),
   });
 
-  const { data: losers } = useQuery({
+  const { data: losersData } = useQuery({
     queryKey: ["watchlist-losers"],
-    queryFn: () => apiFetch<WatchlistRow[]>("/watchlist?sort=pct_change&sortDir=asc&limit=10"),
+    queryFn: () => apiFetch<{ items: WatchlistRow[]; total: number }>("/watchlist?sort=pct_change&sortDir=asc&limit=10"),
   });
+  const losers = losersData?.items;
 
-  const { data: gainers } = useQuery({
+  const { data: gainersData } = useQuery({
     queryKey: ["watchlist-gainers"],
-    queryFn: () => apiFetch<WatchlistRow[]>("/watchlist?sort=pct_change&sortDir=desc&limit=10"),
+    queryFn: () => apiFetch<{ items: WatchlistRow[]; total: number }>("/watchlist?sort=pct_change&sortDir=desc&limit=10"),
   });
+  const gainers = gainersData?.items;
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto">
