@@ -21,7 +21,7 @@ fi
 
 # 1. Build and run pipeline
 echo "==> Building..."
-yarn build --silent
+yarn build 2>&1 | tail -1
 
 echo "==> Running pipeline..."
 node dist/src/index.js
