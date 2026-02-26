@@ -44,6 +44,7 @@ const db = new Database(DB_PATH, { readonly: true });
 db.pragma("journal_mode = WAL");
 
 const app = express();
+app.set("trust proxy", 1);
 
 // Security middleware
 app.use(helmet({
